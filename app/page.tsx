@@ -1,9 +1,6 @@
 import Link from "next/link";
 
-/**
- * 主区内容。全站唯一 `WorkspaceLayout` 与统一 `appBreadcrumbTree` 在
- * `app/layout.tsx`（`route-trees` 已并入该处根为 `/` 的树）。
- */
+/** 主区；壳与全站 `appRouter`（`@/config/routes`）由 `app/layout` 提供。 */
 export default function Home() {
   return (
     <div className="space-y-3 p-4 text-sm">

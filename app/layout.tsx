@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import { WorkspaceLayout, type RouteNode } from "@/components/workspace-layout";
+import { WorkspaceLayout } from "@/components/workspace-layout";
+import { appRouter } from "@/config/routes";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,46 +14,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-/**
- * 全站唯一面包屑树（根为 `/`）：`/products/.../phones/:type/:year/:id` 等；`:type` 无 index，`:year` 有 page。
- * （原 `route-trees` / 多 `breadcrumbRoute` 已合并。）
- */
-const appBreadcrumbTree: RouteNode = {
-  path: "/",
-  title: "首页",
-  children: [
-    {
-      path: "products",
-      title: "产品",
-      children: [
-        {
-          path: "phones",
-          title: "手机",
-          children: [
-            {
-              path: ":type",
-              title: "类型",
-              hasPage: false,
-              children: [
-                {
-                  path: ":year",
-                  title: "年份",
-                  children: [
-                    {
-                      path: ":id",
-                      title: "详情",
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -70,7 +31,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <WorkspaceLayout breadcrumbRoute={appBreadcrumbTree} main={children} />
+        <WorkspaceLayout breadcrumbRoute={appRouter} main={children} />
       </body>
     </html>
   );

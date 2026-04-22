@@ -4,20 +4,10 @@ import { Breadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
+import type { Router } from "@/config/routes";
 import { cn } from "@/lib/utils";
 
-/**
- * 路由树节点；子节点 `path` 为相对该级的段，如 `phones`、`:id`。
- * `hasPage` 默认 `true`；无该前缀的独立 page 时显式设 `false`。
- */
-export type RouteNode = {
-  path: string;
-  title: string;
-  hasPage?: boolean;
-  children?: RouteNode[];
-};
-
-export type BreadcrumbItem = {
+type BreadcrumbItem = {
   title: string;
   href: string | null;
   isCurrent: boolean;
@@ -39,21 +29,21 @@ function firstSeg(p: string) {
 const isDyn = (p: string) => firstSeg(p).startsWith(":");
 const matchSeg = (pat: string, u: string) => (isDyn(pat) ? true : firstSeg(pat) === u);
 
-function findChild(ch: RouteNode[], seg: string) {
+function findChild(ch: Router[], seg: string) {
   const s = ch.find((c) => !isDyn(c.path) && firstSeg(c.path) === seg);
   if (s) return s;
   return ch.find((c) => isDyn(c.path));
 }
 
-const hasPage = (n: RouteNode) => n.hasPage !== false;
+const hasPage = (n: Router) => n.hasPage !== false;
 
 function prefixPath(parts: string[], end: number) {
   return end <= 0 ? "/" : `/${parts.slice(0, end).join("/")}`;
 }
 
-type Step = { node: RouteNode; endExclusive: number };
+type Step = { node: Router; endExclusive: number };
 
-function buildSteps(pathname: string, root: RouteNode): Step[] | null {
+function buildSteps(pathname: string, root: Router): Step[] | null {
   const parts = segs(pathname);
   const base = rootSegs(root.path);
   for (let i = 0; i < base.length; i++) {
@@ -74,7 +64,7 @@ function buildSteps(pathname: string, root: RouteNode): Step[] | null {
   return steps;
 }
 
-function buildBreadcrumbItems(pathname: string, root: RouteNode): BreadcrumbItem[] {
+function buildBreadcrumbItems(pathname: string, root: Router): BreadcrumbItem[] {
   const steps = buildSteps(pathname, root);
   if (steps == null || steps.length === 0) return [];
   const parts = segs(pathname);
@@ -92,12 +82,12 @@ function buildBreadcrumbItems(pathname: string, root: RouteNode): BreadcrumbItem
 }
 
 export type RouteBreadcrumbsProps = {
-  route: RouteNode;
+  route: Router;
   className?: string;
 };
 
 /**
- * 根据当前 `pathname` 与路由树匹配面包屑。HeroUI `Breadcrumbs` + `Breadcrumbs.Item`。
+ * 专用于面包屑 UI；`Router` 与全站树见 `@/config/routes`。
  * @see https://heroui.com/docs/react/components/breadcrumbs
  */
 export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
