@@ -4,19 +4,100 @@ import { Breadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
-import type { BreadcrumbRouteNode } from "@/lib/breadcrumb-route";
-import { buildBreadcrumbItems } from "@/lib/breadcrumb-route";
 import { cn } from "@/lib/utils";
 
+/**
+ * 路由树节点；子节点 `path` 为相对该级的段，如 `phones`、`:id`。
+ * `hasPage` 默认 `true`；无该前缀的独立 page 时显式设 `false`。
+ */
+export type RouteNode = {
+  path: string;
+  title: string;
+  hasPage?: boolean;
+  children?: RouteNode[];
+};
+
+export type BreadcrumbItem = {
+  title: string;
+  href: string | null;
+  isCurrent: boolean;
+};
+
+function segs(p: string) {
+  if (!p || p === "/") return [] as string[];
+  return p.split("/").filter(Boolean);
+}
+
+function rootSegs(path: string) {
+  return segs(path.startsWith("/") ? path : `/${path}`);
+}
+
+function firstSeg(p: string) {
+  return p.replace(/^\//, "").split("/").filter(Boolean)[0] ?? "";
+}
+
+const isDyn = (p: string) => firstSeg(p).startsWith(":");
+const matchSeg = (pat: string, u: string) => (isDyn(pat) ? true : firstSeg(pat) === u);
+
+function findChild(ch: RouteNode[], seg: string) {
+  const s = ch.find((c) => !isDyn(c.path) && firstSeg(c.path) === seg);
+  if (s) return s;
+  return ch.find((c) => isDyn(c.path));
+}
+
+const hasPage = (n: RouteNode) => n.hasPage !== false;
+
+function prefixPath(parts: string[], end: number) {
+  return end <= 0 ? "/" : `/${parts.slice(0, end).join("/")}`;
+}
+
+type Step = { node: RouteNode; endExclusive: number };
+
+function buildSteps(pathname: string, root: RouteNode): Step[] | null {
+  const parts = segs(pathname);
+  const base = rootSegs(root.path);
+  for (let i = 0; i < base.length; i++) {
+    if (i >= parts.length) return null;
+    if (!matchSeg(`/${base[i]}`, parts[i]!)) return null;
+  }
+  const steps: Step[] = [{ node: root, endExclusive: base.length }];
+  let rem = parts.slice(base.length);
+  let cur = root;
+  while (rem.length) {
+    if (!cur.children?.length) break;
+    const child = findChild(cur.children, rem[0]!);
+    if (!child) break;
+    steps.push({ node: child, endExclusive: steps[steps.length - 1]!.endExclusive + 1 });
+    rem = rem.slice(1);
+    cur = child;
+  }
+  return steps;
+}
+
+function buildBreadcrumbItems(pathname: string, root: RouteNode): BreadcrumbItem[] {
+  const steps = buildSteps(pathname, root);
+  if (steps == null || steps.length === 0) return [];
+  const parts = segs(pathname);
+  const n = steps.length;
+  return steps.map((step, i) => {
+    const last = i === n - 1;
+    if (last) {
+      return { title: step.node.title, href: null, isCurrent: true };
+    }
+    if (!hasPage(step.node)) {
+      return { title: step.node.title, href: null, isCurrent: false };
+    }
+    return { title: step.node.title, href: prefixPath(parts, step.endExclusive), isCurrent: false };
+  });
+}
+
 export type RouteBreadcrumbsProps = {
-  /** 单根路由树，如 `{ path: "/products", meta: { title: "产品" }, children: [...] }` */
-  route: BreadcrumbRouteNode;
+  route: RouteNode;
   className?: string;
 };
 
 /**
- * 根据当前 `pathname` 与路由树匹配面包屑。使用 HeroUI `Breadcrumbs` + `Breadcrumbs.Item`（与官方文档一致：有 `href` 可点，无 `href` 为仅展示/当前节）。
- * 由 `WorkspaceLayout` 顶栏使用；也可单独使用。
+ * 根据当前 `pathname` 与路由树匹配面包屑。HeroUI `Breadcrumbs` + `Breadcrumbs.Item`。
  * @see https://heroui.com/docs/react/components/breadcrumbs
  */
 export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
@@ -26,9 +107,7 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
     [pathname, route],
   );
 
-  if (items.length === 0) {
-    return null;
-  }
+  if (items.length === 0) return null;
 
   const staticItemClass = cn(
     "no-underline",

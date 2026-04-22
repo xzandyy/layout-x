@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 
-import type { BreadcrumbRouteNode } from "@/lib/breadcrumb-route";
 import { cn } from "@/lib/utils";
 
-import { RouteBreadcrumbs } from "./route-breadcrumbs";
+import { RouteBreadcrumbs, type RouteNode } from "./route-breadcrumbs";
 
 export type WorkspaceLayoutProps = {
   className?: string;
@@ -14,7 +13,7 @@ export type WorkspaceLayoutProps = {
   /** 次级侧栏宽度 */
   sidebarSecondaryWidth?: string;
   /** 与当前 `pathname` 匹配的路由树，用于顶栏左侧面包屑；不传则不留面包屑位 */
-  breadcrumbRoute?: BreadcrumbRouteNode;
+  breadcrumbRoute?: RouteNode;
   rail?: ReactNode;
   sidebarPrimary?: ReactNode;
   /**
