@@ -31,7 +31,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <WorkspaceLayout breadcrumbRoute={appRouter} main={children} />
+        <WorkspaceLayout>
+          <WorkspaceLayout.Rail />
+          <WorkspaceLayout.Sidebar />
+          <WorkspaceLayout.Panel>
+            <WorkspaceLayout.Header breadcrumbRoute={appRouter} />
+            <WorkspaceLayout.Body>
+              <WorkspaceLayout.SidebarSecondary />
+              <WorkspaceLayout.Main>{children}</WorkspaceLayout.Main>
+            </WorkspaceLayout.Body>
+          </WorkspaceLayout.Panel>
+        </WorkspaceLayout>
       </body>
     </html>
   );
