@@ -53,8 +53,9 @@ export type WorkspaceLayoutProps = {
 /**
  * 工作区根容器；内部使用 `WorkspaceLayout.Rail` / `Sidebar` / `Panel` 等组合。
  * 可放在 `app/layout` 或任意子目录 `layout` 中，由路由决定由谁包裹。
+ * 在 `index.ts` 中组装为 `WorkspaceLayout` 并导出，避免经 barrel 重导出时子组件引用丢失。
  */
-function WorkspaceLayoutRoot({
+export function WorkspaceLayoutRoot({
   className,
   headerHeight = 3.5,
   railWidth = 3,
@@ -99,7 +100,7 @@ export type WorkspaceLayoutRegionProps = {
   children?: ReactNode;
 };
 
-function Rail({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutRail({ className, children }: WorkspaceLayoutRegionProps) {
   const { railWidth } = useWorkspaceLayoutContext();
   return (
     <aside
@@ -115,7 +116,7 @@ function Rail({ className, children }: WorkspaceLayoutRegionProps) {
   );
 }
 
-function Sidebar({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutSidebar({ className, children }: WorkspaceLayoutRegionProps) {
   const { sidebarPrimaryWidth } = useWorkspaceLayoutContext();
   return (
     <aside
@@ -131,7 +132,7 @@ function Sidebar({ className, children }: WorkspaceLayoutRegionProps) {
   );
 }
 
-function Panel({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutPanel({ className, children }: WorkspaceLayoutRegionProps) {
   return (
     <div
       className={cn(
@@ -156,7 +157,7 @@ export type WorkspaceLayoutHeaderProps = {
   end?: ReactNode;
 };
 
-function Header({ className, breadcrumbRoute, end }: WorkspaceLayoutHeaderProps) {
+export function WorkspaceLayoutHeader({ className, breadcrumbRoute, end }: WorkspaceLayoutHeaderProps) {
   const { headerHeight } = useWorkspaceLayoutContext();
   return (
     <header
@@ -190,7 +191,7 @@ function Header({ className, breadcrumbRoute, end }: WorkspaceLayoutHeaderProps)
   );
 }
 
-function Body({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutBody({ className, children }: WorkspaceLayoutRegionProps) {
   return (
     <div
       className={cn("flex min-h-0 min-w-0 flex-1 flex-row", className)}
@@ -200,7 +201,7 @@ function Body({ className, children }: WorkspaceLayoutRegionProps) {
   );
 }
 
-function SidebarSecondary({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutSidebarSecondary({ className, children }: WorkspaceLayoutRegionProps) {
   const { sidebarSecondaryWidth } = useWorkspaceLayoutContext();
   return (
     <aside
@@ -216,7 +217,7 @@ function SidebarSecondary({ className, children }: WorkspaceLayoutRegionProps) {
   );
 }
 
-function Main({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutMain({ className, children }: WorkspaceLayoutRegionProps) {
   return (
     <main
       aria-label="Main content"
@@ -227,14 +228,3 @@ function Main({ className, children }: WorkspaceLayoutRegionProps) {
   );
 }
 
-// --- 复合导出 ----------------------------------------------------------------
-
-export const WorkspaceLayout = Object.assign(WorkspaceLayoutRoot, {
-  Rail,
-  Sidebar,
-  Panel,
-  Header,
-  Body,
-  SidebarSecondary,
-  Main,
-});
