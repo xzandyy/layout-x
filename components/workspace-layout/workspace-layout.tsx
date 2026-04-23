@@ -49,7 +49,7 @@ export type WorkspaceLayoutProps = {
 export function WorkspaceLayoutRoot({
   className,
   headerHeight = 3.5,
-  railWidth = 3,
+  railWidth = 4,
   sidebarPrimaryWidth = 16,
   children,
 }: WorkspaceLayoutProps) {
