@@ -36,10 +36,7 @@ export default function RootLayout({
           <WorkspaceLayout.Sidebar />
           <WorkspaceLayout.Panel>
             <WorkspaceLayout.Header breadcrumbRoute={appRouter} />
-            <WorkspaceLayout.Body>
-              <WorkspaceLayout.SidebarSecondary />
-              <WorkspaceLayout.Main>{children}</WorkspaceLayout.Main>
-            </WorkspaceLayout.Body>
+            <WorkspaceLayout.Main>{children}</WorkspaceLayout.Main>
           </WorkspaceLayout.Panel>
         </WorkspaceLayout>
       </body>

@@ -18,7 +18,6 @@ export type WorkspaceLayoutContextValue = {
   headerHeight: number;
   railWidth: number;
   sidebarPrimaryWidth: number;
-  sidebarSecondaryWidth: number;
 };
 
 const WorkspaceLayoutContext = createContext<WorkspaceLayoutContextValue | null>(
@@ -45,8 +44,6 @@ export type WorkspaceLayoutProps = {
   railWidth?: number;
   /** 主侧栏宽度，数值单位为 `rem` */
   sidebarPrimaryWidth?: number;
-  /** 第三栏（次侧栏）宽度，数值单位为 `rem` */
-  sidebarSecondaryWidth?: number;
   children: ReactNode;
 };
 
@@ -60,7 +57,6 @@ export function WorkspaceLayoutRoot({
   headerHeight = 3.5,
   railWidth = 3,
   sidebarPrimaryWidth = 16,
-  sidebarSecondaryWidth = 20,
   children,
 }: WorkspaceLayoutProps) {
   const value = useMemo(
@@ -68,14 +64,8 @@ export function WorkspaceLayoutRoot({
       headerHeight,
       railWidth,
       sidebarPrimaryWidth,
-      sidebarSecondaryWidth,
     }),
-    [
-      headerHeight,
-      railWidth,
-      sidebarPrimaryWidth,
-      sidebarSecondaryWidth,
-    ],
+    [headerHeight, railWidth, sidebarPrimaryWidth],
   );
 
   return (
@@ -191,37 +181,11 @@ export function WorkspaceLayoutHeader({ className, breadcrumbRoute, end }: Works
   );
 }
 
-export function WorkspaceLayoutBody({ className, children }: WorkspaceLayoutRegionProps) {
-  return (
-    <div
-      className={cn("flex min-h-0 min-w-0 flex-1 flex-row", className)}
-    >
-      {children}
-    </div>
-  );
-}
-
-export function WorkspaceLayoutSidebarSecondary({ className, children }: WorkspaceLayoutRegionProps) {
-  const { sidebarSecondaryWidth } = useWorkspaceLayoutContext();
-  return (
-    <aside
-      aria-label="Secondary sidebar"
-      className={cn(
-        "shrink-0 border-r border-black/10 bg-zinc-100 dark:border-white/10 dark:bg-zinc-950",
-        className,
-      )}
-      style={{ width: `${sidebarSecondaryWidth}rem` }}
-    >
-      {children}
-    </aside>
-  );
-}
-
 export function WorkspaceLayoutMain({ className, children }: WorkspaceLayoutRegionProps) {
   return (
     <main
       aria-label="Main content"
-      className={cn("min-h-0 min-w-0 flex-1", className)}
+      className={cn("min-h-0 min-w-0 flex-1 overflow-auto", className)}
     >
       {children}
     </main>

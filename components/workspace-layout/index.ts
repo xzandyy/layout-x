@@ -1,12 +1,10 @@
 import {
-  WorkspaceLayoutBody,
   WorkspaceLayoutHeader,
   WorkspaceLayoutMain,
   WorkspaceLayoutPanel,
   WorkspaceLayoutRail,
   WorkspaceLayoutRoot,
   WorkspaceLayoutSidebar,
-  WorkspaceLayoutSidebarSecondary,
 } from "./workspace-layout";
 
 /**
@@ -18,8 +16,6 @@ export const WorkspaceLayout = Object.assign(WorkspaceLayoutRoot, {
   Sidebar: WorkspaceLayoutSidebar,
   Panel: WorkspaceLayoutPanel,
   Header: WorkspaceLayoutHeader,
-  Body: WorkspaceLayoutBody,
-  SidebarSecondary: WorkspaceLayoutSidebarSecondary,
   Main: WorkspaceLayoutMain,
 });
 

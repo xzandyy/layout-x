@@ -26,3 +26,23 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* RouteBreadcrumbs：与 HeroUI 文档一致，用 BEM 固定「同一 li 内 a + 分隔符」的布局
+   @see https://heroui.com/docs/react/components/breadcrumbs#customizing-the-component-classes */
+@layer components {
+  .route-breadcrumbs .breadcrumbs__item {
+    @apply flex min-w-0 max-w-full shrink items-center gap-1.5;
+  }
+
+  .route-breadcrumbs .breadcrumbs__separator,
+  .route-breadcrumbs [data-slot="breadcrumbs-separator"] {
+    @apply inline-flex shrink-0 select-none items-center self-center text-sm font-normal leading-none text-foreground/45;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .route-breadcrumbs .breadcrumbs__separator,
+    .route-breadcrumbs [data-slot="breadcrumbs-separator"] {
+      @apply text-foreground/50;
+    }
+  }
+}

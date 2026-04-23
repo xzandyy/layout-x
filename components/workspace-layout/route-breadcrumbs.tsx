@@ -27,7 +27,8 @@ function firstSeg(p: string) {
 }
 
 const isDyn = (p: string) => firstSeg(p).startsWith(":");
-const matchSeg = (pat: string, u: string) => (isDyn(pat) ? true : firstSeg(pat) === u);
+const matchSeg = (pat: string, u: string) =>
+  isDyn(pat) ? true : firstSeg(pat) === u;
 
 function findChild(ch: Router[], seg: string) {
   const s = ch.find((c) => !isDyn(c.path) && firstSeg(c.path) === seg);
@@ -57,14 +58,20 @@ function buildSteps(pathname: string, root: Router): Step[] | null {
     if (!cur.children?.length) break;
     const child = findChild(cur.children, rem[0]!);
     if (!child) break;
-    steps.push({ node: child, endExclusive: steps[steps.length - 1]!.endExclusive + 1 });
+    steps.push({
+      node: child,
+      endExclusive: steps[steps.length - 1]!.endExclusive + 1,
+    });
     rem = rem.slice(1);
     cur = child;
   }
   return steps;
 }
 
-function buildBreadcrumbItems(pathname: string, root: Router): BreadcrumbItem[] {
+function buildBreadcrumbItems(
+  pathname: string,
+  root: Router,
+): BreadcrumbItem[] {
   const steps = buildSteps(pathname, root);
   if (steps == null || steps.length === 0) return [];
   const parts = segs(pathname);
@@ -77,7 +84,11 @@ function buildBreadcrumbItems(pathname: string, root: Router): BreadcrumbItem[] 
     if (!hasPage(step.node)) {
       return { title: step.node.title, href: null, isCurrent: false };
     }
-    return { title: step.node.title, href: prefixPath(parts, step.endExclusive), isCurrent: false };
+    return {
+      title: step.node.title,
+      href: prefixPath(parts, step.endExclusive),
+      isCurrent: false,
+    };
   });
 }
 
@@ -86,10 +97,6 @@ export type RouteBreadcrumbsProps = {
   className?: string;
 };
 
-/**
- * 专用于面包屑 UI；`Router` 与全站树见 `@/config/routes`。
- * @see https://heroui.com/docs/react/components/breadcrumbs
- */
 export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
   const pathname = usePathname() || "/";
   const items = useMemo(
@@ -108,7 +115,14 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
   );
 
   return (
-    <Breadcrumbs aria-label="Breadcrumb" className={cn("min-w-0", className)}>
+    <Breadcrumbs
+      aria-label="Breadcrumb"
+      className={cn(
+        "route-breadcrumbs min-w-0 flex-wrap items-center",
+        className,
+      )}
+      separator={<span className="text-muted">/</span>}
+    >
       {items.map((item, i) =>
         item.href ? (
           <Breadcrumbs.Item
@@ -116,14 +130,14 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
             className="no-underline"
             href={item.href}
           >
-            {item.title}
+            <span className="mr-1">{item.title}</span>
           </Breadcrumbs.Item>
         ) : (
           <Breadcrumbs.Item
             key={`${i}-${item.title}-${String(item.isCurrent)}`}
             className={staticItemClass}
           >
-            {item.title}
+            <span className="mr-1">{item.title}</span>
           </Breadcrumbs.Item>
         ),
       )}
