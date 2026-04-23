@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 
 import { WorkspaceLayout } from "@/components/workspace-layout";
 import { appRouter } from "@/config/routes";
@@ -27,16 +28,90 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <WorkspaceLayout>
-          <WorkspaceLayout.Rail />
-          <WorkspaceLayout.Sidebar />
+          <WorkspaceLayout.Rail>
+            <WorkspaceLayout.RailHeader>
+              <div className="flex items-center justify-center p-2">
+                <div
+                  className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10 text-xs font-semibold text-foreground"
+                  title="品牌 / Logo"
+                >
+                  LX
+                </div>
+              </div>
+            </WorkspaceLayout.RailHeader>
+            <WorkspaceLayout.RailMain>
+              <nav
+                className="flex flex-col items-center gap-1 p-1"
+                aria-label="快捷入口"
+              >
+                {["搜", "邮", "日", "档"].map((t) => (
+                  <div
+                    key={t}
+                    className="flex h-9 w-9 cursor-default items-center justify-center rounded-md text-xs text-foreground/80 hover:bg-foreground/10"
+                    title={t}
+                  >
+                    {t}
+                  </div>
+                ))}
+              </nav>
+            </WorkspaceLayout.RailMain>
+            <WorkspaceLayout.RailFooter>
+              <div className="flex justify-center p-2">
+                <div
+                  className="h-7 w-7 rounded-full bg-foreground/15"
+                  title="账户"
+                />
+              </div>
+            </WorkspaceLayout.RailFooter>
+          </WorkspaceLayout.Rail>
+          <WorkspaceLayout.Sidebar>
+            <WorkspaceLayout.SidebarHeader>
+              <div className="border-b border-black/10 px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10">
+                导航
+              </div>
+            </WorkspaceLayout.SidebarHeader>
+            <WorkspaceLayout.SidebarMain>
+              <ul className="flex flex-col gap-0.5 p-2 text-sm text-foreground/90">
+                <li>
+                  <Link
+                    className="block rounded-md px-2 py-1.5 hover:bg-foreground/10"
+                    href="/"
+                  >
+                    首页
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="block rounded-md px-2 py-1.5 hover:bg-foreground/10"
+                    href="/products"
+                  >
+                    产品
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="block rounded-md px-2 py-1.5 hover:bg-foreground/10"
+                    href="/products/phones"
+                  >
+                    手机
+                  </Link>
+                </li>
+              </ul>
+            </WorkspaceLayout.SidebarMain>
+            <WorkspaceLayout.SidebarFooter>
+              <div className="border-t border-black/10 px-3 py-2 text-xs text-foreground/55 dark:border-white/10">
+                layout-x · 侧栏底栏占位
+              </div>
+            </WorkspaceLayout.SidebarFooter>
+          </WorkspaceLayout.Sidebar>
           <WorkspaceLayout.Panel>
-            <WorkspaceLayout.Header breadcrumbRoute={appRouter} />
-            <WorkspaceLayout.Main>{children}</WorkspaceLayout.Main>
+            <WorkspaceLayout.PanelHeader breadcrumbRoute={appRouter} />
+            <WorkspaceLayout.PanelMain>{children}</WorkspaceLayout.PanelMain>
           </WorkspaceLayout.Panel>
         </WorkspaceLayout>
       </body>

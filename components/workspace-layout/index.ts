@@ -1,10 +1,16 @@
 import {
-  WorkspaceLayoutHeader,
-  WorkspaceLayoutMain,
   WorkspaceLayoutPanel,
+  WorkspaceLayoutPanelHeader,
+  WorkspaceLayoutPanelMain,
   WorkspaceLayoutRail,
+  WorkspaceLayoutRailFooter,
+  WorkspaceLayoutRailHeader,
+  WorkspaceLayoutRailMain,
   WorkspaceLayoutRoot,
   WorkspaceLayoutSidebar,
+  WorkspaceLayoutSidebarFooter,
+  WorkspaceLayoutSidebarHeader,
+  WorkspaceLayoutSidebarMain,
 } from "./workspace-layout";
 
 /**
@@ -13,15 +19,21 @@ import {
  */
 export const WorkspaceLayout = Object.assign(WorkspaceLayoutRoot, {
   Rail: WorkspaceLayoutRail,
+  RailHeader: WorkspaceLayoutRailHeader,
+  RailMain: WorkspaceLayoutRailMain,
+  RailFooter: WorkspaceLayoutRailFooter,
   Sidebar: WorkspaceLayoutSidebar,
+  SidebarHeader: WorkspaceLayoutSidebarHeader,
+  SidebarMain: WorkspaceLayoutSidebarMain,
+  SidebarFooter: WorkspaceLayoutSidebarFooter,
   Panel: WorkspaceLayoutPanel,
-  Header: WorkspaceLayoutHeader,
-  Main: WorkspaceLayoutMain,
+  PanelHeader: WorkspaceLayoutPanelHeader,
+  PanelMain: WorkspaceLayoutPanelMain,
 });
 
 export {
   type WorkspaceLayoutContextValue,
-  type WorkspaceLayoutHeaderProps,
+  type WorkspaceLayoutPanelHeaderProps,
   type WorkspaceLayoutProps,
   type WorkspaceLayoutRegionProps,
 } from "./workspace-layout";

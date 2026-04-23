@@ -130,14 +130,14 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
             className="no-underline"
             href={item.href}
           >
-            <span className="mr-1">{item.title}</span>
+            <span className="text-[0.8rem] mr-1">{item.title}</span>
           </Breadcrumbs.Item>
         ) : (
           <Breadcrumbs.Item
             key={`${i}-${item.title}-${String(item.isCurrent)}`}
             className={staticItemClass}
           >
-            <span className="mr-1">{item.title}</span>
+            <span className="text-[0.8rem] mr-1">{item.title}</span>
           </Breadcrumbs.Item>
         ),
       )}

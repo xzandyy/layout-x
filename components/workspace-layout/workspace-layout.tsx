@@ -48,7 +48,7 @@ export type WorkspaceLayoutProps = {
 };
 
 /**
- * 工作区根容器；内部使用 `WorkspaceLayout.Rail` / `Sidebar` / `Panel` 等组合。
+ * 工作区根容器；内部使用 `WorkspaceLayout.Rail` / `Sidebar` / `Panel` + `PanelHeader` / `PanelMain` 等组合。
  * 可放在 `app/layout` 或任意子目录 `layout` 中，由路由决定由谁包裹。
  * 在 `index.ts` 中组装为 `WorkspaceLayout` 并导出，避免经 barrel 重导出时子组件引用丢失。
  */
@@ -90,13 +90,17 @@ export type WorkspaceLayoutRegionProps = {
   children?: ReactNode;
 };
 
+/**
+ * 最左窄栏外壳；子区域用 `WorkspaceLayout.RailHeader`、`.RailMain`、`.RailFooter`（中间 `RailMain` 可滚动）。
+ */
 export function WorkspaceLayoutRail({ className, children }: WorkspaceLayoutRegionProps) {
   const { railWidth } = useWorkspaceLayoutContext();
   return (
     <aside
       aria-label="Rail"
       className={cn(
-        "shrink-0 border-r border-black/10 dark:border-white/10",
+        "flex h-full min-h-0 w-full min-w-0 flex-col",
+        "shrink-0 self-stretch border-r border-black/10 dark:border-white/10",
         className,
       )}
       style={{ width: `${railWidth}rem` }}
@@ -106,19 +110,83 @@ export function WorkspaceLayoutRail({ className, children }: WorkspaceLayoutRegi
   );
 }
 
+export function WorkspaceLayoutRailHeader({ className, children }: WorkspaceLayoutRegionProps) {
+  return (
+    <div className={cn("shrink-0", className)} data-slot="workspace-rail-header">
+      {children}
+    </div>
+  );
+}
+
+export function WorkspaceLayoutRailMain({ className, children }: WorkspaceLayoutRegionProps) {
+  return (
+    <div
+      className={cn(
+        "min-h-0 w-full min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
+        className,
+      )}
+      data-slot="workspace-rail-main"
+    >
+      {children}
+    </div>
+  );
+}
+
+export function WorkspaceLayoutRailFooter({ className, children }: WorkspaceLayoutRegionProps) {
+  return (
+    <div className={cn("shrink-0", className)} data-slot="workspace-rail-footer">
+      {children}
+    </div>
+  );
+}
+
+/**
+ * 主侧栏外壳；子区域用 `WorkspaceLayout.SidebarHeader`、`.SidebarMain`、`.SidebarFooter`（中间 `SidebarMain` 可滚动）。
+ */
 export function WorkspaceLayoutSidebar({ className, children }: WorkspaceLayoutRegionProps) {
   const { sidebarPrimaryWidth } = useWorkspaceLayoutContext();
   return (
     <aside
       aria-label="Primary sidebar"
       className={cn(
-        "shrink-0 border-r border-black/10 dark:border-white/10",
+        "flex h-full min-h-0 w-full min-w-0 flex-col",
+        "shrink-0 self-stretch border-r border-black/10 dark:border-white/10",
         className,
       )}
       style={{ width: `${sidebarPrimaryWidth}rem` }}
     >
       {children}
     </aside>
+  );
+}
+
+export function WorkspaceLayoutSidebarHeader({ className, children }: WorkspaceLayoutRegionProps) {
+  return (
+    <div className={cn("shrink-0", className)} data-slot="workspace-sidebar-header">
+      {children}
+    </div>
+  );
+}
+
+export function WorkspaceLayoutSidebarMain({ className, children }: WorkspaceLayoutRegionProps) {
+  return (
+    <div
+      className={cn(
+        "min-h-0 w-full min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
+        className,
+      )}
+      data-slot="workspace-sidebar-main"
+    >
+      {children}
+    </div>
+  );
+}
+
+export function WorkspaceLayoutSidebarFooter({ className, children }: WorkspaceLayoutRegionProps) {
+  return (
+    <div className={cn("shrink-0", className)} data-slot="workspace-sidebar-footer">
+      {children}
+    </div>
   );
 }
 
@@ -135,7 +203,7 @@ export function WorkspaceLayoutPanel({ className, children }: WorkspaceLayoutReg
   );
 }
 
-export type WorkspaceLayoutHeaderProps = {
+export type WorkspaceLayoutPanelHeaderProps = {
   className?: string;
   /**
    * 与当前路径匹配的路由树，顶栏左侧面包屑；不传则仅渲染 `end`（若有）。
@@ -147,7 +215,11 @@ export type WorkspaceLayoutHeaderProps = {
   end?: ReactNode;
 };
 
-export function WorkspaceLayoutHeader({ className, breadcrumbRoute, end }: WorkspaceLayoutHeaderProps) {
+export function WorkspaceLayoutPanelHeader({
+  className,
+  breadcrumbRoute,
+  end,
+}: WorkspaceLayoutPanelHeaderProps) {
   const { headerHeight } = useWorkspaceLayoutContext();
   return (
     <header
@@ -181,7 +253,8 @@ export function WorkspaceLayoutHeader({ className, breadcrumbRoute, end }: Works
   );
 }
 
-export function WorkspaceLayoutMain({ className, children }: WorkspaceLayoutRegionProps) {
+/** 右侧面板主内容区，置于 `Panel` 内、通常位于 `PanelHeader` 下。 */
+export function WorkspaceLayoutPanelMain({ className, children }: WorkspaceLayoutRegionProps) {
   return (
     <main
       aria-label="Main content"
