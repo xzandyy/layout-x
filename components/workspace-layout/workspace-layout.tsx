@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 
 import type { Router } from "@/config/routes";
 import { cn } from "@/lib/utils";
@@ -20,9 +15,8 @@ export type WorkspaceLayoutContextValue = {
   sidebarPrimaryWidth: number;
 };
 
-const WorkspaceLayoutContext = createContext<WorkspaceLayoutContextValue | null>(
-  null,
-);
+const WorkspaceLayoutContext =
+  createContext<WorkspaceLayoutContextValue | null>(null);
 
 function useWorkspaceLayoutContext(): WorkspaceLayoutContextValue {
   const ctx = useContext(WorkspaceLayoutContext);
@@ -73,7 +67,7 @@ export function WorkspaceLayoutRoot({
       <div
         className={cn(
           "box-border flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row items-stretch overflow-hidden",
-          "bg-zinc-100 dark:bg-zinc-950",
+          "bg-gray-100 dark:bg-zinc-950",
           className,
         )}
       >
@@ -93,7 +87,10 @@ export type WorkspaceLayoutRegionProps = {
 /**
  * 最左窄栏外壳；子区域用 `WorkspaceLayout.RailHeader`、`.RailMain`、`.RailFooter`（中间 `RailMain` 可滚动）。
  */
-export function WorkspaceLayoutRail({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutRail({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   const { railWidth } = useWorkspaceLayoutContext();
   return (
     <aside
@@ -110,15 +107,24 @@ export function WorkspaceLayoutRail({ className, children }: WorkspaceLayoutRegi
   );
 }
 
-export function WorkspaceLayoutRailHeader({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutRailHeader({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
-    <div className={cn("shrink-0", className)} data-slot="workspace-rail-header">
+    <div
+      className={cn("shrink-0", className)}
+      data-slot="workspace-rail-header"
+    >
       {children}
     </div>
   );
 }
 
-export function WorkspaceLayoutRailMain({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutRailMain({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
     <div
       className={cn(
@@ -132,9 +138,15 @@ export function WorkspaceLayoutRailMain({ className, children }: WorkspaceLayout
   );
 }
 
-export function WorkspaceLayoutRailFooter({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutRailFooter({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
-    <div className={cn("shrink-0", className)} data-slot="workspace-rail-footer">
+    <div
+      className={cn("shrink-0", className)}
+      data-slot="workspace-rail-footer"
+    >
       {children}
     </div>
   );
@@ -143,7 +155,10 @@ export function WorkspaceLayoutRailFooter({ className, children }: WorkspaceLayo
 /**
  * 主侧栏外壳；子区域用 `WorkspaceLayout.SidebarHeader`、`.SidebarMain`、`.SidebarFooter`（中间 `SidebarMain` 可滚动）。
  */
-export function WorkspaceLayoutSidebar({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutSidebar({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   const { sidebarPrimaryWidth } = useWorkspaceLayoutContext();
   return (
     <aside
@@ -160,15 +175,24 @@ export function WorkspaceLayoutSidebar({ className, children }: WorkspaceLayoutR
   );
 }
 
-export function WorkspaceLayoutSidebarHeader({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutSidebarHeader({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
-    <div className={cn("shrink-0", className)} data-slot="workspace-sidebar-header">
+    <div
+      className={cn("shrink-0", className)}
+      data-slot="workspace-sidebar-header"
+    >
       {children}
     </div>
   );
 }
 
-export function WorkspaceLayoutSidebarMain({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutSidebarMain({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
     <div
       className={cn(
@@ -182,15 +206,24 @@ export function WorkspaceLayoutSidebarMain({ className, children }: WorkspaceLay
   );
 }
 
-export function WorkspaceLayoutSidebarFooter({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutSidebarFooter({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
-    <div className={cn("shrink-0", className)} data-slot="workspace-sidebar-footer">
+    <div
+      className={cn("shrink-0", className)}
+      data-slot="workspace-sidebar-footer"
+    >
       {children}
     </div>
   );
 }
 
-export function WorkspaceLayoutPanel({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutPanel({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
     <div
       className={cn(
@@ -254,7 +287,10 @@ export function WorkspaceLayoutPanelHeader({
 }
 
 /** 右侧面板主内容区，置于 `Panel` 内、通常位于 `PanelHeader` 下。 */
-export function WorkspaceLayoutPanelMain({ className, children }: WorkspaceLayoutRegionProps) {
+export function WorkspaceLayoutPanelMain({
+  className,
+  children,
+}: WorkspaceLayoutRegionProps) {
   return (
     <main
       aria-label="Main content"
@@ -264,4 +300,3 @@ export function WorkspaceLayoutPanelMain({ className, children }: WorkspaceLayou
     </main>
   );
 }
-
