@@ -1,0 +1,35 @@
+{
+  "path": "/",
+  "title": "首页",
+  "children": [
+    {
+      "path": "products",
+      "title": "产品",
+      "children": [
+        {
+          "path": "phones",
+          "title": "手机",
+          "children": [
+            {
+              "path": ":type",
+              "title": "类型",
+              "hasPage": false,
+              "children": [
+                {
+                  "path": ":year",
+                  "title": "年份",
+                  "children": [
+                    {
+                      "path": ":id",
+                      "title": "详情"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
