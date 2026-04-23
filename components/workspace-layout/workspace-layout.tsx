@@ -7,12 +7,12 @@ import { RouteBreadcrumbs } from "./route-breadcrumbs";
 
 export type WorkspaceLayoutProps = {
   className?: string;
-  /** 左侧最窄栏宽度，如 `3rem`、`48px` */
-  railWidth?: string;
-  /** 主侧栏宽度 */
-  sidebarPrimaryWidth?: string;
-  /** 次级侧栏宽度 */
-  sidebarSecondaryWidth?: string;
+  /** 左侧最窄栏宽度，数值单位为 `rem` */
+  railWidth?: number;
+  /** 主侧栏宽度，数值单位为 `rem` */
+  sidebarPrimaryWidth?: number;
+  /** 次级侧栏宽度，数值单位为 `rem` */
+  sidebarSecondaryWidth?: number;
   /** 与当前 `pathname` 匹配的路由树，用于顶栏左侧面包屑；不传则不留面包屑位 */
   breadcrumbRoute?: Router;
   rail?: ReactNode;
@@ -22,8 +22,8 @@ export type WorkspaceLayoutProps = {
    * 与 `breadcrumbRoute` 共同组成顶栏行。
    */
   header?: ReactNode;
-  /** 顶栏高度（`min-height`），如 `3.5rem`、`48px`；默认 `3.5rem` */
-  headerHeight?: string;
+  /** 顶栏高度（`min-height`），数值单位为 `rem` */
+  headerHeight?: number;
   sidebarSecondary?: ReactNode;
   main?: ReactNode;
 };
@@ -35,10 +35,10 @@ export type WorkspaceLayoutProps = {
  */
 export function WorkspaceLayout({
   className,
-  headerHeight = "3.5rem",
-  railWidth = "3rem",
-  sidebarPrimaryWidth = "16rem",
-  sidebarSecondaryWidth = "20rem",
+  headerHeight = 3.5,
+  railWidth = 3,
+  sidebarPrimaryWidth = 16,
+  sidebarSecondaryWidth = 20,
   breadcrumbRoute,
   header,
   rail,
@@ -50,27 +50,30 @@ export function WorkspaceLayout({
     <div
       className={cn(
         "box-border flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row items-stretch overflow-hidden",
+        "bg-zinc-100 dark:bg-zinc-950",
         className,
       )}
     >
       <aside
         aria-label="Rail"
         className="shrink-0 border-r border-black/10 dark:border-white/10"
-        style={{ width: railWidth }}
+        style={{ width: `${railWidth}rem` }}
       >
         {rail}
       </aside>
       <aside
         aria-label="Primary sidebar"
         className="shrink-0 border-r border-black/10 dark:border-white/10"
-        style={{ width: sidebarPrimaryWidth }}
+        style={{ width: `${sidebarPrimaryWidth}rem` }}
       >
         {sidebarPrimary}
       </aside>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div
+        className="m-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200/80 bg-white dark:border-zinc-700/60 dark:bg-zinc-900"
+      >
         <header
           className="flex shrink-0 items-center border-b border-black/10 px-4 dark:border-white/10"
-          style={{ minHeight: headerHeight }}
+          style={{ minHeight: `${headerHeight}rem` }}
         >
           <div className="flex w-full min-w-0 items-center gap-3">
             {breadcrumbRoute ? (
@@ -93,11 +96,11 @@ export function WorkspaceLayout({
             ) : null}
           </div>
         </header>
-        <div className="flex min-h-0 flex-1 flex-row">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-row">
           <aside
             aria-label="Secondary sidebar"
-            className="shrink-0 border-r border-black/10 dark:border-white/10"
-            style={{ width: sidebarSecondaryWidth }}
+            className="shrink-0 border-r border-black/10 bg-zinc-100 dark:border-white/10 dark:bg-zinc-950"
+            style={{ width: `${sidebarSecondaryWidth}rem` }}
           >
             {sidebarSecondary}
           </aside>
