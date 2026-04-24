@@ -16,7 +16,11 @@ export default function Home() {
         <Link className="text-accent underline" href="/products">
           产品
         </Link>
-        等页面（亦可用左侧导航）。
+        、
+        <Link className="text-accent underline" href="/tools">
+          工具台
+        </Link>
+        ；最左 Rail 可切换工作区 / 工具 / 我的，对应不同侧栏。
       </p>
     </div>
   );

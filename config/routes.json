@@ -54,8 +54,20 @@
       ]
     },
     {
+      "path": "profile",
+      "title": "个人资料"
+    },
+    {
+      "path": "settings",
+      "title": "账户设置"
+    },
+    {
       "path": "support",
       "title": "帮助与支持"
+    },
+    {
+      "path": "tools",
+      "title": "工具台"
     }
   ]
 }

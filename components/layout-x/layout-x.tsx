@@ -1,12 +1,13 @@
 "use client";
 
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import { RouteBreadcrumbs } from "./route-breadcrumbs";
 import { MenuTree } from "./menu-tree";
+import { findBestEntryIdForPathname } from "./sidebar-routing";
 import type {
   LayoutXContextValue,
   LayoutXContentHeaderProps,
@@ -31,6 +32,11 @@ function useLayoutXContext(): LayoutXContextValue {
   return ctx;
 }
 
+/** 读取 `LayoutX` 提供的 route / 当前激活 entry（须在 `<LayoutX>` 内使用）。 */
+export function useLayoutX() {
+  return useLayoutXContext();
+}
+
 // ---------------------------------------------------------------------------
 // Root — Sidebar.Provider + flex 外壳
 // ---------------------------------------------------------------------------
@@ -43,12 +49,68 @@ export function LayoutXRoot({
   headerHeight = 3.5,
   railWidth = 4,
   className,
+  route,
   children,
 }: LayoutXProps) {
   const router = useRouter();
-  const value = useMemo(
-    () => ({ headerHeight, railWidth }),
-    [headerHeight, railWidth],
+  const pathname = usePathname() ?? "/";
+  /** 用户点 Rail 时的临时选择；`forPathname` 与当前 URL 一致时才生效，换路由后自动回退为 URL 推断。 */
+  const [railOverride, setRailOverride] = useState<{
+    entryId: string;
+    forPathname: string;
+  } | null>(null);
+
+  const urlEntryId = useMemo(
+    () => (route ? findBestEntryIdForPathname(route, pathname) : undefined),
+    [route, pathname],
+  );
+
+  const fallbackId = useMemo(() => {
+    if (!route?.entries.length) return undefined;
+    return route.defaultEntryId ?? route.entries[0]!.id;
+  }, [route]);
+
+  const activeEntryId = useMemo(() => {
+    if (!route) return undefined;
+    if (
+      railOverride != null &&
+      railOverride.forPathname === pathname
+    ) {
+      return railOverride.entryId;
+    }
+    return urlEntryId ?? fallbackId;
+  }, [route, railOverride, pathname, urlEntryId, fallbackId]);
+
+  const activeEntry = useMemo(() => {
+    if (!route || activeEntryId == null) return undefined;
+    return route.entries.find((e) => e.id === activeEntryId);
+  }, [route, activeEntryId]);
+
+  const setActiveEntryId = useCallback(
+    (id: string) => {
+      if (!route) return;
+      setRailOverride({ entryId: id, forPathname: pathname });
+    },
+    [route, pathname],
+  );
+
+  const value = useMemo<LayoutXContextValue>(
+    () => ({
+      headerHeight,
+      railWidth,
+      route,
+      activeEntryId,
+      activeEntry,
+      setActiveEntryId,
+    }),
+    [
+      headerHeight,
+      railWidth,
+      route,
+      activeEntryId,
+      activeEntry,
+      setActiveEntryId,
+    ],
   );
 
   return (
@@ -119,6 +181,46 @@ export function LayoutXRailFooter({ className, children }: LayoutXRegionProps) {
   );
 }
 
+/**
+ * 根据 `route.entries` 渲染 Rail 入口按钮，点击切换当前侧栏 `sidebar`。
+ * 无 `route` 时不渲染。须放在 `LayoutX` 子树中。
+ */
+export function LayoutXRailRouteNav({ className }: LayoutXRegionProps) {
+  const { route, activeEntryId, setActiveEntryId } = useLayoutXContext();
+  if (!route?.entries.length) return null;
+  return (
+    <nav
+      className={cn(
+        "flex flex-col items-center gap-1 p-1",
+        className,
+      )}
+      aria-label="工作区入口"
+    >
+      {route.entries.map((e) => {
+        const isActive = e.id === activeEntryId;
+        return (
+          <button
+            key={e.id}
+            type="button"
+            aria-pressed={isActive}
+            aria-label={typeof e.label === "string" ? e.label : e.id}
+            title={typeof e.label === "string" ? e.label : e.id}
+            onClick={() => setActiveEntryId(e.id)}
+            className={cn(
+              "flex h-9 w-9 items-center justify-center rounded-md text-foreground/80",
+              "outline-none transition-colors hover:bg-foreground/10",
+              "focus-visible:ring-2 focus-visible:ring-foreground/25",
+              isActive && "bg-foreground/12 text-foreground",
+            )}
+          >
+            {e.icon}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Sidebar（Pro Sidebar aside，置于 Rail 右侧）
 // ---------------------------------------------------------------------------
@@ -142,23 +244,54 @@ export function LayoutXSidebarHeader({
 }
 
 /**
+ * 显示当前 `route` 激活项的图标 + `label`；无 `activeEntry` 时显示「导航」。
+ */
+export function LayoutXSidebarEntryHeading({ className }: LayoutXRegionProps) {
+  const { activeEntry } = useLayoutXContext();
+  if (!activeEntry) {
+    return (
+      <div
+        className={cn(
+          "border-b border-black/10 px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10",
+          className,
+        )}
+      >
+        导航
+      </div>
+    );
+  }
+  return (
+    <div
+      className={cn(
+        "flex min-h-10 items-center gap-2 border-b border-black/10 px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10",
+        className,
+      )}
+    >
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center text-foreground/90 [&>svg]:size-4">
+        {activeEntry.icon}
+      </span>
+      <span className="min-w-0 truncate">{activeEntry.label}</span>
+    </div>
+  );
+}
+
+/**
  * 侧栏可滚动内容区，映射到 `Sidebar.Content`。
- *
- * - 传入 `content` 时，内部自动渲染配置化菜单树（`isCurrent` 由 `usePathname` 自动派生）。
- * - `children` 与 `content` 可并存，先渲染 `content`，后渲染 `children`。
+ * 菜单树来自 `LayoutX` 根上 `route` 与当前 `activeEntry.sidebar`；`isCurrent` 等由 `usePathname` 派生。
  */
 export function LayoutXSidebarMain({
   className,
-  content,
   children,
 }: LayoutXSidebarMainProps) {
   const pathname = usePathname();
+  const { activeEntry } = useLayoutXContext();
+  const sidebar = activeEntry?.sidebar;
   return (
     <Sidebar.Content
       aria-label="侧栏导航"
       className={className}
     >
-      {content && <MenuTree config={content} pathname={pathname} />}
+      {sidebar && <MenuTree config={sidebar} pathname={pathname} />}
       {children}
     </Sidebar.Content>
   );

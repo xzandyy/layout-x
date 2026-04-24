@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { LayoutX } from "@/components/layout-x";
-import { workspaceSidebarContent } from "@/config/workspace-sidebar-content";
 import { appRouter } from "@/config/routes";
+import { workspaceRoute } from "@/config/workspace-route";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -32,7 +32,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <LayoutX>
+        <LayoutX route={workspaceRoute}>
           <LayoutX.Rail>
             <LayoutX.RailHeader>
               <div className="flex items-center justify-center p-2">
@@ -45,20 +45,7 @@ export default function RootLayout({
               </div>
             </LayoutX.RailHeader>
             <LayoutX.RailMain>
-              <nav
-                className="flex flex-col items-center gap-1 p-1"
-                aria-label="快捷入口"
-              >
-                {["搜", "邮", "日", "档"].map((t) => (
-                  <div
-                    key={t}
-                    className="flex h-9 w-9 cursor-default items-center justify-center rounded-md text-xs text-foreground/80 hover:bg-foreground/10"
-                    title={t}
-                  >
-                    {t}
-                  </div>
-                ))}
-              </nav>
+              <LayoutX.RailRouteNav />
             </LayoutX.RailMain>
             <LayoutX.RailFooter>
               <div className="flex justify-center p-2">
@@ -71,11 +58,9 @@ export default function RootLayout({
           </LayoutX.Rail>
           <LayoutX.Sidebar>
             <LayoutX.SidebarHeader>
-              <div className="px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10">
-                导航
-              </div>
+              <LayoutX.SidebarEntryHeading />
             </LayoutX.SidebarHeader>
-            <LayoutX.SidebarMain content={workspaceSidebarContent} />
+            <LayoutX.SidebarMain />
             <LayoutX.SidebarFooter>
               <div className="px-3 py-2 text-xs text-foreground/55 dark:border-white/10">
                 layout-x · 侧栏底栏占位

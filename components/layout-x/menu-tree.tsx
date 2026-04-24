@@ -236,7 +236,7 @@ function computeDismissed(
 
 /**
  * 将 `SidebarContentConfig` 渲染为 Pro Sidebar 菜单。
- * 由 `LayoutX.SidebarMain` 在收到 `content` 时内部调用。
+ * 由 `LayoutX.SidebarMain` 使用当前 `activeEntry.sidebar` 时内部调用。
  */
 export function MenuTree({
   config,

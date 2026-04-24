@@ -3,30 +3,33 @@ import {
   LayoutXRail,
   LayoutXRailHeader,
   LayoutXRailMain,
+  LayoutXRailRouteNav,
   LayoutXRailFooter,
   LayoutXSidebar,
   LayoutXSidebarHeader,
+  LayoutXSidebarEntryHeading,
   LayoutXSidebarMain,
   LayoutXSidebarFooter,
   LayoutXContent,
   LayoutXContentHeader,
   LayoutXContentBody,
+  useLayoutX,
 } from "./layout-x";
 
 /**
  * 整合组件：三列工作区骨架（Rail + Sidebar + Content）+ 配置化 Pro Sidebar。
  *
  * 静态子组件：
- *   LayoutX.Rail / RailHeader / RailMain / RailFooter
- *   LayoutX.Sidebar / SidebarHeader / SidebarMain / SidebarFooter
+ *   LayoutX.Rail / RailHeader / RailMain / RailRouteNav / RailFooter
+ *   LayoutX.Sidebar / SidebarHeader / SidebarEntryHeading / SidebarMain / SidebarFooter
  *   LayoutX.Content / ContentHeader / ContentBody
  *
  * 典型用法：
- *   <LayoutX>
- *     <LayoutX.Rail>...</LayoutX.Rail>
+ *   <LayoutX route={routeConfig}>
+ *     <LayoutX.Rail>…<LayoutX.RailMain><LayoutX.RailRouteNav /></LayoutX.RailMain>…</LayoutX.Rail>
  *     <LayoutX.Sidebar>
- *       <LayoutX.SidebarHeader>导航</LayoutX.SidebarHeader>
- *       <LayoutX.SidebarMain content={sidebarContent} />
+ *       <LayoutX.SidebarHeader><LayoutX.SidebarEntryHeading /></LayoutX.SidebarHeader>
+ *       <LayoutX.SidebarMain />
  *       <LayoutX.SidebarFooter>…</LayoutX.SidebarFooter>
  *     </LayoutX.Sidebar>
  *     <LayoutX.Content>
@@ -39,9 +42,11 @@ export const LayoutX = Object.assign(LayoutXRoot, {
   Rail: LayoutXRail,
   RailHeader: LayoutXRailHeader,
   RailMain: LayoutXRailMain,
+  RailRouteNav: LayoutXRailRouteNav,
   RailFooter: LayoutXRailFooter,
   Sidebar: LayoutXSidebar,
   SidebarHeader: LayoutXSidebarHeader,
+  SidebarEntryHeading: LayoutXSidebarEntryHeading,
   SidebarMain: LayoutXSidebarMain,
   SidebarFooter: LayoutXSidebarFooter,
   Content: LayoutXContent,
@@ -49,12 +54,16 @@ export const LayoutX = Object.assign(LayoutXRoot, {
   ContentBody: LayoutXContentBody,
 });
 
+export { useLayoutX };
+
 export type {
   LayoutXProps,
   LayoutXRegionProps,
   LayoutXSidebarMainProps,
   LayoutXContentHeaderProps,
   LayoutXContextValue,
+  RouteConfig,
+  RouteEntry,
   SidebarContentConfig,
   SidebarNode,
   SidebarGroupNode,
