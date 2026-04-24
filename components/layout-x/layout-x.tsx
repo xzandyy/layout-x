@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@heroui/react";
 import { Sidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
@@ -198,23 +199,21 @@ export function LayoutXRailRouteNav({ className }: LayoutXRegionProps) {
     >
       {route.entries.map((e) => {
         const isActive = e.id === activeEntryId;
+        const name =
+          typeof e.label === "string" ? e.label : e.id;
         return (
-          <button
+          <Button
             key={e.id}
-            type="button"
+            isIconOnly
+            size="md"
+            variant={isActive ? "secondary" : "ghost"}
             aria-pressed={isActive}
-            aria-label={typeof e.label === "string" ? e.label : e.id}
-            title={typeof e.label === "string" ? e.label : e.id}
-            onClick={() => setActiveEntryId(e.id)}
-            className={cn(
-              "flex h-9 w-9 items-center justify-center rounded-md text-foreground/80",
-              "outline-none transition-colors hover:bg-foreground/10",
-              "focus-visible:ring-2 focus-visible:ring-foreground/25",
-              isActive && "bg-foreground/12 text-foreground",
-            )}
+            aria-label={name}
+            onPress={() => setActiveEntryId(e.id)}
+            className="h-9 w-9 shrink-0 p-0 text-foreground/90 [&>svg]:size-5"
           >
             {e.icon}
-          </button>
+          </Button>
         );
       })}
     </nav>

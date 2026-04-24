@@ -12,6 +12,6 @@ export type Router = {
 };
 
 /**
- * 全站路由树，由 `pnpm run generate:routes` 根据 `app/` 扫描生成并写入 `routes.json`。
+ * 全站路由树，由 `npm run gen-routes` 根据 `app/` 扫描生成并写入 `routes.json`。
  */
 export const appRouter = appRouterJson as Router;

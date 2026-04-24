@@ -75,10 +75,7 @@ function resolveActiveRoute(
       const isBranch = itemHasChildren(item);
 
       if (isBranch) {
-        visit(item.children, groupIndex, itemPath, [
-          ...branchIdsSoFar,
-          itemId,
-        ]);
+        visit(item.children, groupIndex, itemPath, [...branchIdsSoFar, itemId]);
         continue;
       }
 
@@ -133,9 +130,8 @@ function useMenuExpansion({
   pathname: string;
   requiredBranchIds: readonly string[];
 }) {
-  const [userExpanded, setUserExpanded] = useState<ReadonlySet<string>>(
-    EMPTY_SET,
-  );
+  const [userExpanded, setUserExpanded] =
+    useState<ReadonlySet<string>>(EMPTY_SET);
   const [dismissed, setDismissed] = useState<DismissedState>(EMPTY_DISMISSED);
 
   const activeDismissed =
@@ -353,11 +349,7 @@ function MenuItem({
   const { icon, label, chip, actions, tooltip, onPress } = item;
   const children = "children" in item ? item.children : undefined;
   const hasSubmenu = Boolean(children && children.length > 0);
-  const href = hasSubmenu
-    ? undefined
-    : "href" in item
-      ? item.href
-      : undefined;
+  const href = hasSubmenu ? undefined : "href" in item ? item.href : undefined;
   const isCurrent = Boolean(
     href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
   );

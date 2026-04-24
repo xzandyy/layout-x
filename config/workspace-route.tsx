@@ -1,20 +1,24 @@
 import {
   BookOpen,
+  Box,
+  CircleInfo,
+  Display,
   FileText,
   House,
-  Info,
-  Laptop,
-  LayoutGrid,
-  LifeBuoy,
-  Package2,
-  Settings2,
+  LayoutCells,
+  LayoutSideContentLeft,
+  LifeRing,
+  Person,
   ShoppingBag,
+  Sliders,
   Smartphone,
-  User,
   Wrench,
-} from "lucide-react";
+} from "@gravity-ui/icons";
 
 import type { RouteConfig, SidebarContentConfig } from "@/components/layout-x";
+
+const ic = "size-4 shrink-0 text-foreground/90";
+const railIc = "size-5 shrink-0";
 
 /** 主工作区：首页、内容、产品（与站内路由对齐）。 */
 const workspaceSidebar: SidebarContentConfig = {
@@ -23,7 +27,7 @@ const workspaceSidebar: SidebarContentConfig = {
       type: "group",
       menu: [
         {
-          icon: <House size={16} />,
+          icon: <House className={ic} />,
           label: "首页",
           href: "/",
         },
@@ -35,28 +39,28 @@ const workspaceSidebar: SidebarContentConfig = {
       label: "内容",
       menu: [
         {
-          icon: <BookOpen size={16} />,
+          icon: <BookOpen className={ic} />,
           label: "文档",
           children: [
             {
-              icon: <FileText size={16} />,
+              icon: <FileText className={ic} />,
               label: "文档中心",
               href: "/docs",
             },
             {
-              icon: <FileText size={16} />,
+              icon: <FileText className={ic} />,
               label: "使用指南",
               href: "/docs/guide",
             },
           ],
         },
         {
-          icon: <LifeBuoy size={16} />,
+          icon: <LifeRing className={ic} />,
           label: "帮助与支持",
           href: "/support",
         },
         {
-          icon: <Info size={16} />,
+          icon: <CircleInfo className={ic} />,
           label: "关于",
           href: "/about",
         },
@@ -68,26 +72,26 @@ const workspaceSidebar: SidebarContentConfig = {
       label: "产品",
       menu: [
         {
-          icon: <ShoppingBag size={16} />,
+          icon: <ShoppingBag className={ic} />,
           label: "产品总览",
           children: [
             {
-              icon: <LayoutGrid size={16} />,
+              icon: <LayoutCells className={ic} />,
               label: "产品列表",
               href: "/products",
             },
             {
-              icon: <Smartphone size={16} />,
+              icon: <Smartphone className={ic} />,
               label: "手机",
               href: "/products/phones",
             },
             {
-              icon: <Laptop size={16} />,
+              icon: <Display className={ic} />,
               label: "笔记本",
               href: "/products/laptops",
             },
             {
-              icon: <Package2 size={16} />,
+              icon: <Box className={ic} />,
               label: "配件",
               href: "/products/accessories",
             },
@@ -106,17 +110,17 @@ const toolsSidebar: SidebarContentConfig = {
       label: "工具",
       menu: [
         {
-          icon: <Wrench size={16} />,
+          icon: <Wrench className={ic} />,
           label: "工具台",
           href: "/tools",
         },
         {
-          icon: <FileText size={16} />,
+          icon: <FileText className={ic} />,
           label: "文档中心",
           href: "/docs",
         },
         {
-          icon: <LifeBuoy size={16} />,
+          icon: <LifeRing className={ic} />,
           label: "帮助与支持",
           href: "/support",
         },
@@ -133,17 +137,17 @@ const accountSidebar: SidebarContentConfig = {
       label: "我的",
       menu: [
         {
-          icon: <User size={16} />,
+          icon: <Person className={ic} />,
           label: "个人资料",
           href: "/profile",
         },
         {
-          icon: <Settings2 size={16} />,
+          icon: <Sliders className={ic} />,
           label: "账户设置",
           href: "/settings",
         },
         {
-          icon: <Info size={16} />,
+          icon: <CircleInfo className={ic} />,
           label: "关于我们",
           href: "/about",
         },
@@ -162,19 +166,19 @@ export const workspaceRoute: RouteConfig = {
     {
       id: "workspace",
       label: "工作区",
-      icon: <LayoutGrid size={20} />,
+      icon: <LayoutSideContentLeft className={railIc} />,
       sidebar: workspaceSidebar,
     },
     {
       id: "tools",
       label: "工具",
-      icon: <Wrench size={20} />,
+      icon: <Wrench className={railIc} />,
       sidebar: toolsSidebar,
     },
     {
       id: "account",
       label: "我的",
-      icon: <User size={20} />,
+      icon: <Person className={railIc} />,
       sidebar: accountSidebar,
     },
   ],
