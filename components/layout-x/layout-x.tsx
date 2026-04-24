@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useMemo,
-  type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@heroui-pro/react";
@@ -205,7 +204,7 @@ export function LayoutXContent({ className, children }: LayoutXRegionProps) {
 
 /**
  * 主内容区顶栏，渲染面包屑（`breadcrumbRoute`）与右侧操作区（`end`）。
- * 映射到原 `WorkspaceLayoutPanelHeader` 的逻辑与样式。
+ * 顶栏：面包屑 + 右侧区域（与旧版 PanelHeader 视觉一致）。
  */
 export function LayoutXContentHeader({
   className,
@@ -244,7 +243,7 @@ export function LayoutXContentHeader({
 
 /**
  * 主内容区可滚动主体，放于 `LayoutX.ContentHeader` 之下。
- * 映射到原 `WorkspaceLayoutPanelMain`。
+ * 主内容可滚区。
  */
 export function LayoutXContentBody({
   className,

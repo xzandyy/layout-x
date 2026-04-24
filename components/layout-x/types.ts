@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Router } from "@/config/routes";
 
 // ---------------------------------------------------------------------------
-// 菜单节点类型（来自 config-sidebar，在此统一维护）
+// 菜单节点类型（LayoutX.SidebarMain 的 content 配置）
 // ---------------------------------------------------------------------------
 
 /**

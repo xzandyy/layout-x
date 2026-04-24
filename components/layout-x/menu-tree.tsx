@@ -30,16 +30,16 @@ function normalize(p: string): string {
 }
 
 /**
- * 判断 href 是否匹配当前路径。
- * 策略：完整相等 或 前缀匹配（pathname 以 href + "/" 开头）。
- * 根路由 "/" 仅在 pathname === "/" 时匹配；外链永远返回 false。
+ * 判断 href 是否对应当前「页面」以用于 isCurrent 高亮。
+ * 仅做**路径完全相等**（归一化后），**不做**前缀匹配，避免父级（如 /products）与
+ * 子级（/products/phones）同时高亮；子菜单展开由 Tree/Sidebar 根据选中子项处理。
+ * 外链永远 false。
  */
 export function isCurrentHref(pathname: string, href: string): boolean {
   if (href.startsWith("http://") || href.startsWith("https://")) return false;
   const normPath = normalize(pathname);
   const normHref = normalize(href);
-  if (normHref === "/") return normPath === "/";
-  return normPath === normHref || normPath.startsWith(normHref + "/");
+  return normPath === normHref;
 }
 
 function buildTooltipProps(tooltip: TooltipConfig) {
