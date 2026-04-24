@@ -290,6 +290,22 @@ function ContentNode({
   return <GroupNode node={node} {...rest} />;
 }
 
+/**
+ * `Sidebar.Menu` 底层是 React Aria `Tree`，须具备 `aria-label` / `aria-labelledby`，
+ * 否则控制台会出现 “An aria-label or aria-labelledby prop is required…”。
+ */
+function ariaLabelForSidebarMenu(
+  node: SidebarGroupNode,
+  groupIndex: number,
+): string {
+  const { label } = node;
+  if (typeof label === "string" && label.trim() !== "") {
+    return `${label} 菜单`;
+  }
+  if (groupIndex === 0) return "主导航菜单";
+  return `侧栏导航第 ${groupIndex + 1} 组`;
+}
+
 function GroupNode({
   node,
   groupIndex,
@@ -301,6 +317,7 @@ function GroupNode({
     <Sidebar.Group>
       {node.label && <Sidebar.GroupLabel>{node.label}</Sidebar.GroupLabel>}
       <Sidebar.Menu
+        aria-label={ariaLabelForSidebarMenu(node, groupIndex)}
         expandedKeys={expandedKeys}
         onExpandedChange={onExpandedChange}
       >

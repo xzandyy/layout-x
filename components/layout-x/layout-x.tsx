@@ -154,7 +154,10 @@ export function LayoutXSidebarMain({
 }: LayoutXSidebarMainProps) {
   const pathname = usePathname();
   return (
-    <Sidebar.Content className={className}>
+    <Sidebar.Content
+      aria-label="侧栏导航"
+      className={className}
+    >
       {content && <MenuTree config={content} pathname={pathname} />}
       {children}
     </Sidebar.Content>
