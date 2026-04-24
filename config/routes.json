@@ -3,9 +3,31 @@
   "title": "首页",
   "children": [
     {
+      "path": "about",
+      "title": "关于"
+    },
+    {
+      "path": "docs",
+      "title": "文档",
+      "children": [
+        {
+          "path": "guide",
+          "title": "使用指南"
+        }
+      ]
+    },
+    {
       "path": "products",
       "title": "产品",
       "children": [
+        {
+          "path": "accessories",
+          "title": "配件"
+        },
+        {
+          "path": "laptops",
+          "title": "笔记本"
+        },
         {
           "path": "phones",
           "title": "手机",
@@ -30,6 +52,10 @@
           ]
         }
       ]
+    },
+    {
+      "path": "support",
+      "title": "帮助与支持"
     }
   ]
 }

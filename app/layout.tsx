@@ -71,13 +71,13 @@ export default function RootLayout({
           </LayoutX.Rail>
           <LayoutX.Sidebar>
             <LayoutX.SidebarHeader>
-              <div className="border-b border-black/10 px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10">
+              <div className="px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10">
                 导航
               </div>
             </LayoutX.SidebarHeader>
             <LayoutX.SidebarMain content={workspaceSidebarContent} />
             <LayoutX.SidebarFooter>
-              <div className="border-t border-black/10 px-3 py-2 text-xs text-foreground/55 dark:border-white/10">
+              <div className="px-3 py-2 text-xs text-foreground/55 dark:border-white/10">
                 layout-x · 侧栏底栏占位
               </div>
             </LayoutX.SidebarFooter>

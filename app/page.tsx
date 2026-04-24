@@ -8,10 +8,15 @@ export default function Home() {
         首页主区；壳与面包屑由根 <code>layout</code> 提供。
       </p>
       <p>
-        前往{" "}
-        <Link className="text-accent underline" href="/products">
-          /products
+        可前往{" "}
+        <Link className="text-accent underline" href="/docs">
+          文档
         </Link>
+        、
+        <Link className="text-accent underline" href="/products">
+          产品
+        </Link>
+        等页面（亦可用左侧导航）。
       </p>
     </div>
   );
