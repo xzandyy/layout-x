@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { Key } from "react-aria-components";
 import { Sidebar } from "@heroui-pro/react";
+
 import type {
   SidebarContentConfig,
   SidebarGroupNode,
@@ -12,191 +13,345 @@ import type {
 } from "./types";
 
 // ---------------------------------------------------------------------------
-// Path helpers
+// Path（用于当前路由 vs href 的匹配与归一化）
 // ---------------------------------------------------------------------------
 
-/**
- * 规范化路径：
- * - 移除 hash / query，只保留纯路径
- * - 合并连续斜杠
- * - 保证以 "/" 开头，无尾斜杠（根路径除外）
- */
-function normalize(p: string): string {
-  if (!p) return "/";
-  p = p.split("#")[0]!.split("?")[0]!;
+function normalizePath(input: string): string {
+  if (!input) return "/";
+  let p = input.split("#")[0]!.split("?")[0]!;
   p = p.replace(/\/{2,}/g, "/");
   if (!p.startsWith("/")) p = "/" + p;
   if (p !== "/" && p.endsWith("/")) p = p.replace(/\/+$/, "");
-  if (!p) return "/";
-  return p;
+  return p || "/";
 }
 
-/**
- * 从全配置里收集所有**叶子**的 href（有 children 的不收集）。
- */
-function collectLeafHrefsFromItem(
-  item: SidebarMenuItemNode,
-  out: string[],
-): void {
-  if ("children" in item && item.children && item.children.length > 0) {
-    for (const c of item.children) collectLeafHrefsFromItem(c, out);
-  } else if ("href" in item && item.href) {
-    out.push(item.href);
-  }
+function isExternalHref(href: string): boolean {
+  return href.startsWith("http://") || href.startsWith("https://");
 }
 
-function collectLeafHrefsFromConfig(config: SidebarContentConfig): string[] {
-  const out: string[] = [];
-  for (const n of config.nodes) {
-    if (n.type === "group") {
-      for (const m of n.menu) collectLeafHrefsFromItem(m, out);
+function normalizedHrefMatchesPath(
+  normPath: string,
+  normHref: string,
+): boolean {
+  if (normHref === "/") return normPath === "/";
+  return normPath === normHref || normPath.startsWith(`${normHref}/`);
+}
+
+// ---------------------------------------------------------------------------
+// 数据模型：稳定 item id + 一次遍历求「高亮叶子 + 需自动展开的分支 id」
+// ---------------------------------------------------------------------------
+
+function getGroupIdPrefix(groupIndex: number): string {
+  return `g${groupIndex}:`;
+}
+
+function getItemId(groupIndex: number, itemPath: readonly number[]): string {
+  return `${getGroupIdPrefix(groupIndex)}${itemPath.join(".")}`;
+}
+
+interface ActiveRoute {
+  activeLeafNorm?: string;
+  branchIds: string[];
+}
+
+function resolveActiveRoute(
+  config: SidebarContentConfig,
+  pathname: string,
+): ActiveRoute {
+  const normPath = normalizePath(pathname);
+  let bestDepth = -1;
+  let result: ActiveRoute = { branchIds: [] };
+
+  const visit = (
+    items: readonly SidebarMenuItemNode[],
+    groupIndex: number,
+    pathSoFar: readonly number[],
+    branchIdsSoFar: readonly string[],
+  ) => {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]!;
+      const itemPath = [...pathSoFar, i];
+      const itemId = getItemId(groupIndex, itemPath);
+      const isBranch = itemHasChildren(item);
+
+      if (isBranch) {
+        visit(item.children, groupIndex, itemPath, [
+          ...branchIdsSoFar,
+          itemId,
+        ]);
+        continue;
+      }
+
+      const href = "href" in item ? item.href : undefined;
+      if (!href || isExternalHref(href)) continue;
+
+      const normHref = normalizePath(href);
+      if (!normalizedHrefMatchesPath(normPath, normHref)) continue;
+
+      if (normHref.length > bestDepth) {
+        bestDepth = normHref.length;
+        result = {
+          activeLeafNorm: normHref,
+          branchIds: [...branchIdsSoFar],
+        };
+      }
     }
+  };
+
+  for (let gi = 0; gi < config.nodes.length; gi++) {
+    const node = config.nodes[gi]!;
+    if (node.type === "group") visit(node.menu, gi, [], []);
+  }
+
+  return result;
+}
+
+function itemHasChildren(
+  item: SidebarMenuItemNode,
+): item is SidebarMenuItemNode & { children: SidebarMenuItemNode[] } {
+  return (
+    "children" in item && item.children != null && item.children.length > 0
+  );
+}
+
+// ---------------------------------------------------------------------------
+// 受控展开：多棵 Sidebar.Menu 共用一个键空间，按 group 前缀分桶
+// ---------------------------------------------------------------------------
+
+interface DismissedState {
+  forPath: string;
+  keys: ReadonlySet<string>;
+}
+
+const EMPTY_SET: ReadonlySet<string> = new Set<string>();
+const EMPTY_DISMISSED: DismissedState = { forPath: "", keys: EMPTY_SET };
+
+function useMenuExpansion({
+  pathname,
+  requiredBranchIds,
+}: {
+  pathname: string;
+  requiredBranchIds: readonly string[];
+}) {
+  const [userExpanded, setUserExpanded] = useState<ReadonlySet<string>>(
+    EMPTY_SET,
+  );
+  const [dismissed, setDismissed] = useState<DismissedState>(EMPTY_DISMISSED);
+
+  const activeDismissed =
+    dismissed.forPath === pathname ? dismissed.keys : EMPTY_SET;
+
+  const mergedExpanded = useMemo(() => {
+    const out = new Set(userExpanded);
+    for (const id of requiredBranchIds) {
+      if (!activeDismissed.has(id)) out.add(id);
+    }
+    return out;
+  }, [userExpanded, requiredBranchIds, activeDismissed]);
+
+  const getExpandedForGroup = useCallback(
+    (groupIndex: number): Set<string> => {
+      const prefix = getGroupIdPrefix(groupIndex);
+      return filterByPrefix(mergedExpanded, prefix);
+    },
+    [mergedExpanded],
+  );
+
+  const handleExpandedChange = useCallback(
+    (groupIndex: number, nextKeys: Set<Key> | "all") => {
+      if (nextKeys === "all") return;
+
+      const prefix = getGroupIdPrefix(groupIndex);
+      const nextGroupKeys = toStringSet(nextKeys);
+
+      setUserExpanded((prev) => replaceGroup(prev, prefix, nextGroupKeys));
+      setDismissed((prev) =>
+        computeDismissed(prev, {
+          pathname,
+          prefix,
+          nextGroupKeys,
+          requiredBranchIds,
+        }),
+      );
+    },
+    [pathname, requiredBranchIds],
+  );
+
+  return { getExpandedForGroup, handleExpandedChange };
+}
+
+function toStringSet(input: Iterable<Key>): Set<string> {
+  const out = new Set<string>();
+  for (const k of input) out.add(String(k));
+  return out;
+}
+
+function filterByPrefix(
+  source: ReadonlySet<string>,
+  prefix: string,
+): Set<string> {
+  const out = new Set<string>();
+  for (const k of source) {
+    if (k.startsWith(prefix)) out.add(k);
   }
   return out;
 }
 
-/**
- * 在「与当前 path 匹配」的叶子 href 中，选**归一化后最长**的一条（最具体），
- * 这样 `/products/phones/pro/2024/42` 只会高亮 href 为 `/products/phones` 的叶子，
- * 而不会和更短的 `/products` 等同时亮（若存在多个叶子）。
- * 根路径 `/` 仅当 pathname 恰为 `/` 时参与匹配。
- */
-function pickDeepestMatchingLeafNorm(
-  pathname: string,
-  leafHrefs: string[],
-): string | undefined {
-  const normPath = normalize(pathname);
-  const matches: string[] = [];
-  for (const raw of leafHrefs) {
-    if (!raw || raw.startsWith("http://") || raw.startsWith("https://")) {
-      continue;
-    }
-    const normHref = normalize(raw);
-    if (normHref === "/") {
-      if (normPath === "/") matches.push(normHref);
-      continue;
-    }
-    if (normPath === normHref || normPath.startsWith(`${normHref}/`)) {
-      matches.push(normHref);
-    }
+function replaceGroup(
+  source: ReadonlySet<string>,
+  prefix: string,
+  nextGroupKeys: ReadonlySet<string>,
+): Set<string> {
+  const out = new Set<string>();
+  for (const k of source) {
+    if (!k.startsWith(prefix)) out.add(k);
   }
-  if (matches.length === 0) return undefined;
-  return matches.sort((a, b) => b.length - a.length)[0];
+  for (const k of nextGroupKeys) out.add(k);
+  return out;
 }
 
-/** 与 `Sidebar.Menu` 内 RAC Tree 的 item key 一一对应（同 config 下稳定）。 */
-function makeItemId(nodeIndexInConfig: number, itemPath: number[]) {
-  return `n${nodeIndexInConfig}-${itemPath.join("-")}`;
-}
-
-/**
- * 从当前高亮叶子的归一化 href 反推：路径上**所有带 submenu 的祖先** 的 `makeItemId`，
- * 须展开这些节点才能看到当前项。
- */
-function findAncestorBranchIdsForActiveLeaf(
-  config: SidebarContentConfig,
-  activeLeafNorm: string | undefined,
-): string[] {
-  if (!activeLeafNorm) return [];
-  for (let ni = 0; ni < config.nodes.length; ni++) {
-    const n = config.nodes[ni]!;
-    if (n.type !== "group") continue;
-    const chain = findBranchIdChainInMenu(
-      n.menu,
-      ni,
-      [],
-      activeLeafNorm,
-    );
-    if (chain !== null) return chain;
+function computeDismissed(
+  prev: DismissedState,
+  args: {
+    pathname: string;
+    prefix: string;
+    nextGroupKeys: ReadonlySet<string>;
+    requiredBranchIds: readonly string[];
+  },
+): DismissedState {
+  const { pathname, prefix, nextGroupKeys, requiredBranchIds } = args;
+  const base = prev.forPath === pathname ? prev.keys : EMPTY_SET;
+  const next = new Set(base);
+  for (const id of requiredBranchIds) {
+    if (!id.startsWith(prefix)) continue;
+    if (nextGroupKeys.has(id)) next.delete(id);
+    else next.add(id);
   }
-  return [];
-}
-
-/**
- * 找到目标叶子时返回自根到该叶路径上**仅分支**的 id 链（无 children 的叶子不生成 id进链）。
- */
-function findBranchIdChainInMenu(
-  items: SidebarMenuItemNode[],
-  nodeIndex: number,
-  pathSoFar: number[],
-  targetNorm: string,
-): string[] | null {
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]!;
-    const path = [...pathSoFar, i];
-    const id = makeItemId(nodeIndex, path);
-    const isBranch =
-      "children" in item && item.children && item.children.length > 0;
-    if (isBranch) {
-      const sub = findBranchIdChainInMenu(
-        item.children!,
-        nodeIndex,
-        path,
-        targetNorm,
-      );
-      if (sub !== null) {
-        return [id, ...sub];
-      }
-    } else {
-      const h = "href" in item && item.href;
-      if (h && normalize(h) === targetNorm) {
-        return [];
-      }
-    }
-  }
-  return null;
-}
-
-function buildTooltipProps(tooltip: TooltipConfig) {
-  return {
-    content: tooltip.content,
-    className: tooltip.className,
-    delay: tooltip.delay,
-    closeDelay: tooltip.closeDelay,
-    placement: tooltip.placement ?? "right",
-  } as const;
+  return { forPath: pathname, keys: next };
 }
 
 // ---------------------------------------------------------------------------
-// Recursive item renderer
+// Public: MenuTree
+// ---------------------------------------------------------------------------
+
+/**
+ * 将 `SidebarContentConfig` 渲染为 Pro Sidebar 菜单。
+ * 由 `LayoutX.SidebarMain` 在收到 `content` 时内部调用。
+ */
+export function MenuTree({
+  config,
+  pathname,
+}: {
+  config: SidebarContentConfig;
+  pathname: string;
+}) {
+  const activeRoute = useMemo(
+    () => resolveActiveRoute(config, pathname),
+    [config, pathname],
+  );
+
+  const { getExpandedForGroup, handleExpandedChange } = useMenuExpansion({
+    pathname,
+    requiredBranchIds: activeRoute.branchIds,
+  });
+
+  return (
+    <>
+      {config.nodes.map((node, i) => (
+        <ContentNode
+          key={i}
+          node={node}
+          groupIndex={i}
+          activeRoute={activeRoute}
+          expandedKeys={getExpandedForGroup(i)}
+          onExpandedChange={(keys) => handleExpandedChange(i, keys)}
+        />
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Top-level node (separator | group)
+// ---------------------------------------------------------------------------
+
+interface GroupRenderProps {
+  groupIndex: number;
+  activeRoute: ActiveRoute;
+  expandedKeys: Set<string>;
+  onExpandedChange: (keys: Set<Key> | "all") => void;
+}
+
+function ContentNode({
+  node,
+  ...rest
+}: { node: SidebarNode } & GroupRenderProps) {
+  if (node.type === "separator") return <Sidebar.Separator />;
+  return <GroupNode node={node} {...rest} />;
+}
+
+function GroupNode({
+  node,
+  groupIndex,
+  activeRoute,
+  expandedKeys,
+  onExpandedChange,
+}: { node: SidebarGroupNode } & GroupRenderProps) {
+  return (
+    <Sidebar.Group>
+      {node.label && <Sidebar.GroupLabel>{node.label}</Sidebar.GroupLabel>}
+      <Sidebar.Menu
+        expandedKeys={expandedKeys}
+        onExpandedChange={onExpandedChange}
+      >
+        {node.menu.map((item, i) => (
+          <MenuItem
+            key={i}
+            item={item}
+            groupIndex={groupIndex}
+            itemPath={[i]}
+            activeLeafNorm={activeRoute.activeLeafNorm}
+          />
+        ))}
+      </Sidebar.Menu>
+    </Sidebar.Group>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Recursive item
 // ---------------------------------------------------------------------------
 
 function MenuItem({
-  node,
-  itemId,
-  nodeIndex,
+  item,
+  groupIndex,
   itemPath,
   activeLeafNorm,
 }: {
-  node: SidebarMenuItemNode;
-  /** RAC Tree 节点 id，与 expandedKeys 一致 */
-  itemId: string;
-  /** 对应 `config.nodes` 中的下标（本 group 所在位） */
-  nodeIndex: number;
-  /** 在 group.menu 树内的下标路径 */
+  item: SidebarMenuItemNode;
+  groupIndex: number;
   itemPath: number[];
-  /** 全树算出的「当前应高亮」的叶子 href（归一化后）；仅叶子与其相等时 isCurrent */
   activeLeafNorm: string | undefined;
 }) {
-  const { icon, label, chip, actions, tooltip, onPress } = node;
-  const hasSubmenu = Boolean(
-    "children" in node && node.children && node.children.length > 0,
-  );
-  const children = "children" in node ? node.children : undefined;
-  /** 有子菜单时不传 href（仅展开/收起）；若配置里误带 href 也忽略。 */
-  const href =
-    hasSubmenu ? undefined : "href" in node ? node.href : undefined;
+  const { icon, label, chip, actions, tooltip, onPress } = item;
+  const children = "children" in item ? item.children : undefined;
+  const hasSubmenu = Boolean(children && children.length > 0);
+  const href = hasSubmenu
+    ? undefined
+    : "href" in item
+      ? item.href
+      : undefined;
   const isCurrent = Boolean(
-    href && activeLeafNorm && normalize(href) === activeLeafNorm,
+    href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
   );
 
   return (
     <Sidebar.MenuItem
-      id={itemId}
+      id={getItemId(groupIndex, itemPath)}
       href={href}
       isCurrent={isCurrent}
       onAction={onPress}
-      tooltipProps={tooltip ? buildTooltipProps(tooltip) : undefined}
+      tooltipProps={tooltip ? toTooltipProps(tooltip) : undefined}
     >
       <Sidebar.MenuItemContent>
         {icon && <Sidebar.MenuIcon>{icon}</Sidebar.MenuIcon>}
@@ -212,169 +367,27 @@ function MenuItem({
 
       {hasSubmenu && children != null && (
         <Sidebar.Submenu>
-          {children.map((child, i) => {
-            const childPath = [...itemPath, i];
-            return (
-              <MenuItem
-                key={i}
-                node={child}
-                itemId={makeItemId(nodeIndex, childPath)}
-                nodeIndex={nodeIndex}
-                itemPath={childPath}
-                activeLeafNorm={activeLeafNorm}
-              />
-            );
-          })}
+          {children.map((child, i) => (
+            <MenuItem
+              key={i}
+              item={child}
+              groupIndex={groupIndex}
+              itemPath={[...itemPath, i]}
+              activeLeafNorm={activeLeafNorm}
+            />
+          ))}
         </Sidebar.Submenu>
       )}
     </Sidebar.MenuItem>
   );
 }
 
-function GroupNode({
-  node,
-  nodeIndex,
-  activeLeafNorm,
-  expandedForTree,
-  onExpandedChangeForTree,
-}: {
-  node: SidebarGroupNode;
-  /** `config.nodes` 里本 group 节点的下标 */
-  nodeIndex: number;
-  activeLeafNorm: string | undefined;
-  /** 本 Menu（Tree）应展示的展开键（已按 nodeIndex 过滤） */
-  expandedForTree: Set<string>;
-  onExpandedChangeForTree: (keys: Set<Key> | "all") => void;
-}) {
-  return (
-    <Sidebar.Group>
-      {node.label && <Sidebar.GroupLabel>{node.label}</Sidebar.GroupLabel>}
-      <Sidebar.Menu
-        expandedKeys={expandedForTree}
-        onExpandedChange={onExpandedChangeForTree}
-      >
-        {node.menu.map((item, i) => {
-          const itemPath = [i];
-          return (
-            <MenuItem
-              key={i}
-              node={item}
-              itemId={makeItemId(nodeIndex, itemPath)}
-              nodeIndex={nodeIndex}
-              itemPath={itemPath}
-              activeLeafNorm={activeLeafNorm}
-            />
-          );
-        })}
-      </Sidebar.Menu>
-    </Sidebar.Group>
-  );
-}
-
-function SidebarContentNode({
-  node,
-  nodeIndex,
-  activeLeafNorm,
-  expandedForTree,
-  onExpandedChangeForTree,
-}: {
-  node: SidebarNode;
-  nodeIndex: number;
-  activeLeafNorm: string | undefined;
-  expandedForTree: Set<string>;
-  onExpandedChangeForTree: (keys: Set<Key> | "all") => void;
-}) {
-  switch (node.type) {
-    case "separator":
-      return <Sidebar.Separator />;
-    case "group":
-      return (
-        <GroupNode
-          node={node}
-          nodeIndex={nodeIndex}
-          activeLeafNorm={activeLeafNorm}
-          expandedForTree={expandedForTree}
-          onExpandedChangeForTree={onExpandedChangeForTree}
-        />
-      );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Public: MenuTree
-// ---------------------------------------------------------------------------
-
-/**
- * 将 `SidebarContentConfig` 渲染为 Pro Sidebar 菜单节点树。
- * 由 `LayoutX.SidebarMain` 在接收到 `content` prop 时内部调用，
- * 不需要外部单独使用。
- */
-export function MenuTree({
-  config,
-  pathname,
-}: {
-  config: SidebarContentConfig;
-  pathname: string;
-}) {
-  const leafHrefs = useMemo(
-    () => collectLeafHrefsFromConfig(config),
-    [config],
-  );
-  const activeLeafNorm = useMemo(
-    () => pickDeepestMatchingLeafNorm(pathname, leafHrefs),
-    [pathname, leafHrefs],
-  );
-
-  const requiredBranchIds = useMemo(
-    () => findAncestorBranchIdsForActiveLeaf(config, activeLeafNorm),
-    [config, activeLeafNorm],
-  );
-  const [userExpanded, setUserExpanded] = useState<Set<string>>(() => new Set());
-
-  const expandedKeys = useMemo(() => {
-    const n = new Set(userExpanded);
-    for (const k of requiredBranchIds) {
-      n.add(k);
-    }
-    return n;
-  }, [userExpanded, requiredBranchIds]);
-
-  const onExpandedChangeForNodeIndex = useCallback(
-    (nodeIndex: number) => (treeKeys: Set<Key> | "all") => {
-      if (treeKeys === "all") return;
-      const prefix = `n${nodeIndex}-`;
-      setUserExpanded((prev) => {
-        const next = new Set<string>();
-        for (const k of prev) {
-          if (!String(k).startsWith(prefix)) {
-            next.add(String(k));
-          }
-        }
-        for (const k of treeKeys) {
-          next.add(String(k));
-        }
-        return next;
-      });
-    },
-    [],
-  );
-
-  return (
-    <>
-      {config.nodes.map((node, i) => (
-        <SidebarContentNode
-          key={i}
-          node={node}
-          nodeIndex={i}
-          activeLeafNorm={activeLeafNorm}
-          expandedForTree={
-            new Set(
-              [...expandedKeys].filter((k) => String(k).startsWith(`n${i}-`)),
-            )
-          }
-          onExpandedChangeForTree={onExpandedChangeForNodeIndex(i)}
-        />
-      ))}
-    </>
-  );
+function toTooltipProps(tooltip: TooltipConfig) {
+  return {
+    content: tooltip.content,
+    className: tooltip.className,
+    delay: tooltip.delay,
+    closeDelay: tooltip.closeDelay,
+    placement: tooltip.placement ?? "right",
+  } as const;
 }
