@@ -63,9 +63,15 @@ function MenuItem({
   node: SidebarMenuItemNode;
   pathname: string;
 }) {
-  const { icon, label, chip, actions, tooltip, href, children, onPress } = node;
+  const { icon, label, chip, actions, tooltip, onPress } = node;
+  const hasSubmenu = Boolean(
+    "children" in node && node.children && node.children.length > 0,
+  );
+  const children = "children" in node ? node.children : undefined;
+  /** 有子菜单时不传 href（仅展开/收起）；若配置里误带 href 也忽略。 */
+  const href =
+    hasSubmenu ? undefined : "href" in node ? node.href : undefined;
   const isCurrent = href ? isCurrentHref(pathname, href) : false;
-  const hasSubmenu = children && children.length > 0;
 
   return (
     <Sidebar.MenuItem
@@ -86,7 +92,7 @@ function MenuItem({
         )}
       </Sidebar.MenuItemContent>
 
-      {hasSubmenu && (
+      {hasSubmenu && children != null && (
         <Sidebar.Submenu>
           {children.map((child, i) => (
             <MenuItem key={i} node={child} pathname={pathname} />

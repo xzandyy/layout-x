@@ -22,29 +22,35 @@ export type TooltipConfig = {
   placement?: "top" | "bottom" | "left" | "right";
 };
 
-/**
- * 单个菜单项，递归支持子项（children → Sidebar.Submenu）。
- *
- * 映射关系：
- *   icon     → Sidebar.MenuIcon
- *   label    → Sidebar.MenuLabel
- *   chip     → Sidebar.MenuChip
- *   actions  → Sidebar.MenuActions（ReactNode，调用方用 Sidebar.MenuAction 绑定事件）
- *   tooltip  → Sidebar.MenuItem tooltipProps（折叠态）
- *   href     → Sidebar.MenuItem href（Provider navigate 路由）
- *   children → Sidebar.Submenu；Pro 自动加 MenuTrigger + MenuIndicator
- *   onPress  → Sidebar.MenuItem onAction（RAC TreeItem），与 href 可并存
- */
-export type SidebarMenuItemNode = {
+type SidebarMenuItemBase = {
   icon?: ReactNode;
   label: ReactNode;
   chip?: ReactNode;
   actions?: ReactNode;
   tooltip?: TooltipConfig;
-  href?: string;
-  children?: SidebarMenuItemNode[];
   onPress?: () => void;
 };
+
+/**
+ * 叶子项：可带 `href` 导航，**无**子菜单（无 `children`）。
+ */
+export type SidebarMenuItemLeaf = SidebarMenuItemBase & {
+  href?: string;
+  children?: never;
+};
+
+/**
+ * 分支项：有 `children` 时**禁止** `href`（仅用于展开/收起子菜单，不导航）。
+ */
+export type SidebarMenuItemBranch = SidebarMenuItemBase & {
+  children: SidebarMenuItemNode[];
+  href?: never;
+};
+
+/**
+ * 菜单项；叶子与分支二选一，保证「有子菜单则无 href」。
+ */
+export type SidebarMenuItemNode = SidebarMenuItemLeaf | SidebarMenuItemBranch;
 
 /** 横向分隔线节点，映射到 Sidebar.Separator */
 export type SidebarSeparatorNode = {

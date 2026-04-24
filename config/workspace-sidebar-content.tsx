@@ -23,7 +23,6 @@ export const workspaceSidebarContent: SidebarContentConfig = {
         {
           icon: <ShoppingBag size={16} />,
           label: "产品总览",
-          href: "/products",
           children: [
             {
               icon: <Smartphone size={16} />,

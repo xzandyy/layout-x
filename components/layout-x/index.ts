@@ -60,6 +60,8 @@ export type {
   SidebarGroupNode,
   SidebarSeparatorNode,
   SidebarMenuItemNode,
+  SidebarMenuItemLeaf,
+  SidebarMenuItemBranch,
   TooltipConfig,
 } from "./types";
 
