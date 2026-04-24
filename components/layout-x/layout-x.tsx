@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-} from "react";
+import { createContext, useContext, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar } from "@heroui-pro/react";
 
@@ -57,7 +53,7 @@ export function LayoutXRoot({
 
   return (
     <LayoutXContext.Provider value={value}>
-      <Sidebar.Provider navigate={router.push}>
+      <Sidebar.Provider navigate={router.push} variant="inset">
         <div
           className={cn(
             "box-border flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row items-stretch overflow-hidden",
@@ -117,10 +113,7 @@ export function LayoutXRailMain({ className, children }: LayoutXRegionProps) {
 
 export function LayoutXRailFooter({ className, children }: LayoutXRegionProps) {
   return (
-    <div
-      className={cn("shrink-0", className)}
-      data-slot="layout-x-rail-footer"
-    >
+    <div className={cn("shrink-0", className)} data-slot="layout-x-rail-footer">
       {children}
     </div>
   );
@@ -192,7 +185,7 @@ export function LayoutXContent({ className, children }: LayoutXRegionProps) {
     <Sidebar.Main>
       <div
         className={cn(
-          "m-2 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200/80 bg-white dark:border-zinc-700/60 dark:bg-zinc-900",
+          "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-white dark:bg-zinc-900",
           className,
         )}
       >
@@ -222,7 +215,10 @@ export function LayoutXContentHeader({
     >
       <div className="flex w-full min-w-0 items-center gap-3">
         {breadcrumbRoute != null ? (
-          <RouteBreadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
+          <RouteBreadcrumbs
+            className="min-w-0 shrink"
+            route={breadcrumbRoute}
+          />
         ) : null}
         {end != null ? (
           <div
