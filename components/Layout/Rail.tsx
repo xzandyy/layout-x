@@ -16,8 +16,8 @@ export function Rail({ className, children }: RailProps) {
   const { railWidth } = useLayoutContext();
   return (
     <aside
-      aria-label="Rail"
       className={cn(
+        "z-100",
         "flex h-full min-h-0 w-full min-w-0 flex-col",
         "shrink-0 self-stretch bg-canvas",
         className,

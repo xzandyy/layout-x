@@ -51,6 +51,10 @@ export function ContentHeader({ className, end }: ContentHeaderProps) {
       style={{ minHeight: `${headerHeight}rem` }}
     >
       <div className="flex w-full min-w-0 items-center gap-3">
+        <HeroSidebar.Trigger
+          className="shrink-0 text-fg-3"
+          aria-label="切换侧栏"
+        />
         <Breadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
         {end != null ? (
           <div

@@ -134,7 +134,7 @@ export function LayoutRoot({
 
   return (
     <LayoutContext.Provider value={value}>
-      <HeroSidebar.Provider navigate={router.push} collapsible="none">
+      <HeroSidebar.Provider navigate={router.push} collapsible="offcanvas">
         <div
           className={cn(
             "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0",
