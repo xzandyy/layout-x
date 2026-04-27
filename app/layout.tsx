@@ -17,9 +17,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const sidebarHeaderBtnClass =
-  "size-7 min-w-7 shrink-0 rounded-md! p-0 text-fg-3 hover:bg-canvas-2! hover:text-fg-1!";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -38,9 +35,9 @@ export default function RootLayout({
         <Layout route={workspaceRoute}>
           <Layout.Rail>
             <Layout.RailHeader>
-              <div className="flex items-center justify-center py-3">
+              <div className="flex items-center justify-center py-3 mb-2">
                 <div
-                  className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-canvas-2 text-[11px] font-semibold tracking-[-0.01em] text-fg-1"
+                  className="flex h-8 w-8 bg-linear-to-br from-[#4F8AF7] to-[#2056B3] items-center justify-center rounded-[9px] text-[11px] font-semibold tracking-[-0.01em] text-white"
                   title="Brand / Logo"
                 >
                   LX
@@ -75,7 +72,9 @@ export default function RootLayout({
                   size="sm"
                   variant="ghost"
                   aria-label="Edit"
-                  className={sidebarHeaderBtnClass}
+                  className={
+                    "size-7 min-w-7 shrink-0 rounded-md! p-0 text-fg-3 hover:bg-canvas-2! hover:text-fg-1!"
+                  }
                 >
                   <Pencil className="size-3.5 text-current" />
                 </Button>
@@ -84,7 +83,10 @@ export default function RootLayout({
                   size="sm"
                   variant="ghost"
                   aria-label="More"
-                  className={cn(sidebarHeaderBtnClass, "ml-1")}
+                  className={cn(
+                    "size-7 min-w-7 shrink-0 rounded-md! p-0 text-fg-3 hover:bg-canvas-2! hover:text-fg-1!",
+                    "ml-1",
+                  )}
                 >
                   <EllipsisVertical className="size-3.5 text-current" />
                 </Button>
