@@ -212,7 +212,7 @@ export function Sidebar({ className, children }: LayoutXRegionProps) {
   );
   return (
     <HeroSidebar
-      className={cn("bg-canvas border-none shadow-none px-2", className)}
+      className={cn("bg-canvas border-none shadow-none pr-2", className)}
       style={sidebarVars}
     >
       {children}

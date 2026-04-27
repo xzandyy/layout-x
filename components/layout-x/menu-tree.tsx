@@ -149,7 +149,7 @@ function MenuItem({
     >
       <Sidebar.MenuItemContent
         className={cn(
-          "flex items-center gap-2 min-h-8 my-[0.1rem]",
+          "flex items-center gap-2 min-h-8 my-px",
           "px-2.5 py-1 rounded-md",
           "transition-all duration-150",
           isCurrent
