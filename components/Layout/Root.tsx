@@ -138,6 +138,7 @@ export function LayoutRoot({
         <div
           className={cn(
             "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0",
+            "flex-col-reverse md:flex-row",
             "bg-canvas text-fg-1",
             className,
           )}

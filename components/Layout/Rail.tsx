@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo, type CSSProperties, type ReactNode } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { useLayoutContext } from "./root";
@@ -17,12 +17,13 @@ export function Rail({ className, children }: RailProps) {
   return (
     <aside
       className={cn(
-        "z-100",
-        "flex h-full min-h-0 w-full min-w-0 flex-col",
-        "shrink-0 self-stretch bg-canvas",
+        "z-100 shrink-0 bg-canvas",
+        "flex min-h-0 min-w-0",
+        "h-auto w-full flex-row border-t border-border-hair",
+        "md:h-full md:w-[var(--rail-width)] md:flex-col md:self-stretch md:border-t-0",
         className,
       )}
-      style={{ width: `${railWidth}rem` }}
+      style={{ "--rail-width": `${railWidth}rem` } as CSSProperties}
     >
       {children}
     </aside>
@@ -37,7 +38,9 @@ export type RailHeaderProps = {
 };
 
 export function RailHeader({ className, children }: RailHeaderProps) {
-  return <div className={cn("shrink-0", className)}>{children}</div>;
+  return (
+    <div className={cn("hidden shrink-0 md:block", className)}>{children}</div>
+  );
 }
 
 // -- Rail Footer -- //
@@ -48,7 +51,9 @@ export type RailFooterProps = {
 };
 
 export function RailFooter({ className, children }: RailFooterProps) {
-  return <div className={cn("shrink-0", className)}>{children}</div>;
+  return (
+    <div className={cn("hidden shrink-0 md:block", className)}>{children}</div>
+  );
 }
 
 // -- Rail Main -- //
@@ -67,12 +72,19 @@ export function RailMain({ className, children }: RailMainProps) {
   return (
     <div
       className={cn(
-        "w-full min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
+        "min-h-0 min-w-0 flex-1",
+        "overflow-x-auto overflow-y-hidden md:overflow-x-hidden md:overflow-y-auto",
         className,
       )}
     >
       {items.length ? (
-        <nav className="flex flex-col items-center gap-1">
+        <nav
+          className={cn(
+            "flex items-center gap-1",
+            "flex-row justify-around px-2 py-1",
+            "md:flex-col md:justify-start md:px-0 md:py-0",
+          )}
+        >
           {items.map((e) => {
             const isActive = e.id === activeEntryId;
             const name = typeof e.label === "string" ? e.label : e.id;

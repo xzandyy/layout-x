@@ -39,12 +39,18 @@ export function Sidebar({ className, children }: SidebarProps) {
     [sidebarWidth],
   );
   return (
-    <HeroSidebar
-      className={cn("bg-canvas border-none shadow-none pr-2", className)}
-      style={sidebarVars}
-    >
-      {children}
-    </HeroSidebar>
+    <>
+      <HeroSidebar
+        className={cn(
+          "bg-canvas border-none shadow-none md:pr-2",
+          className,
+        )}
+        style={sidebarVars}
+      >
+        {children}
+      </HeroSidebar>
+      <HeroSidebar.Mobile>{children}</HeroSidebar.Mobile>
+    </>
   );
 }
 

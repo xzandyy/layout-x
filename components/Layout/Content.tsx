@@ -17,7 +17,7 @@ export type ContentProps = {
 
 export function Content({ className, children }: ContentProps) {
   return (
-    <HeroSidebar.Main className="min-h-0 min-w-0 p-2 pl-0">
+    <HeroSidebar.Main className="min-h-0 min-w-0 p-2 md:pl-0">
       <div
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
