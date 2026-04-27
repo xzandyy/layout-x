@@ -193,9 +193,9 @@ function ariaLabelForSidebarMenu(
 ): string {
   const { label } = node;
   if (typeof label === "string" && label.trim() !== "") {
-    return `${label}`;
+    return `${label} menu`;
   }
-  return `菜单${groupIndex + 1}`;
+  return `Menu group ${groupIndex + 1}`;
 }
 
 function toTooltipProps(tooltip: TooltipConfig) {

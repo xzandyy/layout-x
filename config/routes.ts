@@ -1,8 +1,8 @@
 import appRouterJson from "./routes.json";
 
 /**
- * 全局通用路由树节点（面包屑/导航等共用）。
- * `hasPage` 默认 `true`；无该 URL 前缀的独立 page 时显式为 `false`。
+ * Shared route tree node (breadcrumbs, nav, etc.).
+ * `hasPage` defaults to `true`; set `false` when that URL segment has no `page.tsx`.
  */
 export type Router = {
   path: string;
@@ -12,6 +12,6 @@ export type Router = {
 };
 
 /**
- * 全站路由树，由 `npm run gen-routes` 根据 `app/` 扫描生成并写入 `routes.json`。
+ * App route tree: generated into `routes.json` by `npm run gen-routes` from `app/`.
  */
 export const appRouter = appRouterJson as Router;

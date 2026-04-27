@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="zh-CN"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
@@ -42,7 +42,7 @@ export default function RootLayout({
               <div className="flex items-center justify-center py-3">
                 <div
                   className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-canvas-2 text-[11px] font-semibold tracking-[-0.01em] text-fg-1"
-                  title="品牌 / Logo"
+                  title="Brand / Logo"
                 >
                   LX
                 </div>
@@ -55,7 +55,7 @@ export default function RootLayout({
               <div className="flex justify-center py-3">
                 <div
                   className="h-7 w-7 rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A]"
-                  title="账户"
+                  title="Account"
                 />
               </div>
             </LayoutX.RailFooter>
@@ -65,7 +65,7 @@ export default function RootLayout({
               <div className="sb-head flex items-center px-2 py-3">
                 <div className="flex-1 min-w-0">
                   <div className="sb-title font-medium text-[1rem] text-fg-1 truncate">
-                    Home
+                    Workspace
                   </div>
                   <div className="sb-title-sub text-xs text-fg-4 truncate">
                     Workspace · Astrid

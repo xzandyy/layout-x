@@ -2,23 +2,23 @@ import type { ReactNode } from "react";
 import type { Router } from "@/config/routes";
 
 // ---------------------------------------------------------------------------
-// 菜单节点（SidebarContentConfig，由 RouteEntry.sidebar 等传入）
+// Menu nodes (SidebarContentConfig, passed from RouteEntry.sidebar, etc.)
 // ---------------------------------------------------------------------------
 
 /**
- * 折叠态 tooltip 配置，映射到 Sidebar.MenuItem 的 tooltipProps。
- * 侧栏折叠为 icon-only 时 Pro 将此配置渲染为悬浮提示。
+ * Collapsed-mode tooltip; maps to `Sidebar.MenuItem` `tooltipProps`.
+ * When the sidebar is icon-only, Pro renders this as a tooltip.
  */
 export type TooltipConfig = {
-  /** Tooltip 内容 */
+  /** Tooltip content */
   content: ReactNode;
-  /** 附加在 Tooltip 容器上的 className */
+  /** Optional class on the tooltip container */
   className?: string;
-  /** 显示前延迟（ms） */
+  /** Show delay (ms) */
   delay?: number;
-  /** 隐藏前延迟（ms） */
+  /** Hide delay (ms) */
   closeDelay?: number;
-  /** 弹出方向，默认 "right" */
+  /** Placement, default "right" */
   placement?: "top" | "bottom" | "left" | "right";
 };
 
@@ -32,7 +32,7 @@ type SidebarMenuItemBase = {
 };
 
 /**
- * 叶子项：可带 `href` 导航，**无**子菜单（无 `children`）。
+ * Leaf: may have `href` to navigate, **no** submenu (`children` absent).
  */
 export type SidebarMenuItemLeaf = SidebarMenuItemBase & {
   href?: string;
@@ -40,7 +40,7 @@ export type SidebarMenuItemLeaf = SidebarMenuItemBase & {
 };
 
 /**
- * 分支项：有 `children` 时**禁止** `href`（仅用于展开/收起子菜单，不导航）。
+ * Branch: with `children`, **`href` is not allowed** (expand/collapse only, no navigation).
  */
 export type SidebarMenuItemBranch = SidebarMenuItemBase & {
   children: SidebarMenuItemNode[];
@@ -48,45 +48,45 @@ export type SidebarMenuItemBranch = SidebarMenuItemBase & {
 };
 
 /**
- * 菜单项；叶子与分支二选一，保证「有子菜单则无 href」。
+ * Menu item: leaf XOR branch, enforcing "submenu => no href".
  */
 export type SidebarMenuItemNode = SidebarMenuItemLeaf | SidebarMenuItemBranch;
 
-/** 横向分隔线节点，映射到 Sidebar.Separator */
+/** Horizontal rule; maps to `Sidebar.Separator` */
 export type SidebarSeparatorNode = {
   type: "separator";
 };
 
 /**
- * 分组节点，映射到 Sidebar.Group + Sidebar.Menu。
- * label 存在时额外渲染 Sidebar.GroupLabel（折叠态自动隐藏）。
+ * Group; maps to `Sidebar.Group` + `Sidebar.Menu`.
+ * When `label` is set, also renders `Sidebar.GroupLabel` (hidden when collapsed).
  */
 export type SidebarGroupNode = {
   type: "group";
-  /** 可选分组标题；省略则不渲染 GroupLabel */
+  /** Optional group title; if omitted, no GroupLabel */
   label?: ReactNode;
   menu: SidebarMenuItemNode[];
 };
 
-/** SidebarContentConfig 的 `nodes` 中允许出现的节点类型联合 */
+/** Allowed node types in `SidebarContentConfig.nodes` */
 export type SidebarNode = SidebarSeparatorNode | SidebarGroupNode;
 
 /**
- * 侧栏配置树根；`RouteEntry.sidebar` 持有此类型。
- * nodes 有序渲染，在 menu-tree 中按类型分发给 Pro 组件。
+ * Sidebar config root; `RouteEntry.sidebar` uses this.
+ * `nodes` render in order; `menu-tree` dispatches to Pro by node type.
  */
 export type SidebarContentConfig = {
   nodes: SidebarNode[];
 };
 
 // ---------------------------------------------------------------------------
-// Route（Rail 入口 + 每个入口绑定的 Sidebar 内容）
+// Route (rail slot + bound sidebar)
 // ---------------------------------------------------------------------------
 
 /**
- * 一个 Rail 入口（图标 + 绑定的侧栏内容）。
- * 点击仅切换当前展示的 sidebar，不导航（由 `LayoutXContext.setActiveEntryId` 表示）。
- * URL 上应高亮/激活哪个 entry：由 `sidebar` 中叶子 `href` 在实现层推导，本类型不声明单独 match 字段。
+ * One rail slot (icon + bound sidebar).
+ * Click only switches the visible sidebar (see `setActiveEntryId`); it does not navigate.
+ * Which entry is active for a URL is derived from leaf `href`s in implementation; this type has no extra match field.
  */
 export type RouteEntry = {
   id: string;
@@ -97,79 +97,76 @@ export type RouteEntry = {
 };
 
 /**
- * 整合配置：多入口 Rail 与各自侧栏内容。
- * 由 `LayoutX` 根传入，经 Context 分发给 `LayoutX.RailMain` / `LayoutX.SidebarMain`。
+ * Full route config: multiple rail entries and their sidebars.
+ * Passed from the `LayoutX` root; Context fans out to `Rail` / `SidebarMain`.
  */
 export type RouteConfig = {
   entries: RouteEntry[];
   /**
-   * 当 pathname 无法与任一 entry 的 `sidebar` 叶子 `href` 匹配时的兜底 `entry.id`。
-   * 省略则回退为 `entries[0]?.id`。
+   * Fallback `entry.id` when pathname matches no leaf in any `sidebar`.
+   * If omitted, falls back to `entries[0]?.id`.
    */
   defaultEntryId?: string;
 };
 
 // ---------------------------------------------------------------------------
-// LayoutX 组件 props 类型
+// LayoutX component props
 // ---------------------------------------------------------------------------
 
-/** LayoutX 根组件（含 Sidebar.Provider）props */
+/** `LayoutX` root (wraps `Sidebar.Provider`) */
 export type LayoutXProps = {
-  /** 顶栏高度（rem），影响 ContentHeader 的 minHeight */
+  /** Content header min-height (rem) */
   headerHeight?: number;
-  /** Rail 最窄宽度（rem） */
+  /** Rail width (rem) */
   railWidth?: number;
   /**
-   * 侧栏宽度（rem），对应 Pro `Sidebar` 的 `--sidebar-width`（文档默认 240px ≈ 15rem）。本布局不启用侧栏折叠，不设 `--sidebar-width-collapsed`。
+   * Sidebar width (rem); Pro `--sidebar-width` (docs default 240px ≈ 15rem). No collapsed width — collapse is off.
    * @see https://docs-prod.heroui.pro/docs/react/components/sidebar#css-variables
    */
   sidebarWidth?: number;
   className?: string;
   /**
-   * Rail 入口 + 各入口侧栏内容；与 Context 中 `activeEntry` / `setActiveEntryId` 配合使用。
+   * Rail entries + per-entry sidebars; used with `activeEntry` / `setActiveEntryId` in Context.
    */
   route?: RouteConfig;
   children: ReactNode;
 };
 
-/** Rail 区域、SidebarHeader/Footer 等通用区域 props */
+/** Common region props: Rail, Sidebar header/footer, etc. */
 export type LayoutXRegionProps = {
   className?: string;
   children?: ReactNode;
 };
 
-/** LayoutX.SidebarMain props：菜单树由根 `route` 与当前 `activeEntry.sidebar` 驱动；`children` 附加在配置菜单之后。 */
+/** `SidebarMain`: tree from root `route` and current `activeEntry.sidebar`; `children` append after the configured menu. */
 export type LayoutXSidebarMainProps = {
   className?: string;
   children?: ReactNode;
 };
 
-/** LayoutX.ContentHeader props */
+/** Content header */
 export type LayoutXContentHeaderProps = {
   className?: string;
   /**
-   * 顶栏左侧面包屑对应的路由树（来自 @/config/routes）。
-   * 不传则不渲染面包屑。
+   * Route tree for breadcrumbs (`@/config/routes`); omit to hide breadcrumbs.
    */
   breadcrumbRoute?: Router;
-  /** 顶栏右侧自由区域，如操作按钮、搜索框 */
+  /** Trailing area (actions, search, etc.) */
   end?: ReactNode;
 };
 
-/** LayoutX context：尺寸 + 可选的 route 与当前激活 entry（hybrid：URL 推断 + 用户点 Rail 覆盖） */
+/** LayoutX context: dimensions + optional route + active entry (URL guess + optional rail override) */
 export type LayoutXContextValue = {
   headerHeight: number;
   railWidth: number;
-  /**
-   * 侧栏宽度（rem），与 Pro `Sidebar` 的 `--sidebar-width` 一致。
-   */
+  /** Sidebar width (rem); matches Pro `--sidebar-width` */
   sidebarWidth: number;
-  /** 根传入的 `route`（若有） */
+  /** Root `route`, if any */
   route?: RouteConfig;
-  /** 当前激活的 entry id；无 `route` 时为 `undefined` */
+  /** Active entry id; `undefined` if no `route` */
   activeEntryId?: string;
-  /** 当前激活的 entry 对象 */
+  /** Active entry object */
   activeEntry?: RouteEntry;
-  /** 用户点击 Rail 图标切换 entry（在下次 pathname 变化时由实现重置与 URL 对齐） */
+  /** User rail click; reset toward URL on pathname change in implementation */
   setActiveEntryId: (id: string) => void;
 };

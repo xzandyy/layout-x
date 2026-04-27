@@ -2,15 +2,12 @@
 @import "@heroui/styles";
 @import "@heroui-pro/react/css";
 
-/* =============================================================
-   设计 Token —— 参考 EasyX.AI Appkit (Arda)
-   外层 off-white canvas + 内层 white surface 的双层卡片体系
-   ============================================================= */
+
 :root {
   /* Surface */
-  --bg-canvas: #f4f5f7; /* outer chrome / rail / sidebar 背景 */
-  --bg-canvas-2: #eef0f3; /* hover / 弱填充 */
-  --bg-surface: #ffffff; /* 内层白卡片 / 主内容区 */
+  --bg-canvas: #f4f5f7; /* outer chrome / rail / sidebar */
+  --bg-canvas-2: #eef0f3; /* hover / weak fill */
+  --bg-surface: #ffffff; /* inner cards / main content */
   --bg-row-hover: #f7f8fa;
   --bg-subtle: #f0f2f5;
 
@@ -37,7 +34,7 @@
   --r-sb-item: 7px;
   --r-card: 14px;
 
-  /* 兼容旧变量：Tailwind 默认通过这两个生成 bg-background / text-foreground */
+  /* Back-compat: Tailwind `bg-background` / `text-foreground` */
   --background: var(--bg-canvas);
   --foreground: var(--fg-1);
 }
@@ -53,6 +50,7 @@
   --color-fg-2: var(--fg-2);
   --color-fg-3: var(--fg-3);
   --color-fg-4: var(--fg-4);
+  --color-fg-5: var(--fg-5);
   --color-border-hair: var(--border-hair);
   --color-border-soft: var(--border);
   --font-sans: var(--font-geist-sans);
@@ -100,6 +98,6 @@ body {
   }
 
   .breadcrumbs .breadcrumbs__separator {
-    @apply inline-flex shrink-0 select-none items-center self-center text-sm font-normal leading-none text-fg-4;
+    @apply inline-flex shrink-0 select-none items-center self-center text-sm font-normal leading-none text-fg-5;
   }
 }

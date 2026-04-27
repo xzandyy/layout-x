@@ -32,7 +32,7 @@ function useLayoutContext(): LayoutXContextValue {
   const ctx = useContext(LayoutXContext);
   if (ctx == null) {
     throw new Error(
-      "LayoutX 子组件（Rail、SidebarHeader、ContentHeader 等）必须放在 <LayoutX> 内使用。",
+      "LayoutX subcomponents (Rail, SidebarHeader, ContentHeader, etc.) must be used inside <LayoutX>.",
     );
   }
   return ctx;

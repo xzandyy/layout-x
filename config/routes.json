@@ -1,73 +1,44 @@
 {
   "path": "/",
-  "title": "首页",
+  "title": "Home",
   "children": [
     {
-      "path": "about",
-      "title": "关于"
+      "path": "agents",
+      "title": "Agents"
     },
     {
-      "path": "docs",
-      "title": "文档",
+      "path": "inbox",
+      "title": "Inbox",
       "children": [
         {
-          "path": "guide",
-          "title": "使用指南"
+          "path": "review",
+          "title": "Review"
         }
       ]
     },
     {
-      "path": "products",
-      "title": "产品",
+      "path": "integrations",
+      "title": "Integrations"
+    },
+    {
+      "path": "library",
+      "title": "Library",
       "children": [
         {
-          "path": "accessories",
-          "title": "配件"
-        },
-        {
-          "path": "laptops",
-          "title": "笔记本"
-        },
-        {
-          "path": "phones",
-          "title": "手机",
-          "children": [
-            {
-              "path": ":type",
-              "title": "类型",
-              "hasPage": false,
-              "children": [
-                {
-                  "path": ":year",
-                  "title": "年份",
-                  "children": [
-                    {
-                      "path": ":id",
-                      "title": "详情"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+          "path": "playbooks",
+          "title": "Playbooks"
         }
       ]
     },
     {
-      "path": "profile",
-      "title": "个人资料"
-    },
-    {
-      "path": "settings",
-      "title": "账户设置"
-    },
-    {
-      "path": "support",
-      "title": "帮助与支持"
-    },
-    {
-      "path": "tools",
-      "title": "工具台"
+      "path": "workflows",
+      "title": "Workflows",
+      "children": [
+        {
+          "path": "lead-crm",
+          "title": "Lead → CRM"
+        }
+      ]
     }
   ]
 }

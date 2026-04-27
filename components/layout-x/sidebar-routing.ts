@@ -34,7 +34,7 @@ function itemHasChildren(
 }
 
 /**
- * 与 menu-tree 中 `resolveActiveRoute` 一致：取与 pathname 最匹配的叶子归一化 href；无匹配则 `undefined`。
+ * Same as `resolveActiveRoute` in `menu-tree`: best-matching leaf href for pathname; or `undefined`.
  */
 export function getActiveLeafNormForConfig(
   config: SidebarContentConfig,
@@ -76,8 +76,8 @@ export function getActiveLeafNormForConfig(
 }
 
 /**
- * 在多个 entry 的 `sidebar` 中，用「最具体」的叶子匹配（按归一化 href 长度）选出唯一 entry id。
- * 全都不匹配时返回 `undefined`。
+ * Pick the one `RouteConfig.entries` item whose `sidebar` has the most specific matching leaf
+ * (longest normalized href). If none match, `undefined`.
  */
 export function findBestEntryIdForPathname(
   route: RouteConfig,

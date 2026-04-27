@@ -90,7 +90,7 @@ function buildBreadcrumbItems(
       isCurrent: false,
     };
   });
-  /** `routes.json` 中 `title: ""` 的段不参与面包屑；过滤后最后一项为当前段 */
+  /** Segments with empty `title` in routes.json are omitted; last visible crumb is current. */
   const visible = items.filter((item) => item.title.trim() !== "");
   if (visible.length === 0) return [];
   return visible.map((item, i, arr) => ({

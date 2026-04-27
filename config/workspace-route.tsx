@@ -1,183 +1,186 @@
 import {
-  BookOpen,
-  Box,
-  CircleInfo,
-  Display,
+  Book,
+  CheckDouble,
+  Envelope,
+  FaceRobot,
   FileText,
+  FolderFlows,
+  Gear,
   House,
-  LayoutCells,
-  LayoutSideContentLeft,
-  LifeRing,
-  Person,
-  ShoppingBag,
-  Sliders,
-  Smartphone,
-  Wrench,
 } from "@gravity-ui/icons";
 
 import type { RouteConfig, SidebarContentConfig } from "@/components/layout-x";
 
+/** Icons + sidebars aligned with the EasyX.AI Appkit six-area shell. */
 const ic = "size-4 shrink-0 text-foreground/90";
 const railIc = "size-5 shrink-0";
 
-/** 主工作区：首页、内容、产品（与站内路由对齐）。 */
-const workspaceSidebar: SidebarContentConfig = {
+/** Home rail: only `/` (avoid duplicate leaf hrefs in other entries for URL → rail resolution). */
+const homeSidebar: SidebarContentConfig = {
   nodes: [
     {
       type: "group",
+      label: "Overview",
       menu: [
         {
           icon: <House className={ic} />,
-          label: "首页",
+          label: "Home",
           href: "/",
         },
       ],
     },
-    {
-      type: "group",
-      label: "内容",
-      menu: [
-        {
-          icon: <BookOpen className={ic} />,
-          label: "文档",
-          children: [
-            {
-              icon: <FileText className={ic} />,
-              label: "文档中心",
-              href: "/docs",
-            },
-            {
-              icon: <FileText className={ic} />,
-              label: "使用指南",
-              href: "/docs/guide",
-            },
-          ],
-        },
-        {
-          icon: <LifeRing className={ic} />,
-          label: "帮助与支持",
-          href: "/support",
-        },
-        {
-          icon: <CircleInfo className={ic} />,
-          label: "关于",
-          href: "/about",
-        },
-      ],
-    },
-    {
-      type: "group",
-      label: "产品",
-      menu: [
-        {
-          icon: <ShoppingBag className={ic} />,
-          label: "产品总览",
-          children: [
-            {
-              icon: <LayoutCells className={ic} />,
-              label: "产品列表",
-              href: "/products",
-            },
-            {
-              icon: <Smartphone className={ic} />,
-              label: "手机",
-              href: "/products/phones",
-            },
-            {
-              icon: <Display className={ic} />,
-              label: "笔记本",
-              href: "/products/laptops",
-            },
-            {
-              icon: <Box className={ic} />,
-              label: "配件",
-              href: "/products/accessories",
-            },
-          ],
-        },
-      ],
-    },
   ],
 };
 
-/** 工具与效率：与「工具」Rail 项对应。 */
-const toolsSidebar: SidebarContentConfig = {
+/** Inbox + Review */
+const inboxSidebar: SidebarContentConfig = {
   nodes: [
     {
       type: "group",
-      label: "工具",
+      label: "Inbox",
       menu: [
         {
-          icon: <Wrench className={ic} />,
-          label: "工具台",
-          href: "/tools",
+          icon: <Envelope className={ic} />,
+          label: "Inbox",
+          href: "/inbox",
         },
         {
-          icon: <FileText className={ic} />,
-          label: "文档中心",
-          href: "/docs",
-        },
-        {
-          icon: <LifeRing className={ic} />,
-          label: "帮助与支持",
-          href: "/support",
+          icon: <CheckDouble className={ic} />,
+          label: "Review",
+          href: "/inbox/review",
         },
       ],
     },
   ],
 };
 
-/** 账户与个人：与「我的」Rail 项对应。 */
-const accountSidebar: SidebarContentConfig = {
+const agentsSidebar: SidebarContentConfig = {
   nodes: [
     {
       type: "group",
-      label: "我的",
+      label: "Agents",
       menu: [
         {
-          icon: <Person className={ic} />,
-          label: "个人资料",
-          href: "/profile",
-        },
-        {
-          icon: <Sliders className={ic} />,
-          label: "账户设置",
-          href: "/settings",
-        },
-        {
-          icon: <CircleInfo className={ic} />,
-          label: "关于我们",
-          href: "/about",
+          icon: <FaceRobot className={ic} />,
+          label: "Overview",
+          href: "/agents",
         },
       ],
     },
   ],
 };
 
-/**
- * 根布局唯一 Route 配置：Rail 多入口，各自 `sidebar` 树。
- * URL 与当前 Rail 项的自动对齐由 `sidebar-routing` 从叶子 `href` 推导。
- */
+/** Workflows + Lead → CRM */
+const workflowsSidebar: SidebarContentConfig = {
+  nodes: [
+    {
+      type: "group",
+      label: "Workflows",
+      menu: [
+        {
+          icon: <FolderFlows className={ic} />,
+          label: "All",
+          children: [
+            {
+              icon: <FolderFlows className={ic} />,
+              label: "Board",
+              href: "/workflows",
+            },
+            {
+              icon: <FolderFlows className={ic} />,
+              label: "Lead → CRM",
+              href: "/workflows/lead-crm",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+/** Library + Playbooks */
+const librarySidebar: SidebarContentConfig = {
+  nodes: [
+    {
+      type: "group",
+      label: "Library",
+      menu: [
+        {
+          icon: <Book className={ic} />,
+          label: "Catalog",
+          children: [
+            {
+              icon: <Book className={ic} />,
+              label: "Main",
+              href: "/library",
+            },
+            {
+              icon: <FileText className={ic} />,
+              label: "Playbooks",
+              href: "/library/playbooks",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+const integrationsSidebar: SidebarContentConfig = {
+  nodes: [
+    {
+      type: "group",
+      label: "Settings",
+      menu: [
+        {
+          icon: <Gear className={ic} />,
+          label: "Integrations",
+          href: "/integrations",
+        },
+      ],
+    },
+  ],
+};
+
+/** Six rail entries + per-entry sidebars; active rail from leaf `href` (see `sidebar-routing`). */
 export const workspaceRoute: RouteConfig = {
-  defaultEntryId: "workspace",
+  defaultEntryId: "home",
   entries: [
     {
-      id: "workspace",
-      label: "工作区",
-      icon: <LayoutSideContentLeft className={railIc} />,
-      sidebar: workspaceSidebar,
+      id: "home",
+      label: "Home",
+      icon: <House className={railIc} />,
+      sidebar: homeSidebar,
     },
     {
-      id: "tools",
-      label: "工具",
-      icon: <Wrench className={railIc} />,
-      sidebar: toolsSidebar,
+      id: "inbox",
+      label: "Inbox",
+      icon: <Envelope className={railIc} />,
+      sidebar: inboxSidebar,
     },
     {
-      id: "account",
-      label: "我的",
-      icon: <Person className={railIc} />,
-      sidebar: accountSidebar,
+      id: "agents",
+      label: "Agents",
+      icon: <FaceRobot className={railIc} />,
+      sidebar: agentsSidebar,
+    },
+    {
+      id: "workflows",
+      label: "Flows",
+      icon: <FolderFlows className={railIc} />,
+      sidebar: workflowsSidebar,
+    },
+    {
+      id: "library",
+      label: "Library",
+      icon: <Book className={railIc} />,
+      sidebar: librarySidebar,
+    },
+    {
+      id: "integrations",
+      label: "Settings",
+      icon: <Gear className={railIc} />,
+      sidebar: integrationsSidebar,
     },
   ],
 };

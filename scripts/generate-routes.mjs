@@ -1,11 +1,10 @@
 /**
- * 扫描 `app/` 下所有 `page.tsx`，覆盖写入 `config/routes.json`（Router 树）。
+ * Scans all `app/**/page.tsx` and overwrites `config/routes.json` (Router tree).
  *
- * - 启动前会读入**当前** `config/routes.json`，按「规范化全路径」保留各节点 `title`。
- * - 扫描得到的新节点若旧 JSON 无对应路径，则 `title` 为 `"todo"`。
- * - `hasPage` 仅由是否存在 `…/该段/page.tsx` 决定；`hasPage: true` 不会写入 JSON（与默认一致）。
- * - 路由组目录 `(name)` 不进入 URL；`[param]` 在树中为 `:param`。
- *
+ * - On start, reads the current `config/routes.json` and keeps each node's `title` by normalized full path.
+ * - New nodes from the scan with no matching path in old JSON get `title: "todo"`.
+ * - `hasPage` is derived only from whether `…/segment/page.tsx` exists; default `true` is not written.
+ * - Route group dirs `(name)` are omitted from the URL; `[param]` becomes `:param` in the tree.
  */
 import fs from "node:fs";
 import path from "node:path";
