@@ -39,8 +39,8 @@ export type {
 } from "./sidebar";
 export type {
   RouteConfig,
-  RouteEntry,
-  SidebarContentConfig,
+  RailMenuItem as RouteEntry,
+  SidebarMenuConfig as SidebarContentConfig,
   SidebarNode,
   SidebarGroupNode,
   SidebarSeparatorNode,

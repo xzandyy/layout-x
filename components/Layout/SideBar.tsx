@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import type { Key } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
@@ -8,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { useLayoutContext } from "./root";
 import type {
   RouteConfig,
-  SidebarContentConfig,
+  SidebarMenuConfig,
   SidebarGroupNode,
   SidebarMenuItemNode,
   SidebarNode,
@@ -96,7 +102,7 @@ function MenuTree({
   config,
   pathname,
 }: {
-  config: SidebarContentConfig;
+  config: SidebarMenuConfig;
   pathname: string;
 }) {
   const activeRoute = useMemo(
@@ -220,7 +226,9 @@ function MenuItem({
           {label}
         </HeroSidebar.MenuLabel>
         {chip && <HeroSidebar.MenuChip>{chip}</HeroSidebar.MenuChip>}
-        {actions && <HeroSidebar.MenuActions>{actions}</HeroSidebar.MenuActions>}
+        {actions && (
+          <HeroSidebar.MenuActions>{actions}</HeroSidebar.MenuActions>
+        )}
         {hasSubmenu && (
           <HeroSidebar.MenuTrigger>
             <HeroSidebar.MenuIndicator />
@@ -412,7 +420,7 @@ function computeDismissed(
  * 返回最深匹配的叶子 href（已规范化）以及沿途各分支 id（用于自动展开父级）。
  */
 function resolveActiveRoute(
-  config: SidebarContentConfig,
+  config: SidebarMenuConfig,
   pathname: string,
 ): ActiveRoute {
   const normPath = normalizePath(pathname);
@@ -465,7 +473,7 @@ function resolveActiveRoute(
  * 与 `resolveActiveRoute` 同源，但只关心叶子，不收集沿途分支 id。
  */
 export function getActiveLeafNormForConfig(
-  config: SidebarContentConfig,
+  config: SidebarMenuConfig,
   pathname: string,
 ): string | undefined {
   const normPath = normalizePath(pathname);

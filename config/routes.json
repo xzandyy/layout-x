@@ -1,6 +1,6 @@
 {
-  "path": "/",
-  "title": "Home",
+  "path": "/workspace",
+  "title": "Workspace",
   "children": [
     {
       "path": "agents",

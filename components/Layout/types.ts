@@ -1,26 +1,36 @@
 import type { ReactNode } from "react";
 import appRouterJson from "../../config/routes.json";
 
-// ---------------------------------------------------------------------------
-// Menu nodes (SidebarContentConfig, passed from RouteEntry.sidebar, etc.)
-// ---------------------------------------------------------------------------
-
-/**
- * Collapsed-mode tooltip; maps to `Sidebar.MenuItem` `tooltipProps`.
- * When the sidebar is icon-only, Pro renders this as a tooltip.
- */
-export type TooltipConfig = {
-  /** Tooltip content */
-  content: ReactNode;
-  /** Optional class on the tooltip container */
-  className?: string;
-  /** Show delay (ms) */
-  delay?: number;
-  /** Hide delay (ms) */
-  closeDelay?: number;
-  /** Placement, default "right" */
-  placement?: "top" | "bottom" | "left" | "right";
+export type RouteConfig = {
+  entries: RailMenuItem[];
+  defaultEntryId?: string;
 };
+
+export type RailMenuItem = {
+  id: string;
+  icon: ReactNode;
+  label: ReactNode;
+  tooltip?: TooltipConfig;
+  sidebar: SidebarMenuConfig;
+};
+
+export type SidebarMenuConfig = {
+  nodes: SidebarNode[];
+};
+
+export type SidebarNode = SidebarSeparatorNode | SidebarGroupNode;
+
+export type SidebarGroupNode = {
+  type: "group";
+  label?: ReactNode;
+  menu: SidebarMenuItemNode[];
+};
+
+export type SidebarSeparatorNode = {
+  type: "separator";
+};
+
+export type SidebarMenuItemNode = SidebarMenuItemLeaf | SidebarMenuItemBranch;
 
 type SidebarMenuItemBase = {
   icon?: ReactNode;
@@ -31,92 +41,26 @@ type SidebarMenuItemBase = {
   onPress?: () => void;
 };
 
-/**
- * Leaf: may have `href` to navigate, **no** submenu (`children` absent).
- */
-export type SidebarMenuItemLeaf = SidebarMenuItemBase & {
-  href?: string;
-  children?: never;
-};
-
-/**
- * Branch: with `children`, **`href` is not allowed** (expand/collapse only, no navigation).
- */
 export type SidebarMenuItemBranch = SidebarMenuItemBase & {
   children: SidebarMenuItemNode[];
   href?: never;
 };
 
-/**
- * Menu item: leaf XOR branch, enforcing "submenu => no href".
- */
-export type SidebarMenuItemNode = SidebarMenuItemLeaf | SidebarMenuItemBranch;
-
-/** Horizontal rule; maps to `Sidebar.Separator` */
-export type SidebarSeparatorNode = {
-  type: "separator";
+export type SidebarMenuItemLeaf = SidebarMenuItemBase & {
+  href?: string;
+  children?: never;
 };
 
-/**
- * Group; maps to `Sidebar.Group` + `Sidebar.Menu`.
- * When `label` is set, also renders `Sidebar.GroupLabel` (hidden when collapsed).
- */
-export type SidebarGroupNode = {
-  type: "group";
-  /** Optional group title; if omitted, no GroupLabel */
-  label?: ReactNode;
-  menu: SidebarMenuItemNode[];
+export type TooltipConfig = {
+  content: ReactNode;
+  className?: string;
+  delay?: number;
+  closeDelay?: number;
+  placement?: "top" | "bottom" | "left" | "right";
 };
 
-/** Allowed node types in `SidebarContentConfig.nodes` */
-export type SidebarNode = SidebarSeparatorNode | SidebarGroupNode;
+// -- 所有路径 -- //
 
-/**
- * Sidebar config root; `RouteEntry.sidebar` uses this.
- * `nodes` render in order; `menu-tree` dispatches to Pro by node type.
- */
-export type SidebarContentConfig = {
-  nodes: SidebarNode[];
-};
-
-// ---------------------------------------------------------------------------
-// Route (rail slot + bound sidebar)
-// ---------------------------------------------------------------------------
-
-/**
- * One rail slot (icon + bound sidebar).
- * Click only switches the visible sidebar (see `setActiveEntryId`); it does not navigate.
- * Which entry is active for a URL is derived from leaf `href`s in implementation; this type has no extra match field.
- */
-export type RouteEntry = {
-  id: string;
-  icon: ReactNode;
-  label: ReactNode;
-  tooltip?: TooltipConfig;
-  sidebar: SidebarContentConfig;
-};
-
-/**
- * Full route config: multiple rail entries and their sidebars.
- * Passed from the `Layout` root; Context fans out to `Rail` / `SidebarMain`.
- */
-export type RouteConfig = {
-  entries: RouteEntry[];
-  /**
-   * Fallback `entry.id` when pathname matches no leaf in any `sidebar`.
-   * If omitted, falls back to `entries[0]?.id`.
-   */
-  defaultEntryId?: string;
-};
-
-// ---------------------------------------------------------------------------
-// 应用路由树（面包屑等，与 `gen-routes` 生成的 `config/routes.json` 对应）
-// ---------------------------------------------------------------------------
-
-/**
- * 应用侧共享的路由树节点（面包屑、导航等）。
- * `hasPage` 默认为 `true`；某段没有对应 `page.tsx` 时请设为 `false`。
- */
 export type Router = {
   path: string;
   title: string;
@@ -124,7 +68,4 @@ export type Router = {
   children?: Router[];
 };
 
-/**
- * 由 `npm run gen-routes` 根据 `app/` 下页面生成并写入 `config/routes.json`。
- */
 export const appRouter = appRouterJson as Router;

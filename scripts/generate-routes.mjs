@@ -1,18 +1,15 @@
-/**
- * Scans all `app/**/page.tsx` and overwrites `config/routes.json` (Router tree).
- *
- * - On start, reads the current `config/routes.json` and keeps each node's `title` by normalized full path.
- * - New nodes from the scan with no matching path in old JSON get `title: "todo"`.
- * - `hasPage` is derived only from whether `…/segment/page.tsx` exists; default `true` is not written.
- * - Route group dirs `(name)` are omitted from the URL; `[param]` becomes `:param` in the tree.
- */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+/** 与 `app/` 下应用目录名一致（无前后斜杠） */
+const appDirSegment = "workspace";
+/** 对外 URL 前缀，面包屑与侧栏 href 一致 */
+const routeBase = "/workspace";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
-const appDir = path.join(root, "app");
+const appDir = path.join(root, "app", appDirSegment);
 const outFile = path.join(root, "config", "routes.json");
 
 function isRouteGroup(name) {
@@ -27,7 +24,7 @@ function segmentForUrl(name) {
   return name;
 }
 
-/** 相对 `app` 的目录路径 -> URL 段数组 */
+/** 相对 `app/<appDirSegment>` 的目录路径 -> URL 段数组 */
 function relDirToSegments(relFromApp) {
   if (!relFromApp) return [];
   const parts = relFromApp.split(/[/\\]/).filter(Boolean);
@@ -41,8 +38,8 @@ function relDirToSegments(relFromApp) {
 }
 
 function fullKey(segments) {
-  if (segments.length === 0) return "/";
-  return `/${segments.join("/")}`;
+  if (segments.length === 0) return routeBase;
+  return `${routeBase}/${segments.join("/")}`;
 }
 
 function pageDirKeyFromAbs(absPagePath) {
@@ -112,18 +109,21 @@ function trieToRouter(trie, segs, hasPageSet) {
     const o = { path: k, title: "todo" };
     const fk = fullKey(newSegs);
     o.hasPage = hasPageSet.has(fk) ? true : false;
-    if (sub && sub.size > 0) o.children = trieToRouter(sub, newSegs, hasPageSet);
+    if (sub && sub.size > 0)
+      o.children = trieToRouter(sub, newSegs, hasPageSet);
     out.push(o);
   }
   return out;
 }
 
+/** 从旧 routes.json 收集 title，键为「完整 URL 路径」 */
 function collectTitles(router) {
   const m = new Map();
   function walk(n, segs) {
     if (!n) return;
-    if (n.path === "/") {
+    if (n.path === "/" || n.path === routeBase) {
       m.set("/", n.title ?? "");
+      m.set(routeBase, n.title ?? "");
       for (const c of n.children ?? []) walk(c, []);
       return;
     }
@@ -135,10 +135,31 @@ function collectTitles(router) {
   return m;
 }
 
+/** 将迁移前（根下直出）的 title 键合并为 `/workspace` 前缀 */
+function migrateLegacyTitleMap(m) {
+  const out = new Map(m);
+  for (const [k, v] of m) {
+    if (k === "/") {
+      out.set(routeBase, out.get(routeBase) || v);
+      continue;
+    }
+    if (
+      k.startsWith("/") &&
+      k !== routeBase &&
+      !k.startsWith(`${routeBase}/`)
+    ) {
+      const nk = `${routeBase}${k === "/" ? "" : k}`;
+      if (!out.has(nk)) out.set(nk, v);
+    }
+  }
+  return out;
+}
+
 function mergeTitles(node, segs, titleMap) {
   if (!node) return;
-  if (node.path === "/") {
-    node.title = titleMap.get("/") ?? "todo";
+  if (node.path === "/" || node.path === routeBase) {
+    node.title =
+      titleMap.get(routeBase) ?? titleMap.get("/") ?? "todo";
     for (const c of node.children ?? []) mergeTitles(c, [], titleMap);
     return;
   }
@@ -156,15 +177,13 @@ function omitHasPageWhenTrue(node) {
 
 function main() {
   if (!fs.existsSync(appDir)) {
-    console.error("Missing app/ directory at", appDir);
+    console.error("Missing app directory at", appDir);
     process.exit(1);
   }
 
   const pageFiles = walkPageFiles(appDir);
   const hasPageSet = buildHasPageSet(pageFiles);
-  const unique = uniquePrefixArrays(
-    collectAllPrefixSegmentArrays(pageFiles),
-  );
+  const unique = uniquePrefixArrays(collectAllPrefixSegmentArrays(pageFiles));
 
   const trie = new Map();
   for (const segs of unique) {
@@ -172,9 +191,9 @@ function main() {
   }
 
   const outRoot = {
-    path: "/",
+    path: routeBase,
     title: "todo",
-    hasPage: hasPageSet.has("/") === true,
+    hasPage: hasPageSet.has(routeBase) === true,
   };
   const children = trieToRouter(trie, [], hasPageSet);
   if (children.length) outRoot.children = children;
@@ -183,7 +202,7 @@ function main() {
   if (fs.existsSync(outFile)) {
     try {
       const old = JSON.parse(fs.readFileSync(outFile, "utf8"));
-      titleMap = collectTitles(old);
+      titleMap = migrateLegacyTitleMap(collectTitles(old));
     } catch (e) {
       console.warn("Could not parse existing routes.json:", e?.message);
     }
@@ -193,7 +212,11 @@ function main() {
 
   const json = JSON.stringify(outRoot, null, 2) + "\n";
   fs.writeFileSync(outFile, json, "utf8");
-  console.log("Wrote", path.relative(root, outFile), `(${pageFiles.length} page.tsx)`);
+  console.log(
+    "Wrote",
+    path.relative(root, outFile),
+    `(${pageFiles.length} page.tsx under app/${appDirSegment})`,
+  );
 }
 
 main();

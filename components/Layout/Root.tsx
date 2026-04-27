@@ -12,7 +12,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
-import type { RouteConfig, RouteEntry } from "./types";
+import type { RouteConfig, RailMenuItem } from "./types";
 import { findBestEntryIdForPathname } from "./sidebar";
 
 // -- Layout Root Context -- //
@@ -23,7 +23,7 @@ export type LayoutContextValue = {
   sidebarWidth: number;
   route?: RouteConfig;
   activeEntryId?: string;
-  activeEntry?: RouteEntry;
+  activeEntry?: RailMenuItem;
   setActiveEntryId: (id: string) => void;
 };
 

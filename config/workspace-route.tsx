@@ -27,7 +27,7 @@ export const workspaceRoute: RouteConfig = {
               {
                 icon: <House />,
                 label: "Home",
-                href: "/",
+                href: "/workspace",
               },
             ],
           },
@@ -47,12 +47,12 @@ export const workspaceRoute: RouteConfig = {
               {
                 icon: <Envelope />,
                 label: "Inbox",
-                href: "/inbox",
+                href: "/workspace/inbox",
               },
               {
                 icon: <CheckDouble />,
                 label: "Review",
-                href: "/inbox/review",
+                href: "/workspace/inbox/review",
               },
             ],
           },
@@ -72,7 +72,7 @@ export const workspaceRoute: RouteConfig = {
               {
                 icon: <FaceRobot />,
                 label: "Overview",
-                href: "/agents",
+                href: "/workspace/agents",
               },
             ],
           },
@@ -96,12 +96,12 @@ export const workspaceRoute: RouteConfig = {
                   {
                     icon: <FolderFlows />,
                     label: "Board",
-                    href: "/workflows",
+                    href: "/workspace/workflows",
                   },
                   {
                     icon: <FolderFlows />,
                     label: "Lead → CRM",
-                    href: "/workflows/lead-crm",
+                    href: "/workspace/workflows/lead-crm",
                   },
                 ],
               },
@@ -127,12 +127,12 @@ export const workspaceRoute: RouteConfig = {
                   {
                     icon: <Book />,
                     label: "Main",
-                    href: "/library",
+                    href: "/workspace/library",
                   },
                   {
                     icon: <FileText />,
                     label: "Playbooks",
-                    href: "/library/playbooks",
+                    href: "/workspace/library/playbooks",
                   },
                 ],
               },
@@ -154,7 +154,7 @@ export const workspaceRoute: RouteConfig = {
               {
                 icon: <Gear />,
                 label: "Integrations",
-                href: "/integrations",
+                href: "/workspace/integrations",
               },
             ],
           },
