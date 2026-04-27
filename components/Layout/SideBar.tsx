@@ -5,7 +5,7 @@ import type { Key } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext } from "./Root";
+import { useLayoutContext } from "./root";
 import type {
   RouteConfig,
   SidebarContentConfig,

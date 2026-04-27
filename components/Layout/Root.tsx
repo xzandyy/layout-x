@@ -19,19 +19,19 @@ import {
   RailMain,
   RailRouteNav,
   RailFooter,
-} from "./Rail";
+} from "./rail";
 import {
   findBestEntryIdForPathname,
   Sidebar,
   SidebarHeader,
   SidebarMain,
   SidebarFooter,
-} from "./SideBar";
+} from "./sidebar";
 import {
   Content,
   ContentHeader,
   ContentBody,
-} from "./Content";
+} from "./content";
 
 export type ContextValue = {
   headerHeight: number;

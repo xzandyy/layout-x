@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext } from "./Root";
+import { useLayoutContext } from "./root";
 
 export type RailProps = {
   className?: string;

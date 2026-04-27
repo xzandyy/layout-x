@@ -1,25 +1,25 @@
-export { Layout, LayoutRoot } from "./Root";
-export { useLayout, useLayoutContext } from "./Root";
+export { Layout, LayoutRoot } from "./root";
+export { useLayout, useLayoutContext } from "./root";
 
-export type { RootProps, ContextValue } from "./Root";
+export type { RootProps, ContextValue } from "./root";
 export type {
   ContentProps,
   ContentHeaderProps,
   ContentBodyProps,
-} from "./Content";
+} from "./content";
 export type {
   RailProps,
   RailHeaderProps,
   RailFooterProps,
   RailMainProps,
   RailRouteNavProps,
-} from "./Rail";
+} from "./rail";
 export type {
   SidebarProps,
   SidebarHeaderProps,
   SidebarFooterProps,
   SidebarMainProps,
-} from "./SideBar";
+} from "./sidebar";
 export type {
   RouteConfig,
   RouteEntry,
@@ -36,5 +36,5 @@ export type {
 
 export { appRouter } from "./types";
 
-export { Breadcrumbs } from "./Breadcrumbs";
-export type { BreadcrumbsProps } from "./Breadcrumbs";
+export { Breadcrumbs } from "./breadcrumbs";
+export type { BreadcrumbsProps } from "./breadcrumbs";
