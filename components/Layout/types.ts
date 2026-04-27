@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import type { Router } from "@/config/routes";
 
 // ---------------------------------------------------------------------------
 // Menu nodes (SidebarContentConfig, passed from RouteEntry.sidebar, etc.)
@@ -107,66 +106,4 @@ export type RouteConfig = {
    * If omitted, falls back to `entries[0]?.id`.
    */
   defaultEntryId?: string;
-};
-
-// ---------------------------------------------------------------------------
-// Layout component props
-// ---------------------------------------------------------------------------
-
-/** `Layout` root (wraps `Sidebar.Provider`) */
-export type LayoutProps = {
-  /** Content header min-height (rem) */
-  headerHeight?: number;
-  /** Rail width (rem) */
-  railWidth?: number;
-  /**
-   * Sidebar width (rem); Pro `--sidebar-width` (docs default 240px ≈ 15rem). No collapsed width — collapse is off.
-   * @see https://docs-prod.heroui.pro/docs/react/components/sidebar#css-variables
-   */
-  sidebarWidth?: number;
-  className?: string;
-  /**
-   * Rail entries + per-entry sidebars; used with `activeEntry` / `setActiveEntryId` in Context.
-   */
-  route?: RouteConfig;
-  children: ReactNode;
-};
-
-/** Common region props: Rail, Sidebar header/footer, etc. */
-export type LayoutRegionProps = {
-  className?: string;
-  children?: ReactNode;
-};
-
-/** `SidebarMain`: tree from root `route` and current `activeEntry.sidebar`; `children` append after the configured menu. */
-export type LayoutSidebarMainProps = {
-  className?: string;
-  children?: ReactNode;
-};
-
-/** Content header */
-export type LayoutContentHeaderProps = {
-  className?: string;
-  /**
-   * Route tree for breadcrumbs (`@/config/routes`); omit to hide breadcrumbs.
-   */
-  breadcrumbRoute?: Router;
-  /** Trailing area (actions, search, etc.) */
-  end?: ReactNode;
-};
-
-/** Layout context: dimensions + optional route + active entry (URL guess + optional rail override) */
-export type LayoutContextValue = {
-  headerHeight: number;
-  railWidth: number;
-  /** Sidebar width (rem); matches Pro `--sidebar-width` */
-  sidebarWidth: number;
-  /** Root `route`, if any */
-  route?: RouteConfig;
-  /** Active entry id; `undefined` if no `route` */
-  activeEntryId?: string;
-  /** Active entry object */
-  activeEntry?: RouteEntry;
-  /** User rail click; reset toward URL on pathname change in implementation */
-  setActiveEntryId: (id: string) => void;
 };

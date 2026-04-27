@@ -1,6 +1,6 @@
 "use client";
 
-import { Breadcrumbs } from "@heroui/react";
+import { Breadcrumbs as HeroBreadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
@@ -99,12 +99,12 @@ function buildBreadcrumbItems(
   }));
 }
 
-export type RouteBreadcrumbsProps = {
+export type BreadcrumbsProps = {
   route: Router;
   className?: string;
 };
 
-export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
+export function Breadcrumbs({ route, className }: BreadcrumbsProps) {
   const pathname = usePathname() || "/";
   const items = useMemo(
     () => buildBreadcrumbItems(pathname, route),
@@ -114,25 +114,25 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
   if (items.length === 0) return null;
 
   return (
-    <Breadcrumbs
+    <HeroBreadcrumbs
       aria-label="Breadcrumb"
       className={cn(
-        "route-breadcrumbs min-w-0 flex-wrap items-center",
+        "breadcrumbs min-w-0 flex-wrap items-center",
         className,
       )}
       separator={<span className="text-fg-4!">/</span>}
     >
       {items.map((item, i) =>
         item.href ? (
-          <Breadcrumbs.Item
+          <HeroBreadcrumbs.Item
             key={`${i}-${item.title}-${item.href}`}
             className="no-underline"
             href={item.href}
           >
             <span className="mr-1 text-[0.8rem] text-fg-4!">{item.title}</span>
-          </Breadcrumbs.Item>
+          </HeroBreadcrumbs.Item>
         ) : (
-          <Breadcrumbs.Item
+          <HeroBreadcrumbs.Item
             key={`${i}-${item.title}-${String(item.isCurrent)}`}
             className={cn(
               "no-underline",
@@ -152,9 +152,9 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
             >
               {item.title}
             </span>
-          </Breadcrumbs.Item>
+          </HeroBreadcrumbs.Item>
         ),
       )}
-    </Breadcrumbs>
+    </HeroBreadcrumbs>
   );
 }

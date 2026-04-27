@@ -1,43 +1,26 @@
-import {
-  LayoutRoot,
-  Rail,
-  RailHeader,
-  RailMain,
-  RailRouteNav,
-  RailFooter,
-  Sidebar,
-  SidebarHeader,
-  SidebarMain,
-  SidebarFooter,
-  Content,
-  ContentHeader,
-  ContentBody,
-  useLayout,
-} from "./Layout";
+export { Layout, LayoutRoot } from "./Root";
+export { useLayout, useLayoutContext } from "./Root";
 
-export const Layout = Object.assign(LayoutRoot, {
-  Rail: Rail,
-  RailHeader: RailHeader,
-  RailMain: RailMain,
-  RailRouteNav: RailRouteNav,
-  RailFooter: RailFooter,
-  Sidebar: Sidebar,
-  SidebarHeader: SidebarHeader,
-  SidebarMain: SidebarMain,
-  SidebarFooter: SidebarFooter,
-  Content: Content,
-  ContentHeader: ContentHeader,
-  ContentBody: ContentBody,
-});
-
-export { useLayout };
-
+export type { RootProps, ContextValue } from "./Root";
 export type {
-  LayoutProps,
-  LayoutRegionProps,
-  LayoutSidebarMainProps,
-  LayoutContentHeaderProps,
-  LayoutContextValue,
+  ContentProps,
+  ContentHeaderProps,
+  ContentBodyProps,
+} from "./Content";
+export type {
+  RailProps,
+  RailHeaderProps,
+  RailFooterProps,
+  RailMainProps,
+  RailRouteNavProps,
+} from "./Rail";
+export type {
+  SidebarProps,
+  SidebarHeaderProps,
+  SidebarFooterProps,
+  SidebarMainProps,
+} from "./SideBar";
+export type {
   RouteConfig,
   RouteEntry,
   SidebarContentConfig,
@@ -50,5 +33,5 @@ export type {
   TooltipConfig,
 } from "./types";
 
-export { RouteBreadcrumbs } from "./route-breadcrumbs";
-export type { RouteBreadcrumbsProps } from "./route-breadcrumbs";
+export { Breadcrumbs } from "./Breadcrumbs";
+export type { BreadcrumbsProps } from "./Breadcrumbs";

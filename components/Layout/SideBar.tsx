@@ -1,17 +1,94 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import type { Key } from "react-aria-components";
-import { Sidebar } from "@heroui-pro/react";
+import { usePathname } from "next/navigation";
+import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-
+import { useLayoutContext } from "./Root";
 import type {
+  RouteConfig,
   SidebarContentConfig,
   SidebarGroupNode,
   SidebarMenuItemNode,
   SidebarNode,
   TooltipConfig,
 } from "./types";
+import {
+  isExternalHref,
+  itemHasChildren,
+  normalizePath,
+  normalizedHrefMatchesPath,
+} from "./utils";
+
+export type SidebarProps = {
+  className?: string;
+  children?: ReactNode;
+};
+
+export function Sidebar({ className, children }: SidebarProps) {
+  const { sidebarWidth } = useLayoutContext();
+  const sidebarVars = useMemo(
+    () =>
+      ({
+        "--sidebar-width": `${sidebarWidth}rem`,
+      }) as CSSProperties,
+    [sidebarWidth],
+  );
+  return (
+    <HeroSidebar
+      className={cn("bg-canvas border-none shadow-none pr-2", className)}
+      style={sidebarVars}
+    >
+      {children}
+    </HeroSidebar>
+  );
+}
+
+export type SidebarHeaderProps = {
+  className?: string;
+  children?: ReactNode;
+};
+
+export function SidebarHeader({ className, children }: SidebarHeaderProps) {
+  return (
+    <HeroSidebar.Header className={cn("p-0", className)}>
+      {children}
+    </HeroSidebar.Header>
+  );
+}
+
+export type SidebarFooterProps = {
+  className?: string;
+  children?: ReactNode;
+};
+
+export function SidebarFooter({ className, children }: SidebarFooterProps) {
+  return (
+    <HeroSidebar.Footer className={cn("p-0", className)}>
+      {children}
+    </HeroSidebar.Footer>
+  );
+}
+
+export type SidebarMainProps = {
+  className?: string;
+  children?: ReactNode;
+};
+
+export function SidebarMain({ className, children }: SidebarMainProps) {
+  const pathname = usePathname();
+  const { activeEntry } = useLayoutContext();
+  const sidebar = activeEntry?.sidebar;
+  return (
+    <HeroSidebar.Content className={cn("p-0", className)}>
+      {sidebar && <MenuTree config={sidebar} pathname={pathname} />}
+      {children}
+    </HeroSidebar.Content>
+  );
+}
+
+// -- MenuTree -- //
 
 interface ActiveRoute {
   activeLeafNorm?: string;
@@ -26,9 +103,7 @@ interface DismissedState {
 const EMPTY_SET: ReadonlySet<string> = new Set<string>();
 const EMPTY_DISMISSED: DismissedState = { forPath: "", keys: EMPTY_SET };
 
-// -- MenuTree -- //
-
-export function MenuTree({
+function MenuTree({
   config,
   pathname,
 }: {
@@ -61,8 +136,6 @@ export function MenuTree({
   );
 }
 
-// -- MenuNode -- //
-
 function MenuNode({
   node,
   ...rest
@@ -73,11 +146,9 @@ function MenuNode({
   expandedKeys: Set<string>;
   onExpandedChange: (keys: Set<Key> | "all") => void;
 }) {
-  if (node.type === "separator") return <Sidebar.Separator />;
+  if (node.type === "separator") return <HeroSidebar.Separator />;
   return <GroupNode node={node} {...rest} />;
 }
-
-// -- GroupNode -- //
 
 function GroupNode({
   node,
@@ -93,13 +164,13 @@ function GroupNode({
   onExpandedChange: (keys: Set<Key> | "all") => void;
 }) {
   return (
-    <Sidebar.Group>
+    <HeroSidebar.Group>
       {node.label && (
-        <Sidebar.GroupLabel className="text-fg-4 text-xs font-mono tracking-wide">
+        <HeroSidebar.GroupLabel className="text-fg-4 text-xs font-mono tracking-wide">
           {node.label}
-        </Sidebar.GroupLabel>
+        </HeroSidebar.GroupLabel>
       )}
-      <Sidebar.Menu
+      <HeroSidebar.Menu
         aria-label={ariaLabelForSidebarMenu(node, groupIndex)}
         expandedKeys={expandedKeys}
         onExpandedChange={onExpandedChange}
@@ -113,12 +184,10 @@ function GroupNode({
             activeLeafNorm={activeRoute.activeLeafNorm}
           />
         ))}
-      </Sidebar.Menu>
-    </Sidebar.Group>
+      </HeroSidebar.Menu>
+    </HeroSidebar.Group>
   );
 }
-
-// -- MenuItem -- //
 
 function MenuItem({
   item,
@@ -140,14 +209,14 @@ function MenuItem({
   );
 
   return (
-    <Sidebar.MenuItem
+    <HeroSidebar.MenuItem
       id={getItemId(groupIndex, itemPath)}
       href={href}
       isCurrent={isCurrent}
       onAction={onPress}
       tooltipProps={tooltip ? toTooltipProps(tooltip) : undefined}
     >
-      <Sidebar.MenuItemContent
+      <HeroSidebar.MenuItemContent
         className={cn(
           "flex items-center gap-2 min-h-8 my-px",
           "px-2.5 py-1 rounded-md",
@@ -157,19 +226,21 @@ function MenuItem({
             : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
         )}
       >
-        {icon && <Sidebar.MenuIcon>{icon}</Sidebar.MenuIcon>}
-        <Sidebar.MenuLabel className="text-[0.8rem]">{label}</Sidebar.MenuLabel>
-        {chip && <Sidebar.MenuChip>{chip}</Sidebar.MenuChip>}
-        {actions && <Sidebar.MenuActions>{actions}</Sidebar.MenuActions>}
+        {icon && <HeroSidebar.MenuIcon>{icon}</HeroSidebar.MenuIcon>}
+        <HeroSidebar.MenuLabel className="text-[0.8rem]">
+          {label}
+        </HeroSidebar.MenuLabel>
+        {chip && <HeroSidebar.MenuChip>{chip}</HeroSidebar.MenuChip>}
+        {actions && <HeroSidebar.MenuActions>{actions}</HeroSidebar.MenuActions>}
         {hasSubmenu && (
-          <Sidebar.MenuTrigger>
-            <Sidebar.MenuIndicator />
-          </Sidebar.MenuTrigger>
+          <HeroSidebar.MenuTrigger>
+            <HeroSidebar.MenuIndicator />
+          </HeroSidebar.MenuTrigger>
         )}
-      </Sidebar.MenuItemContent>
+      </HeroSidebar.MenuItemContent>
 
       {hasSubmenu && children != null && (
-        <Sidebar.Submenu>
+        <HeroSidebar.Submenu>
           {children.map((child, i) => (
             <MenuItem
               key={i}
@@ -179,13 +250,11 @@ function MenuItem({
               activeLeafNorm={activeLeafNorm}
             />
           ))}
-        </Sidebar.Submenu>
+        </HeroSidebar.Submenu>
       )}
-    </Sidebar.MenuItem>
+    </HeroSidebar.MenuItem>
   );
 }
-
-// -- Helper Functions -- //
 
 function ariaLabelForSidebarMenu(
   node: SidebarGroupNode,
@@ -206,27 +275,6 @@ function toTooltipProps(tooltip: TooltipConfig) {
     closeDelay: tooltip.closeDelay,
     placement: tooltip.placement ?? "right",
   } as const;
-}
-
-function normalizePath(input: string): string {
-  if (!input) return "/";
-  let p = input.split("#")[0]!.split("?")[0]!;
-  p = p.replace(/\/{2,}/g, "/");
-  if (!p.startsWith("/")) p = "/" + p;
-  if (p !== "/" && p.endsWith("/")) p = p.replace(/\/+$/, "");
-  return p || "/";
-}
-
-function isExternalHref(href: string): boolean {
-  return href.startsWith("http://") || href.startsWith("https://");
-}
-
-function normalizedHrefMatchesPath(
-  normPath: string,
-  normHref: string,
-): boolean {
-  if (normHref === "/") return normPath === "/";
-  return normPath === normHref || normPath.startsWith(`${normHref}/`);
 }
 
 function getGroupIdPrefix(groupIndex: number): string {
@@ -284,14 +332,6 @@ function resolveActiveRoute(
   }
 
   return result;
-}
-
-function itemHasChildren(
-  item: SidebarMenuItemNode,
-): item is SidebarMenuItemNode & { children: SidebarMenuItemNode[] } {
-  return (
-    "children" in item && item.children != null && item.children.length > 0
-  );
 }
 
 function useMenuExpansion({
@@ -395,4 +435,67 @@ function computeDismissed(
     else next.add(id);
   }
   return { forPath: pathname, keys: next };
+}
+
+/**
+ * Same as `resolveActiveRoute` below: best-matching leaf href for pathname; or `undefined`.
+ */
+export function getActiveLeafNormForConfig(
+  config: SidebarContentConfig,
+  pathname: string,
+): string | undefined {
+  const normPath = normalizePath(pathname);
+  let bestDepth = -1;
+  let bestNorm: string | undefined;
+
+  const visit = (items: readonly SidebarMenuItemNode[], groupIndex: number) => {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]!;
+      const isBranch = itemHasChildren(item);
+
+      if (isBranch) {
+        visit(item.children, groupIndex);
+        continue;
+      }
+
+      const href = "href" in item ? item.href : undefined;
+      if (!href || isExternalHref(href)) continue;
+
+      const normHref = normalizePath(href);
+      if (!normalizedHrefMatchesPath(normPath, normHref)) continue;
+
+      if (normHref.length > bestDepth) {
+        bestDepth = normHref.length;
+        bestNorm = normHref;
+      }
+    }
+  };
+
+  for (let gi = 0; gi < config.nodes.length; gi++) {
+    const node = config.nodes[gi]!;
+    if (node.type === "group") visit(node.menu, gi);
+  }
+
+  return bestNorm;
+}
+
+/**
+ * Pick the one `RouteConfig.entries` item whose `sidebar` has the most specific matching leaf
+ * (longest normalized href). If none match, `undefined`.
+ */
+export function findBestEntryIdForPathname(
+  route: RouteConfig,
+  pathname: string,
+): string | undefined {
+  let bestId: string | undefined;
+  let bestLen = -1;
+  for (const e of route.entries) {
+    const norm = getActiveLeafNormForConfig(e.sidebar, pathname);
+    const len = norm?.length ?? -1;
+    if (len > bestLen) {
+      bestLen = len;
+      bestId = e.id;
+    }
+  }
+  return bestLen >= 0 ? bestId : undefined;
 }
