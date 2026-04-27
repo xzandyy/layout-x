@@ -5,7 +5,7 @@ import { useLayoutContext } from "./Root";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
-import type { Router } from "@/config/routes";
+import type { Router } from "@/components/Layout";
 
 export type ContentProps = {
   className?: string;

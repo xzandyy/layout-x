@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import appRouterJson from "../../config/routes.json";
 
 // ---------------------------------------------------------------------------
 // Menu nodes (SidebarContentConfig, passed from RouteEntry.sidebar, etc.)
@@ -107,3 +108,23 @@ export type RouteConfig = {
    */
   defaultEntryId?: string;
 };
+
+// ---------------------------------------------------------------------------
+// 应用路由树（面包屑等，与 `gen-routes` 生成的 `config/routes.json` 对应）
+// ---------------------------------------------------------------------------
+
+/**
+ * 应用侧共享的路由树节点（面包屑、导航等）。
+ * `hasPage` 默认为 `true`；某段没有对应 `page.tsx` 时请设为 `false`。
+ */
+export type Router = {
+  path: string;
+  title: string;
+  hasPage?: boolean;
+  children?: Router[];
+};
+
+/**
+ * 由 `npm run gen-routes` 根据 `app/` 下页面生成并写入 `config/routes.json`。
+ */
+export const appRouter = appRouterJson as Router;

@@ -4,7 +4,7 @@ import { Breadcrumbs as HeroBreadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
-import type { Router } from "@/config/routes";
+import type { Router } from "@/components/Layout";
 import { cn } from "@/lib/utils";
 
 export type BreadcrumbsProps = {

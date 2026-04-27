@@ -2,9 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Button } from "@heroui/react";
 import { EllipsisVertical, Pencil } from "@gravity-ui/icons";
 
-import { Layout } from "@/components/Layout";
+import { Layout, appRouter } from "@/components/Layout";
 import { cn } from "@/lib/utils";
-import { appRouter } from "@/config/routes";
 import { workspaceRoute } from "@/config/workspace-route";
 import "./globals.css";
 

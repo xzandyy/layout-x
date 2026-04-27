@@ -31,7 +31,10 @@ export type {
   SidebarMenuItemLeaf,
   SidebarMenuItemBranch,
   TooltipConfig,
+  Router,
 } from "./types";
+
+export { appRouter } from "./types";
 
 export { Breadcrumbs } from "./Breadcrumbs";
 export type { BreadcrumbsProps } from "./Breadcrumbs";
