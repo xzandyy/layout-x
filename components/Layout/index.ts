@@ -1,5 +1,5 @@
 import {
-  Root,
+  LayoutRoot,
   Rail,
   RailHeader,
   RailMain,
@@ -13,9 +13,9 @@ import {
   ContentHeader,
   ContentBody,
   useLayout,
-} from "./layout-x";
+} from "./Layout";
 
-export const LayoutX = Object.assign(Root, {
+export const Layout = Object.assign(LayoutRoot, {
   Rail: Rail,
   RailHeader: RailHeader,
   RailMain: RailMain,
@@ -30,14 +30,14 @@ export const LayoutX = Object.assign(Root, {
   ContentBody: ContentBody,
 });
 
-export { useLayout as useLayoutX };
+export { useLayout };
 
 export type {
-  LayoutXProps,
-  LayoutXRegionProps,
-  LayoutXSidebarMainProps,
-  LayoutXContentHeaderProps,
-  LayoutXContextValue,
+  LayoutProps,
+  LayoutRegionProps,
+  LayoutSidebarMainProps,
+  LayoutContentHeaderProps,
+  LayoutContextValue,
   RouteConfig,
   RouteEntry,
   SidebarContentConfig,

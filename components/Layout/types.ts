@@ -98,7 +98,7 @@ export type RouteEntry = {
 
 /**
  * Full route config: multiple rail entries and their sidebars.
- * Passed from the `LayoutX` root; Context fans out to `Rail` / `SidebarMain`.
+ * Passed from the `Layout` root; Context fans out to `Rail` / `SidebarMain`.
  */
 export type RouteConfig = {
   entries: RouteEntry[];
@@ -110,11 +110,11 @@ export type RouteConfig = {
 };
 
 // ---------------------------------------------------------------------------
-// LayoutX component props
+// Layout component props
 // ---------------------------------------------------------------------------
 
-/** `LayoutX` root (wraps `Sidebar.Provider`) */
-export type LayoutXProps = {
+/** `Layout` root (wraps `Sidebar.Provider`) */
+export type LayoutProps = {
   /** Content header min-height (rem) */
   headerHeight?: number;
   /** Rail width (rem) */
@@ -133,19 +133,19 @@ export type LayoutXProps = {
 };
 
 /** Common region props: Rail, Sidebar header/footer, etc. */
-export type LayoutXRegionProps = {
+export type LayoutRegionProps = {
   className?: string;
   children?: ReactNode;
 };
 
 /** `SidebarMain`: tree from root `route` and current `activeEntry.sidebar`; `children` append after the configured menu. */
-export type LayoutXSidebarMainProps = {
+export type LayoutSidebarMainProps = {
   className?: string;
   children?: ReactNode;
 };
 
 /** Content header */
-export type LayoutXContentHeaderProps = {
+export type LayoutContentHeaderProps = {
   className?: string;
   /**
    * Route tree for breadcrumbs (`@/config/routes`); omit to hide breadcrumbs.
@@ -155,8 +155,8 @@ export type LayoutXContentHeaderProps = {
   end?: ReactNode;
 };
 
-/** LayoutX context: dimensions + optional route + active entry (URL guess + optional rail override) */
-export type LayoutXContextValue = {
+/** Layout context: dimensions + optional route + active entry (URL guess + optional rail override) */
+export type LayoutContextValue = {
   headerHeight: number;
   railWidth: number;
   /** Sidebar width (rem); matches Pro `--sidebar-width` */

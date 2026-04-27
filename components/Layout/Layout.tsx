@@ -17,22 +17,22 @@ import { RouteBreadcrumbs } from "./route-breadcrumbs";
 import { MenuTree } from "./menu-tree";
 import { findBestEntryIdForPathname } from "./sidebar-routing";
 import type {
-  LayoutXContextValue,
-  LayoutXContentHeaderProps,
-  LayoutXProps,
-  LayoutXRegionProps,
-  LayoutXSidebarMainProps,
+  LayoutContextValue,
+  LayoutContentHeaderProps,
+  LayoutProps,
+  LayoutRegionProps,
+  LayoutSidebarMainProps,
 } from "./types";
 
 // -- Layout Context -- //
 
-const LayoutXContext = createContext<LayoutXContextValue | null>(null);
+const LayoutContext = createContext<LayoutContextValue | null>(null);
 
-function useLayoutContext(): LayoutXContextValue {
-  const ctx = useContext(LayoutXContext);
+function useLayoutContext(): LayoutContextValue {
+  const ctx = useContext(LayoutContext);
   if (ctx == null) {
     throw new Error(
-      "LayoutX subcomponents (Rail, SidebarHeader, ContentHeader, etc.) must be used inside <LayoutX>.",
+      "Layout subcomponents (Rail, SidebarHeader, ContentHeader, etc.) must be used inside <Layout>.",
     );
   }
   return ctx;
@@ -44,14 +44,14 @@ export function useLayout() {
 
 // -- Layout Root -- //
 
-export function Root({
+export function LayoutRoot({
   headerHeight = 3.25,
   railWidth = 4,
   sidebarWidth = 16.5,
   className,
   route,
   children,
-}: LayoutXProps) {
+}: LayoutProps) {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
 
@@ -91,7 +91,7 @@ export function Root({
     [route, pathname],
   );
 
-  const value = useMemo<LayoutXContextValue>(
+  const value = useMemo<LayoutContextValue>(
     () => ({
       headerHeight,
       railWidth,
@@ -113,7 +113,7 @@ export function Root({
   );
 
   return (
-    <LayoutXContext.Provider value={value}>
+    <LayoutContext.Provider value={value}>
       <HeroSidebar.Provider navigate={router.push} collapsible="none">
         <div
           className={cn(
@@ -125,13 +125,13 @@ export function Root({
           {children}
         </div>
       </HeroSidebar.Provider>
-    </LayoutXContext.Provider>
+    </LayoutContext.Provider>
   );
 }
 
 // -- Layout Rail -- //
 
-export function Rail({ className, children }: LayoutXRegionProps) {
+export function Rail({ className, children }: LayoutRegionProps) {
   const { railWidth } = useLayoutContext();
   return (
     <aside
@@ -148,15 +148,15 @@ export function Rail({ className, children }: LayoutXRegionProps) {
   );
 }
 
-export function RailHeader({ className, children }: LayoutXRegionProps) {
+export function RailHeader({ className, children }: LayoutRegionProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
-export function RailFooter({ className, children }: LayoutXRegionProps) {
+export function RailFooter({ className, children }: LayoutRegionProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
-export function RailMain({ className, children }: LayoutXRegionProps) {
+export function RailMain({ className, children }: LayoutRegionProps) {
   return (
     <div
       className={cn(
@@ -169,7 +169,7 @@ export function RailMain({ className, children }: LayoutXRegionProps) {
   );
 }
 
-export function RailRouteNav({ className }: LayoutXRegionProps) {
+export function RailRouteNav({ className }: LayoutRegionProps) {
   const { route, activeEntryId, setActiveEntryId } = useLayoutContext();
   if (!route?.entries.length) return null;
   return (
@@ -201,7 +201,7 @@ export function RailRouteNav({ className }: LayoutXRegionProps) {
 
 // -- Sidebar -- //
 
-export function Sidebar({ className, children }: LayoutXRegionProps) {
+export function Sidebar({ className, children }: LayoutRegionProps) {
   const { sidebarWidth } = useLayoutContext();
   const sidebarVars = useMemo(
     () =>
@@ -220,7 +220,7 @@ export function Sidebar({ className, children }: LayoutXRegionProps) {
   );
 }
 
-export function SidebarHeader({ className, children }: LayoutXRegionProps) {
+export function SidebarHeader({ className, children }: LayoutRegionProps) {
   return (
     <HeroSidebar.Header className={cn("p-0", className)}>
       {children}
@@ -228,7 +228,7 @@ export function SidebarHeader({ className, children }: LayoutXRegionProps) {
   );
 }
 
-export function SidebarFooter({ className, children }: LayoutXRegionProps) {
+export function SidebarFooter({ className, children }: LayoutRegionProps) {
   return (
     <HeroSidebar.Footer className={cn("p-0", className)}>
       {children}
@@ -236,7 +236,7 @@ export function SidebarFooter({ className, children }: LayoutXRegionProps) {
   );
 }
 
-export function SidebarMain({ className, children }: LayoutXSidebarMainProps) {
+export function SidebarMain({ className, children }: LayoutSidebarMainProps) {
   const pathname = usePathname();
   const { activeEntry } = useLayoutContext();
   const sidebar = activeEntry?.sidebar;
@@ -250,7 +250,7 @@ export function SidebarMain({ className, children }: LayoutXSidebarMainProps) {
 
 // -- Content -- //
 
-export function Content({ className, children }: LayoutXRegionProps) {
+export function Content({ className, children }: LayoutRegionProps) {
   return (
     <HeroSidebar.Main className="min-h-0 min-w-0 p-2 pl-0">
       <div
@@ -270,7 +270,7 @@ export function ContentHeader({
   className,
   breadcrumbRoute,
   end,
-}: LayoutXContentHeaderProps) {
+}: LayoutContentHeaderProps) {
   const { headerHeight } = useLayoutContext();
   return (
     <header
@@ -304,7 +304,7 @@ export function ContentHeader({
   );
 }
 
-export function ContentBody({ className, children }: LayoutXRegionProps) {
+export function ContentBody({ className, children }: LayoutRegionProps) {
   return (
     <main
       aria-label="Main content"

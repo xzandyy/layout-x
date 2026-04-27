@@ -9,7 +9,7 @@ import {
   House,
 } from "@gravity-ui/icons";
 
-import type { RouteConfig } from "@/components/layout-x";
+import type { RouteConfig } from "@/components/Layout";
 
 export const workspaceRoute: RouteConfig = {
   defaultEntryId: "home",
