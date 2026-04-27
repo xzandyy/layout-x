@@ -59,6 +59,7 @@ export type RailMainProps = {
 };
 
 export function RailMain({ className, children }: RailMainProps) {
+  const { route, activeEntryId, setActiveEntryId } = useLayoutContext();
   return (
     <div
       className={cn(
@@ -66,44 +67,33 @@ export function RailMain({ className, children }: RailMainProps) {
         className,
       )}
     >
+      {route?.entries.length ? (
+        <nav className="flex flex-col items-center gap-1">
+          {route.entries.map((e) => {
+            const isActive = e.id === activeEntryId;
+            const name = typeof e.label === "string" ? e.label : e.id;
+            return (
+              <Button
+                key={e.id}
+                aria-pressed={isActive}
+                aria-label={name}
+                onPress={() => setActiveEntryId(e.id)}
+                className={cn(
+                  "size-10 rounded-[10px]",
+                  "transition-all duration-150",
+                  "[&>svg]:size-5",
+                  isActive
+                    ? "bg-surface text-fg-1"
+                    : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
+                )}
+              >
+                {e.icon}
+              </Button>
+            );
+          })}
+        </nav>
+      ) : null}
       {children}
     </div>
-  );
-}
-
-// -- Rail Main -> Rail Route Nav -- //
-
-export type RailRouteNavProps = {
-  className?: string;
-};
-
-export function RailRouteNav({ className }: RailRouteNavProps) {
-  const { route, activeEntryId, setActiveEntryId } = useLayoutContext();
-  if (!route?.entries.length) return null;
-  return (
-    <nav className={cn("flex flex-col items-center gap-1", className)}>
-      {route.entries.map((e) => {
-        const isActive = e.id === activeEntryId;
-        const name = typeof e.label === "string" ? e.label : e.id;
-        return (
-          <Button
-            key={e.id}
-            aria-pressed={isActive}
-            aria-label={name}
-            onPress={() => setActiveEntryId(e.id)}
-            className={cn(
-              "size-10 rounded-[10px]",
-              "transition-all duration-150",
-              "[&>svg]:size-5",
-              isActive
-                ? "bg-surface text-fg-1"
-                : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
-            )}
-          >
-            {e.icon}
-          </Button>
-        );
-      })}
-    </nav>
   );
 }

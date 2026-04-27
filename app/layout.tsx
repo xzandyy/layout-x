@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Button } from "@heroui/react";
 import { EllipsisVertical, Pencil } from "@gravity-ui/icons";
 
-import { Layout, appRouter } from "@/components/Layout";
+import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
 import { workspaceRoute } from "@/config/workspace-route";
 import "./globals.css";
@@ -44,9 +44,7 @@ export default function RootLayout({
                 </div>
               </div>
             </Layout.RailHeader>
-            <Layout.RailMain>
-              <Layout.RailRouteNav />
-            </Layout.RailMain>
+            <Layout.RailMain />
             <Layout.RailFooter>
               <div className="flex justify-center py-3">
                 <div
@@ -110,7 +108,7 @@ export default function RootLayout({
             </Layout.SidebarFooter>
           </Layout.Sidebar>
           <Layout.Content>
-            <Layout.ContentHeader breadcrumbRoute={appRouter} />
+            <Layout.ContentHeader />
             <Layout.ContentBody>{children}</Layout.ContentBody>
           </Layout.Content>
         </Layout>

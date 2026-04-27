@@ -3,82 +3,44 @@
 @import "@heroui-pro/react/css";
 
 :root {
-  /* Surface */
-  --bg-canvas: #f4f5f7; /* outer chrome / rail / sidebar */
-  --bg-canvas-2: #eef0f3; /* hover / weak fill */
-  --bg-surface: #ffffff; /* inner cards / main content */
-  --bg-row-hover: #f7f8fa;
-  --bg-subtle: #f0f2f5;
+  /* Back-compat: Tailwind `bg-background` / `text-foreground` */
+  --background: var(--bg-canvas);
+  --foreground: var(--fg-1);
 
+  /* Background */
+  --bg-canvas: #f4f5f7;
+  --bg-canvas-2: #eef0f3;
+  --bg-surface: #ffffff;
   /* Text */
   --fg-1: #0f172a;
   --fg-2: #334155;
   --fg-3: #64748b;
   --fg-4: #94a3b8;
   --fg-5: #cbd5e1;
-
   /* Border */
   --border-hair: #eef0f3;
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-
   /* Shadow */
   --shadow-card: 0 1px 1px rgba(15, 23, 42, 0.03);
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-float:
-    0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px -12px rgba(15, 23, 42, 0.08);
-
-  /* Radii */
-  --r-rail-item: 10px;
-  --r-sb-item: 7px;
-  --r-card: 14px;
-
-  /* Back-compat: Tailwind `bg-background` / `text-foreground` */
-  --background: var(--bg-canvas);
-  --foreground: var(--fg-1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Background */
   --color-canvas: var(--bg-canvas);
   --color-canvas-2: var(--bg-canvas-2);
   --color-surface: var(--bg-surface);
-  --color-row-hover: var(--bg-row-hover);
+  /* Text */
   --color-fg-1: var(--fg-1);
   --color-fg-2: var(--fg-2);
   --color-fg-3: var(--fg-3);
   --color-fg-4: var(--fg-4);
   --color-fg-5: var(--fg-5);
+  /* Border */
   --color-border-hair: var(--border-hair);
-  --color-border-soft: var(--border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-canvas: #0c0d10;
-    --bg-canvas-2: #161820;
-    --bg-surface: #1a1c22;
-    --bg-row-hover: #1f2128;
-    --bg-subtle: #1a1c22;
-
-    --fg-1: #f3f4f6;
-    --fg-2: #d1d5db;
-    --fg-3: #9ca3af;
-    --fg-4: #6b7280;
-    --fg-5: #4b5563;
-
-    --border-hair: #23262d;
-    --border: #2f343c;
-    --border-strong: #3d434c;
-
-    --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.45);
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-    --shadow-float:
-      0 1px 2px rgba(0, 0, 0, 0.45), 0 12px 28px -12px rgba(0, 0, 0, 0.6);
-  }
 }
 
 body {
@@ -88,6 +50,24 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-canvas: #0c0d10;
+    --bg-canvas-2: #161820;
+    --bg-surface: #1a1c22;
+
+    --fg-1: #f3f4f6;
+    --fg-2: #d1d5db;
+    --fg-3: #9ca3af;
+    --fg-4: #6b7280;
+    --fg-5: #4b5563;
+
+    --border-hair: #23262d;
+
+    --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.45);
+  }
 }
 
 @layer components {

@@ -5,7 +5,8 @@ import { useLayoutContext } from "./root";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
-import type { Router } from "@/components/Layout";
+import appRouter from "@/config/routes.json";
+import type { Router } from "./types";
 
 // -- Content -- //
 
@@ -34,15 +35,12 @@ export function Content({ className, children }: ContentProps) {
 
 export type ContentHeaderProps = {
   className?: string;
-  breadcrumbRoute?: Router;
   end?: ReactNode;
 };
 
-export function ContentHeader({
-  className,
-  breadcrumbRoute,
-  end,
-}: ContentHeaderProps) {
+const breadcrumbRoute = appRouter as Router;
+
+export function ContentHeader({ className, end }: ContentHeaderProps) {
   const { headerHeight } = useLayoutContext();
   return (
     <header
@@ -53,19 +51,12 @@ export function ContentHeader({
       style={{ minHeight: `${headerHeight}rem` }}
     >
       <div className="flex w-full min-w-0 items-center gap-3">
-        {breadcrumbRoute != null ? (
-          <Breadcrumbs
-            className="min-w-0 shrink"
-            route={breadcrumbRoute}
-          />
-        ) : null}
+        <Breadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
         {end != null ? (
           <div
             className={cn(
               "min-w-0",
-              breadcrumbRoute != null
-                ? "ml-auto flex min-w-0 items-center justify-end gap-2"
-                : "flex w-full",
+              "ml-auto flex min-w-0 items-center justify-end gap-2",
             )}
           >
             {end}
