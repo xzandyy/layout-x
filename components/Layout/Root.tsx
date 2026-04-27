@@ -17,6 +17,11 @@ import { findBestEntryIdForPathname } from "./sidebar";
 
 // -- Layout Root Context -- //
 
+function collectRailMenuItems(route: RouteConfig | undefined) {
+  if (!route) return [] as RailMenuItem[];
+  return route.rail.flatMap((b) => b.items);
+}
+
 export type LayoutContextValue = {
   headerHeight: number;
   railWidth: number;
@@ -70,15 +75,20 @@ export function LayoutRoot({
     forPathname: string;
   } | null>(null);
 
+  const allRailItems = useMemo(
+    () => collectRailMenuItems(route),
+    [route],
+  );
+
   const urlEntryId = useMemo(
     () => (route ? findBestEntryIdForPathname(route, pathname) : undefined),
     [route, pathname],
   );
 
   const fallbackId = useMemo(() => {
-    if (!route?.entries.length) return undefined;
-    return route.defaultEntryId ?? route.entries[0]!.id;
-  }, [route]);
+    if (!allRailItems.length) return undefined;
+    return route?.defaultRailItemId ?? allRailItems[0]!.id;
+  }, [route, allRailItems]);
 
   const activeEntryId = useMemo(() => {
     if (!route) return undefined;
@@ -89,9 +99,9 @@ export function LayoutRoot({
   }, [route, railOverride, pathname, urlEntryId, fallbackId]);
 
   const activeEntry = useMemo(() => {
-    if (!route || activeEntryId == null) return undefined;
-    return route.entries.find((e) => e.id === activeEntryId);
-  }, [route, activeEntryId]);
+    if (activeEntryId == null) return undefined;
+    return allRailItems.find((e) => e.id === activeEntryId);
+  }, [allRailItems, activeEntryId]);
 
   const setActiveEntryId = useCallback(
     (id: string) => {

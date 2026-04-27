@@ -14,10 +14,11 @@ import { cn } from "@/lib/utils";
 import { useLayoutContext } from "./root";
 import type {
   RouteConfig,
-  SidebarMenuConfig,
-  SidebarGroupNode,
+  SidebarGroupItem,
+  SidebarMenuItem,
   SidebarMenuItemNode,
-  SidebarNode,
+  SidebarMenuItemBranch,
+  SidebarMenuConfig,
   TooltipConfig,
 } from "./types";
 
@@ -117,7 +118,7 @@ function MenuTree({
 
   return (
     <>
-      {config.nodes.map((node, i) => (
+      {config.items.map((node, i) => (
         <MenuNode
           key={i}
           node={node}
@@ -135,7 +136,7 @@ function MenuNode({
   node,
   ...rest
 }: {
-  node: SidebarNode;
+  node: SidebarMenuItem;
   groupIndex: number;
   activeRoute: ActiveRoute;
   expandedKeys: Set<string>;
@@ -152,7 +153,7 @@ function GroupNode({
   expandedKeys,
   onExpandedChange,
 }: {
-  node: SidebarGroupNode;
+  node: SidebarGroupItem;
   groupIndex: number;
   activeRoute: ActiveRoute;
   expandedKeys: Set<string>;
@@ -310,7 +311,7 @@ function normalizedHrefMatchesPath(
  */
 function itemHasChildren(
   item: SidebarMenuItemNode,
-): item is SidebarMenuItemNode & { children: SidebarMenuItemNode[] } {
+): item is SidebarMenuItemBranch {
   return (
     "children" in item && item.children != null && item.children.length > 0
   );
@@ -334,7 +335,7 @@ function getItemId(groupIndex: number, itemPath: readonly number[]): string {
  * 给侧栏菜单计算可访问性 label：优先使用分组的 label，否则回退到「Menu group N」。
  */
 function ariaLabelForSidebarMenu(
-  node: SidebarGroupNode,
+  node: SidebarGroupItem,
   groupIndex: number,
 ): string {
   const { label } = node;
@@ -465,8 +466,8 @@ function resolveActiveRoute(
     }
   };
 
-  for (let gi = 0; gi < config.nodes.length; gi++) {
-    const node = config.nodes[gi]!;
+  for (let gi = 0; gi < config.items.length; gi++) {
+    const node = config.items[gi]!;
     if (node.type === "group") visit(node.menu, gi, [], []);
   }
 
@@ -508,8 +509,8 @@ export function getActiveLeafNormForConfig(
     }
   };
 
-  for (let gi = 0; gi < config.nodes.length; gi++) {
-    const node = config.nodes[gi]!;
+  for (let gi = 0; gi < config.items.length; gi++) {
+    const node = config.items[gi]!;
     if (node.type === "group") visit(node.menu, gi);
   }
 
@@ -517,16 +518,17 @@ export function getActiveLeafNormForConfig(
 }
 
 /**
- * 在 `RouteConfig.entries` 中挑出与 pathname 最匹配的 entry id：
- * 取使 `getActiveLeafNormForConfig` 命中 href 最长的那一项；若无任何匹配则返回 `undefined`。
+ * 在 `RouteConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项 id：
+ * 对每项的 `sidebar` 做 `getActiveLeafNormForConfig`，取命中 href 最长者；无匹配则 `undefined`。
  */
 export function findBestEntryIdForPathname(
   route: RouteConfig,
   pathname: string,
 ): string | undefined {
+  const railItems = route.rail.flatMap((b) => b.items);
   let bestId: string | undefined;
   let bestLen = -1;
-  for (const e of route.entries) {
+  for (const e of railItems) {
     const norm = getActiveLeafNormForConfig(e.sidebar, pathname);
     const len = norm?.length ?? -1;
     if (len > bestLen) {

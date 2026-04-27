@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { useLayoutContext } from "./root";
@@ -60,6 +60,10 @@ export type RailMainProps = {
 
 export function RailMain({ className, children }: RailMainProps) {
   const { route, activeEntryId, setActiveEntryId } = useLayoutContext();
+  const items = useMemo(
+    () => (route ? route.rail.flatMap((b) => b.items) : []),
+    [route],
+  );
   return (
     <div
       className={cn(
@@ -67,9 +71,9 @@ export function RailMain({ className, children }: RailMainProps) {
         className,
       )}
     >
-      {route?.entries.length ? (
+      {items.length ? (
         <nav className="flex flex-col items-center gap-1">
-          {route.entries.map((e) => {
+          {items.map((e) => {
             const isActive = e.id === activeEntryId;
             const name = typeof e.label === "string" ? e.label : e.id;
             return (

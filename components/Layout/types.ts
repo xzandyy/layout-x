@@ -2,8 +2,13 @@ import type { ReactNode } from "react";
 import appRouterJson from "../../config/routes.json";
 
 export type RouteConfig = {
-  entries: RailMenuItem[];
-  defaultEntryId?: string;
+  rail: RailMenuConfig[];
+  defaultRailItemId?: string;
+  defaultSidebarItemId?: string;
+};
+
+export type RailMenuConfig = {
+  items: RailMenuItem[];
 };
 
 export type RailMenuItem = {
@@ -15,19 +20,19 @@ export type RailMenuItem = {
 };
 
 export type SidebarMenuConfig = {
-  nodes: SidebarNode[];
+  items: SidebarMenuItem[];
 };
 
-export type SidebarNode = SidebarSeparatorNode | SidebarGroupNode;
+export type SidebarMenuItem = SidebarSeparatorItem | SidebarGroupItem;
 
-export type SidebarGroupNode = {
+export type SidebarSeparatorItem = {
+  type: "separator";
+};
+
+export type SidebarGroupItem = {
   type: "group";
   label?: ReactNode;
   menu: SidebarMenuItemNode[];
-};
-
-export type SidebarSeparatorNode = {
-  type: "separator";
 };
 
 export type SidebarMenuItemNode = SidebarMenuItemLeaf | SidebarMenuItemBranch;

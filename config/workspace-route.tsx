@@ -12,154 +12,158 @@ import {
 import type { RouteConfig } from "@/components/Layout";
 
 export const workspaceRoute: RouteConfig = {
-  defaultEntryId: "home",
-  entries: [
+  defaultRailItemId: "home",
+  rail: [
     {
-      id: "home",
-      label: "Home",
-      icon: <House />,
-      sidebar: {
-        nodes: [
-          {
-            type: "group",
-            label: "Overview",
-            menu: [
+      items: [
+        {
+          id: "home",
+          label: "Home",
+          icon: <House />,
+          sidebar: {
+            items: [
               {
-                icon: <House />,
-                label: "Home",
-                href: "/workspace",
-              },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      id: "inbox",
-      label: "Inbox",
-      icon: <Envelope />,
-      sidebar: {
-        nodes: [
-          {
-            type: "group",
-            label: "Inbox",
-            menu: [
-              {
-                icon: <Envelope />,
-                label: "Inbox",
-                href: "/workspace/inbox",
-              },
-              {
-                icon: <CheckDouble />,
-                label: "Review",
-                href: "/workspace/inbox/review",
-              },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      id: "agents",
-      label: "Agents",
-      icon: <FaceRobot />,
-      sidebar: {
-        nodes: [
-          {
-            type: "group",
-            label: "Agents",
-            menu: [
-              {
-                icon: <FaceRobot />,
+                type: "group",
                 label: "Overview",
-                href: "/workspace/agents",
-              },
-            ],
-          },
-        ],
-      },
-    },
-    {
-      id: "workflows",
-      label: "Flows",
-      icon: <FolderFlows />,
-      sidebar: {
-        nodes: [
-          {
-            type: "group",
-            label: "Workflows",
-            menu: [
-              {
-                icon: <FolderFlows />,
-                label: "All",
-                children: [
+                menu: [
                   {
-                    icon: <FolderFlows />,
-                    label: "Board",
-                    href: "/workspace/workflows",
-                  },
-                  {
-                    icon: <FolderFlows />,
-                    label: "Lead → CRM",
-                    href: "/workspace/workflows/lead-crm",
+                    icon: <House />,
+                    label: "Home",
+                    href: "/workspace",
                   },
                 ],
               },
             ],
           },
-        ],
-      },
-    },
-    {
-      id: "library",
-      label: "Library",
-      icon: <Book />,
-      sidebar: {
-        nodes: [
-          {
-            type: "group",
-            label: "Library",
-            menu: [
+        },
+        {
+          id: "inbox",
+          label: "Inbox",
+          icon: <Envelope />,
+          sidebar: {
+            items: [
               {
-                icon: <Book />,
-                label: "Catalog",
-                children: [
+                type: "group",
+                label: "Inbox",
+                menu: [
+                  {
+                    icon: <Envelope />,
+                    label: "Inbox",
+                    href: "/workspace/inbox",
+                  },
+                  {
+                    icon: <CheckDouble />,
+                    label: "Review",
+                    href: "/workspace/inbox/review",
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          id: "agents",
+          label: "Agents",
+          icon: <FaceRobot />,
+          sidebar: {
+            items: [
+              {
+                type: "group",
+                label: "Agents",
+                menu: [
+                  {
+                    icon: <FaceRobot />,
+                    label: "Overview",
+                    href: "/workspace/agents",
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          id: "workflows",
+          label: "Flows",
+          icon: <FolderFlows />,
+          sidebar: {
+            items: [
+              {
+                type: "group",
+                label: "Workflows",
+                menu: [
+                  {
+                    icon: <FolderFlows />,
+                    label: "All",
+                    children: [
+                      {
+                        icon: <FolderFlows />,
+                        label: "Board",
+                        href: "/workspace/workflows",
+                      },
+                      {
+                        icon: <FolderFlows />,
+                        label: "Lead → CRM",
+                        href: "/workspace/workflows/lead-crm",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          id: "library",
+          label: "Library",
+          icon: <Book />,
+          sidebar: {
+            items: [
+              {
+                type: "group",
+                label: "Library",
+                menu: [
                   {
                     icon: <Book />,
-                    label: "Main",
-                    href: "/workspace/library",
-                  },
-                  {
-                    icon: <FileText />,
-                    label: "Playbooks",
-                    href: "/workspace/library/playbooks",
+                    label: "Catalog",
+                    children: [
+                      {
+                        icon: <Book />,
+                        label: "Main",
+                        href: "/workspace/library",
+                      },
+                      {
+                        icon: <FileText />,
+                        label: "Playbooks",
+                        href: "/workspace/library/playbooks",
+                      },
+                    ],
                   },
                 ],
               },
             ],
           },
-        ],
-      },
-    },
-    {
-      id: "integrations",
-      label: "Settings",
-      icon: <Gear />,
-      sidebar: {
-        nodes: [
-          {
-            type: "group",
-            label: "Settings",
-            menu: [
+        },
+        {
+          id: "integrations",
+          label: "Settings",
+          icon: <Gear />,
+          sidebar: {
+            items: [
               {
-                icon: <Gear />,
-                label: "Integrations",
-                href: "/workspace/integrations",
+                type: "group",
+                label: "Settings",
+                menu: [
+                  {
+                    icon: <Gear />,
+                    label: "Integrations",
+                    href: "/workspace/integrations",
+                  },
+                ],
               },
             ],
           },
-        ],
-      },
+        },
+      ],
     },
   ],
 };
