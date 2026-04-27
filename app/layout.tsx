@@ -35,9 +35,9 @@ export default function RootLayout({
         <LayoutX route={workspaceRoute}>
           <LayoutX.Rail>
             <LayoutX.RailHeader>
-              <div className="flex items-center justify-center p-2">
+              <div className="flex items-center justify-center pb-3">
                 <div
-                  className="flex h-8 w-8 items-center justify-center rounded-md bg-foreground/10 text-xs font-semibold text-foreground"
+                  className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-canvas-2 text-[11px] font-semibold tracking-[-0.01em] text-fg-1"
                   title="品牌 / Logo"
                 >
                   LX
@@ -48,22 +48,30 @@ export default function RootLayout({
               <LayoutX.RailRouteNav />
             </LayoutX.RailMain>
             <LayoutX.RailFooter>
-              <div className="flex justify-center p-2">
+              <div className="flex justify-center pt-2">
                 <div
-                  className="h-7 w-7 rounded-full bg-foreground/15"
+                  className="h-7 w-7 rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A]"
                   title="账户"
                 />
               </div>
             </LayoutX.RailFooter>
           </LayoutX.Rail>
           <LayoutX.Sidebar>
-            <LayoutX.SidebarHeader>
-              <LayoutX.SidebarEntryHeading />
-            </LayoutX.SidebarHeader>
+            <LayoutX.SidebarHeader></LayoutX.SidebarHeader>
             <LayoutX.SidebarMain />
             <LayoutX.SidebarFooter>
-              <div className="px-3 py-2 text-xs text-foreground/55 dark:border-white/10">
-                layout-x · 侧栏底栏占位
+              <div className="flex items-center gap-2 px-2.5 pt-2 text-[12.5px] text-fg-3">
+                <div className="flex size-7 items-center justify-center rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A] text-[11px] font-semibold text-white">
+                  LX
+                </div>
+                <div className="flex min-w-0 flex-col leading-tight">
+                  <span className="truncate text-fg-1 font-medium">
+                    layout-x
+                  </span>
+                  <span className="truncate text-[10.5px] text-fg-4 font-mono uppercase tracking-[0.12em]">
+                    Workspace
+                  </span>
+                </div>
               </div>
             </LayoutX.SidebarFooter>
           </LayoutX.Sidebar>

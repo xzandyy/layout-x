@@ -76,7 +76,7 @@ function buildBreadcrumbItems(
   if (steps == null || steps.length === 0) return [];
   const parts = segs(pathname);
   const n = steps.length;
-  return steps.map((step, i) => {
+  const items = steps.map((step, i) => {
     const last = i === n - 1;
     if (last) {
       return { title: step.node.title, href: null, isCurrent: true };
@@ -90,6 +90,13 @@ function buildBreadcrumbItems(
       isCurrent: false,
     };
   });
+  /** `routes.json` 中 `title: ""` 的段不参与面包屑；过滤后最后一项为当前段 */
+  const visible = items.filter((item) => item.title.trim() !== "");
+  if (visible.length === 0) return [];
+  return visible.map((item, i, arr) => ({
+    ...item,
+    isCurrent: i === arr.length - 1,
+  }));
 }
 
 export type RouteBreadcrumbsProps = {
@@ -106,14 +113,6 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
 
   if (items.length === 0) return null;
 
-  const staticItemClass = cn(
-    "no-underline",
-    "pointer-events-none cursor-default",
-    "text-foreground !no-underline",
-    "hover:!text-foreground",
-    "data-[hovered]:!text-foreground data-[hovered]:no-underline",
-  );
-
   return (
     <Breadcrumbs
       aria-label="Breadcrumb"
@@ -121,7 +120,7 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
         "route-breadcrumbs min-w-0 flex-wrap items-center",
         className,
       )}
-      separator={<span className="text-muted">/</span>}
+      separator={<span className="text-fg-4!">/</span>}
     >
       {items.map((item, i) =>
         item.href ? (
@@ -130,14 +129,29 @@ export function RouteBreadcrumbs({ route, className }: RouteBreadcrumbsProps) {
             className="no-underline"
             href={item.href}
           >
-            <span className="text-[0.8rem] mr-1">{item.title}</span>
+            <span className="mr-1 text-[0.8rem] text-fg-4!">{item.title}</span>
           </Breadcrumbs.Item>
         ) : (
           <Breadcrumbs.Item
             key={`${i}-${item.title}-${String(item.isCurrent)}`}
-            className={staticItemClass}
+            className={cn(
+              "no-underline",
+              "pointer-events-none cursor-default",
+              "no-underline!",
+
+              "data-hovered:no-underline",
+            )}
           >
-            <span className="text-[0.8rem] mr-1">{item.title}</span>
+            <span
+              className={cn(
+                "mr-1 text-[0.8rem]",
+                item.isCurrent
+                  ? "hover:text-fg-1! data-hovered:text-fg-1!"
+                  : "hover:text-fg-4! data-hovered:text-fg-4!",
+              )}
+            >
+              {item.title}
+            </span>
           </Breadcrumbs.Item>
         ),
       )}

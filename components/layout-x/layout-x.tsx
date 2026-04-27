@@ -1,9 +1,16 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type CSSProperties,
+} from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
-import { Sidebar } from "@heroui-pro/react";
+import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import { RouteBreadcrumbs } from "./route-breadcrumbs";
@@ -17,13 +24,11 @@ import type {
   LayoutXSidebarMainProps,
 } from "./types";
 
-// ---------------------------------------------------------------------------
-// Context
-// ---------------------------------------------------------------------------
+// -- Layout Context -- //
 
 const LayoutXContext = createContext<LayoutXContextValue | null>(null);
 
-function useLayoutXContext(): LayoutXContextValue {
+function useLayoutContext(): LayoutXContextValue {
   const ctx = useContext(LayoutXContext);
   if (ctx == null) {
     throw new Error(
@@ -33,29 +38,23 @@ function useLayoutXContext(): LayoutXContextValue {
   return ctx;
 }
 
-/** 读取 `LayoutX` 提供的 route / 当前激活 entry（须在 `<LayoutX>` 内使用）。 */
-export function useLayoutX() {
-  return useLayoutXContext();
+export function useLayout() {
+  return useLayoutContext();
 }
 
-// ---------------------------------------------------------------------------
-// Root — Sidebar.Provider + flex 外壳
-// ---------------------------------------------------------------------------
+// -- Layout Root -- //
 
-/**
- * 工作区根容器，同时挂载 Pro `Sidebar.Provider`（navigate 由内部 useRouter 注入）。
- * 子级按顺序放：`LayoutX.Rail`、`LayoutX.Sidebar`、`LayoutX.Content`。
- */
-export function LayoutXRoot({
-  headerHeight = 3.5,
+export function Root({
+  headerHeight = 3.25,
   railWidth = 4,
+  sidebarWidth = 16.5,
   className,
   route,
   children,
 }: LayoutXProps) {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
-  /** 用户点 Rail 时的临时选择；`forPathname` 与当前 URL 一致时才生效，换路由后自动回退为 URL 推断。 */
+
   const [railOverride, setRailOverride] = useState<{
     entryId: string;
     forPathname: string;
@@ -73,10 +72,7 @@ export function LayoutXRoot({
 
   const activeEntryId = useMemo(() => {
     if (!route) return undefined;
-    if (
-      railOverride != null &&
-      railOverride.forPathname === pathname
-    ) {
+    if (railOverride != null && railOverride.forPathname === pathname) {
       return railOverride.entryId;
     }
     return urlEntryId ?? fallbackId;
@@ -99,6 +95,7 @@ export function LayoutXRoot({
     () => ({
       headerHeight,
       railWidth,
+      sidebarWidth,
       route,
       activeEntryId,
       activeEntry,
@@ -107,6 +104,7 @@ export function LayoutXRoot({
     [
       headerHeight,
       railWidth,
+      sidebarWidth,
       route,
       activeEntryId,
       activeEntry,
@@ -116,33 +114,31 @@ export function LayoutXRoot({
 
   return (
     <LayoutXContext.Provider value={value}>
-      <Sidebar.Provider navigate={router.push} variant="inset">
+      <HeroSidebar.Provider navigate={router.push} collapsible="none">
         <div
           className={cn(
-            "box-border flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row items-stretch overflow-hidden",
-            "bg-gray-100 dark:bg-zinc-950",
+            "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0",
+            "bg-canvas text-fg-1",
             className,
           )}
         >
           {children}
         </div>
-      </Sidebar.Provider>
+      </HeroSidebar.Provider>
     </LayoutXContext.Provider>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Rail（最左窄栏，手写 aside，与 Pro Sidebar 并列）
-// ---------------------------------------------------------------------------
+// -- Layout Rail -- //
 
-export function LayoutXRail({ className, children }: LayoutXRegionProps) {
-  const { railWidth } = useLayoutXContext();
+export function Rail({ className, children }: LayoutXRegionProps) {
+  const { railWidth } = useLayoutContext();
   return (
     <aside
       aria-label="Rail"
       className={cn(
         "flex h-full min-h-0 w-full min-w-0 flex-col",
-        "shrink-0 self-stretch border-r border-black/10 dark:border-white/10",
+        "shrink-0 self-stretch bg-canvas",
         className,
       )}
       style={{ width: `${railWidth}rem` }}
@@ -152,65 +148,48 @@ export function LayoutXRail({ className, children }: LayoutXRegionProps) {
   );
 }
 
-export function LayoutXRailHeader({ className, children }: LayoutXRegionProps) {
-  return (
-    <div className={cn("shrink-0", className)} data-slot="layout-x-rail-header">
-      {children}
-    </div>
-  );
+export function RailHeader({ className, children }: LayoutXRegionProps) {
+  return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
-export function LayoutXRailMain({ className, children }: LayoutXRegionProps) {
+export function RailFooter({ className, children }: LayoutXRegionProps) {
+  return <div className={cn("shrink-0", className)}>{children}</div>;
+}
+
+export function RailMain({ className, children }: LayoutXRegionProps) {
   return (
     <div
       className={cn(
-        "min-h-0 w-full min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
+        "w-full min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden",
         className,
       )}
-      data-slot="layout-x-rail-main"
     >
       {children}
     </div>
   );
 }
 
-export function LayoutXRailFooter({ className, children }: LayoutXRegionProps) {
-  return (
-    <div className={cn("shrink-0", className)} data-slot="layout-x-rail-footer">
-      {children}
-    </div>
-  );
-}
-
-/**
- * 根据 `route.entries` 渲染 Rail 入口按钮，点击切换当前侧栏 `sidebar`。
- * 无 `route` 时不渲染。须放在 `LayoutX` 子树中。
- */
-export function LayoutXRailRouteNav({ className }: LayoutXRegionProps) {
-  const { route, activeEntryId, setActiveEntryId } = useLayoutXContext();
+export function RailRouteNav({ className }: LayoutXRegionProps) {
+  const { route, activeEntryId, setActiveEntryId } = useLayoutContext();
   if (!route?.entries.length) return null;
   return (
-    <nav
-      className={cn(
-        "flex flex-col items-center gap-1 p-1",
-        className,
-      )}
-      aria-label="工作区入口"
-    >
+    <nav className={cn("flex flex-col items-center gap-1", className)}>
       {route.entries.map((e) => {
         const isActive = e.id === activeEntryId;
-        const name =
-          typeof e.label === "string" ? e.label : e.id;
+        const name = typeof e.label === "string" ? e.label : e.id;
         return (
           <Button
             key={e.id}
-            isIconOnly
-            size="md"
-            variant={isActive ? "secondary" : "ghost"}
             aria-pressed={isActive}
             aria-label={name}
             onPress={() => setActiveEntryId(e.id)}
-            className="h-9 w-9 shrink-0 p-0 text-foreground/90 [&>svg]:size-5"
+            className={cn(
+              "size-10 rounded-[10px]",
+              "transition-all duration-150",
+              isActive
+                ? "bg-surface text-fg-1"
+                : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
+            )}
           >
             {e.icon}
           </Button>
@@ -220,130 +199,83 @@ export function LayoutXRailRouteNav({ className }: LayoutXRegionProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Sidebar（Pro Sidebar aside，置于 Rail 右侧）
-// ---------------------------------------------------------------------------
+// -- Sidebar -- //
 
-/**
- * 侧栏外壳，内部直接渲染 Pro `<Sidebar>`。
- * 子级可放 `LayoutX.SidebarHeader`、`LayoutX.SidebarMain`、`LayoutX.SidebarFooter`。
- */
-export function LayoutXSidebar({ className, children }: LayoutXRegionProps) {
-  return <Sidebar className={className}>{children}</Sidebar>;
-}
-
-/**
- * 侧栏顶部槽，映射到 `Sidebar.Header`。
- */
-export function LayoutXSidebarHeader({
-  className,
-  children,
-}: LayoutXRegionProps) {
-  return <Sidebar.Header className={className}>{children}</Sidebar.Header>;
-}
-
-/**
- * 显示当前 `route` 激活项的图标 + `label`；无 `activeEntry` 时显示「导航」。
- */
-export function LayoutXSidebarEntryHeading({ className }: LayoutXRegionProps) {
-  const { activeEntry } = useLayoutXContext();
-  if (!activeEntry) {
-    return (
-      <div
-        className={cn(
-          "border-b border-black/10 px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10",
-          className,
-        )}
-      >
-        导航
-      </div>
-    );
-  }
+export function Sidebar({ className, children }: LayoutXRegionProps) {
+  const { sidebarWidth } = useLayoutContext();
+  const sidebarVars = useMemo(
+    () =>
+      ({
+        "--sidebar-width": `${sidebarWidth}rem`,
+      }) as CSSProperties,
+    [sidebarWidth],
+  );
   return (
-    <div
-      className={cn(
-        "flex min-h-10 items-center gap-2 border-b border-black/10 px-3 py-2.5 text-sm font-medium text-foreground dark:border-white/10",
-        className,
-      )}
+    <HeroSidebar
+      className={cn("bg-canvas border-none shadow-none px-2", className)}
+      style={sidebarVars}
     >
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center text-foreground/90 [&>svg]:size-4">
-        {activeEntry.icon}
-      </span>
-      <span className="min-w-0 truncate">{activeEntry.label}</span>
-    </div>
+      {children}
+    </HeroSidebar>
   );
 }
 
-/**
- * 侧栏可滚动内容区，映射到 `Sidebar.Content`。
- * 菜单树来自 `LayoutX` 根上 `route` 与当前 `activeEntry.sidebar`；`isCurrent` 等由 `usePathname` 派生。
- */
-export function LayoutXSidebarMain({
-  className,
-  children,
-}: LayoutXSidebarMainProps) {
+export function SidebarHeader({ className, children }: LayoutXRegionProps) {
+  return (
+    <HeroSidebar.Header className={cn("p-0", className)}>
+      {children}
+    </HeroSidebar.Header>
+  );
+}
+
+export function SidebarFooter({ className, children }: LayoutXRegionProps) {
+  return (
+    <HeroSidebar.Footer className={cn("p-0", className)}>
+      {children}
+    </HeroSidebar.Footer>
+  );
+}
+
+export function SidebarMain({ className, children }: LayoutXSidebarMainProps) {
   const pathname = usePathname();
-  const { activeEntry } = useLayoutXContext();
+  const { activeEntry } = useLayoutContext();
   const sidebar = activeEntry?.sidebar;
   return (
-    <Sidebar.Content
-      aria-label="侧栏导航"
-      className={className}
-    >
+    <HeroSidebar.Content className={cn("p-0", className)}>
       {sidebar && <MenuTree config={sidebar} pathname={pathname} />}
       {children}
-    </Sidebar.Content>
+    </HeroSidebar.Content>
   );
 }
 
-/**
- * 侧栏底部槽，映射到 `Sidebar.Footer`。
- */
-export function LayoutXSidebarFooter({
-  className,
-  children,
-}: LayoutXRegionProps) {
-  return <Sidebar.Footer className={className}>{children}</Sidebar.Footer>;
-}
+// -- Content -- //
 
-// ---------------------------------------------------------------------------
-// Content（Pro Sidebar.Main — 主内容区，对外名称 Content，不叫 Panel 或 Main）
-// ---------------------------------------------------------------------------
-
-/**
- * 主内容区外壳，映射到 Pro `Sidebar.Main`（`<main>` 标签）。
- * 内部保留原 Panel 的卡片外观（`m-2 rounded-xl border bg-white …`）。
- * 子级可放 `LayoutX.ContentHeader` + `LayoutX.ContentBody`。
- */
-export function LayoutXContent({ className, children }: LayoutXRegionProps) {
+export function Content({ className, children }: LayoutXRegionProps) {
   return (
-    <Sidebar.Main>
+    <HeroSidebar.Main className="min-h-0 min-w-0 p-2 pl-0">
       <div
         className={cn(
-          "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-2xl bg-white dark:bg-zinc-900",
+          "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
+          "rounded-[14px] border border-border-hair bg-surface shadow-(--shadow-card)",
           className,
         )}
       >
         {children}
       </div>
-    </Sidebar.Main>
+    </HeroSidebar.Main>
   );
 }
 
-/**
- * 主内容区顶栏，渲染面包屑（`breadcrumbRoute`）与右侧操作区（`end`）。
- * 顶栏：面包屑 + 右侧区域（与旧版 PanelHeader 视觉一致）。
- */
-export function LayoutXContentHeader({
+export function ContentHeader({
   className,
   breadcrumbRoute,
   end,
 }: LayoutXContentHeaderProps) {
-  const { headerHeight } = useLayoutXContext();
+  const { headerHeight } = useLayoutContext();
   return (
     <header
       className={cn(
-        "flex shrink-0 items-center border-b border-black/10 px-4 dark:border-white/10",
+        "sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b border-border-hair bg-surface px-5",
         className,
       )}
       style={{ minHeight: `${headerHeight}rem` }}
@@ -372,14 +304,7 @@ export function LayoutXContentHeader({
   );
 }
 
-/**
- * 主内容区可滚动主体，放于 `LayoutX.ContentHeader` 之下。
- * 主内容可滚区。
- */
-export function LayoutXContentBody({
-  className,
-  children,
-}: LayoutXRegionProps) {
+export function ContentBody({ className, children }: LayoutXRegionProps) {
   return (
     <main
       aria-label="Main content"

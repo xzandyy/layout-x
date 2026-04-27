@@ -119,6 +119,11 @@ export type LayoutXProps = {
   headerHeight?: number;
   /** Rail 最窄宽度（rem） */
   railWidth?: number;
+  /**
+   * 侧栏宽度（rem），对应 Pro `Sidebar` 的 `--sidebar-width`（文档默认 240px ≈ 15rem）。本布局不启用侧栏折叠，不设 `--sidebar-width-collapsed`。
+   * @see https://docs-prod.heroui.pro/docs/react/components/sidebar#css-variables
+   */
+  sidebarWidth?: number;
   className?: string;
   /**
    * Rail 入口 + 各入口侧栏内容；与 Context 中 `activeEntry` / `setActiveEntryId` 配合使用。
@@ -155,6 +160,10 @@ export type LayoutXContentHeaderProps = {
 export type LayoutXContextValue = {
   headerHeight: number;
   railWidth: number;
+  /**
+   * 侧栏宽度（rem），与 Pro `Sidebar` 的 `--sidebar-width` 一致。
+   */
+  sidebarWidth: number;
   /** 根传入的 `route`（若有） */
   route?: RouteConfig;
   /** 当前激活的 entry id；无 `route` 时为 `undefined` */

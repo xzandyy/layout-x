@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { Key } from "react-aria-components";
 import { Sidebar } from "@heroui-pro/react";
+import { cn } from "@/lib/utils";
 
 import type {
   SidebarContentConfig,
@@ -12,9 +13,200 @@ import type {
   TooltipConfig,
 } from "./types";
 
-// ---------------------------------------------------------------------------
-// Path（用于当前路由 vs href 的匹配与归一化）
-// ---------------------------------------------------------------------------
+interface ActiveRoute {
+  activeLeafNorm?: string;
+  branchIds: string[];
+}
+
+interface DismissedState {
+  forPath: string;
+  keys: ReadonlySet<string>;
+}
+
+const EMPTY_SET: ReadonlySet<string> = new Set<string>();
+const EMPTY_DISMISSED: DismissedState = { forPath: "", keys: EMPTY_SET };
+
+// -- MenuTree -- //
+
+export function MenuTree({
+  config,
+  pathname,
+}: {
+  config: SidebarContentConfig;
+  pathname: string;
+}) {
+  const activeRoute = useMemo(
+    () => resolveActiveRoute(config, pathname),
+    [config, pathname],
+  );
+
+  const { getExpandedForGroup, handleExpandedChange } = useMenuExpansion({
+    pathname,
+    requiredBranchIds: activeRoute.branchIds,
+  });
+
+  return (
+    <>
+      {config.nodes.map((node, i) => (
+        <MenuNode
+          key={i}
+          node={node}
+          groupIndex={i}
+          activeRoute={activeRoute}
+          expandedKeys={getExpandedForGroup(i)}
+          onExpandedChange={(keys) => handleExpandedChange(i, keys)}
+        />
+      ))}
+    </>
+  );
+}
+
+// -- MenuNode -- //
+
+function MenuNode({
+  node,
+  ...rest
+}: {
+  node: SidebarNode;
+  groupIndex: number;
+  activeRoute: ActiveRoute;
+  expandedKeys: Set<string>;
+  onExpandedChange: (keys: Set<Key> | "all") => void;
+}) {
+  if (node.type === "separator") return <Sidebar.Separator />;
+  return <GroupNode node={node} {...rest} />;
+}
+
+// -- GroupNode -- //
+
+function GroupNode({
+  node,
+  groupIndex,
+  activeRoute,
+  expandedKeys,
+  onExpandedChange,
+}: {
+  node: SidebarGroupNode;
+  groupIndex: number;
+  activeRoute: ActiveRoute;
+  expandedKeys: Set<string>;
+  onExpandedChange: (keys: Set<Key> | "all") => void;
+}) {
+  return (
+    <Sidebar.Group>
+      {node.label && (
+        <Sidebar.GroupLabel className="text-fg-4 text-xs font-mono tracking-wide">
+          {node.label}
+        </Sidebar.GroupLabel>
+      )}
+      <Sidebar.Menu
+        aria-label={ariaLabelForSidebarMenu(node, groupIndex)}
+        expandedKeys={expandedKeys}
+        onExpandedChange={onExpandedChange}
+      >
+        {node.menu.map((item, i) => (
+          <MenuItem
+            key={i}
+            item={item}
+            groupIndex={groupIndex}
+            itemPath={[i]}
+            activeLeafNorm={activeRoute.activeLeafNorm}
+          />
+        ))}
+      </Sidebar.Menu>
+    </Sidebar.Group>
+  );
+}
+
+// -- MenuItem -- //
+
+function MenuItem({
+  item,
+  groupIndex,
+  itemPath,
+  activeLeafNorm,
+}: {
+  item: SidebarMenuItemNode;
+  groupIndex: number;
+  itemPath: number[];
+  activeLeafNorm: string | undefined;
+}) {
+  const { icon, label, chip, actions, tooltip, onPress } = item;
+  const children = "children" in item ? item.children : undefined;
+  const hasSubmenu = Boolean(children && children.length > 0);
+  const href = hasSubmenu ? undefined : "href" in item ? item.href : undefined;
+  const isCurrent = Boolean(
+    href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
+  );
+
+  return (
+    <Sidebar.MenuItem
+      id={getItemId(groupIndex, itemPath)}
+      href={href}
+      isCurrent={isCurrent}
+      onAction={onPress}
+      tooltipProps={tooltip ? toTooltipProps(tooltip) : undefined}
+    >
+      <Sidebar.MenuItemContent
+        className={cn(
+          "flex items-center gap-2 min-h-8 my-[0.1rem]",
+          "px-2.5 py-1 rounded-md",
+          "transition-all duration-150",
+          isCurrent
+            ? "bg-surface text-fg-1"
+            : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
+        )}
+      >
+        {icon && <Sidebar.MenuIcon>{icon}</Sidebar.MenuIcon>}
+        <Sidebar.MenuLabel className="text-[0.8rem]">{label}</Sidebar.MenuLabel>
+        {chip && <Sidebar.MenuChip>{chip}</Sidebar.MenuChip>}
+        {actions && <Sidebar.MenuActions>{actions}</Sidebar.MenuActions>}
+        {hasSubmenu && (
+          <Sidebar.MenuTrigger>
+            <Sidebar.MenuIndicator />
+          </Sidebar.MenuTrigger>
+        )}
+      </Sidebar.MenuItemContent>
+
+      {hasSubmenu && children != null && (
+        <Sidebar.Submenu>
+          {children.map((child, i) => (
+            <MenuItem
+              key={i}
+              item={child}
+              groupIndex={groupIndex}
+              itemPath={[...itemPath, i]}
+              activeLeafNorm={activeLeafNorm}
+            />
+          ))}
+        </Sidebar.Submenu>
+      )}
+    </Sidebar.MenuItem>
+  );
+}
+
+// -- Helper Functions -- //
+
+function ariaLabelForSidebarMenu(
+  node: SidebarGroupNode,
+  groupIndex: number,
+): string {
+  const { label } = node;
+  if (typeof label === "string" && label.trim() !== "") {
+    return `${label}`;
+  }
+  return `菜单${groupIndex + 1}`;
+}
+
+function toTooltipProps(tooltip: TooltipConfig) {
+  return {
+    content: tooltip.content,
+    className: tooltip.className,
+    delay: tooltip.delay,
+    closeDelay: tooltip.closeDelay,
+    placement: tooltip.placement ?? "right",
+  } as const;
+}
 
 function normalizePath(input: string): string {
   if (!input) return "/";
@@ -37,21 +229,12 @@ function normalizedHrefMatchesPath(
   return normPath === normHref || normPath.startsWith(`${normHref}/`);
 }
 
-// ---------------------------------------------------------------------------
-// 数据模型：稳定 item id + 一次遍历求「高亮叶子 + 需自动展开的分支 id」
-// ---------------------------------------------------------------------------
-
 function getGroupIdPrefix(groupIndex: number): string {
   return `g${groupIndex}:`;
 }
 
 function getItemId(groupIndex: number, itemPath: readonly number[]): string {
   return `${getGroupIdPrefix(groupIndex)}${itemPath.join(".")}`;
-}
-
-interface ActiveRoute {
-  activeLeafNorm?: string;
-  branchIds: string[];
 }
 
 function resolveActiveRoute(
@@ -110,18 +293,6 @@ function itemHasChildren(
     "children" in item && item.children != null && item.children.length > 0
   );
 }
-
-// ---------------------------------------------------------------------------
-// 受控展开：多棵 Sidebar.Menu 共用一个键空间，按 group 前缀分桶
-// ---------------------------------------------------------------------------
-
-interface DismissedState {
-  forPath: string;
-  keys: ReadonlySet<string>;
-}
-
-const EMPTY_SET: ReadonlySet<string> = new Set<string>();
-const EMPTY_DISMISSED: DismissedState = { forPath: "", keys: EMPTY_SET };
 
 function useMenuExpansion({
   pathname,
@@ -224,179 +395,4 @@ function computeDismissed(
     else next.add(id);
   }
   return { forPath: pathname, keys: next };
-}
-
-// ---------------------------------------------------------------------------
-// Public: MenuTree
-// ---------------------------------------------------------------------------
-
-/**
- * 将 `SidebarContentConfig` 渲染为 Pro Sidebar 菜单。
- * 由 `LayoutX.SidebarMain` 使用当前 `activeEntry.sidebar` 时内部调用。
- */
-export function MenuTree({
-  config,
-  pathname,
-}: {
-  config: SidebarContentConfig;
-  pathname: string;
-}) {
-  const activeRoute = useMemo(
-    () => resolveActiveRoute(config, pathname),
-    [config, pathname],
-  );
-
-  const { getExpandedForGroup, handleExpandedChange } = useMenuExpansion({
-    pathname,
-    requiredBranchIds: activeRoute.branchIds,
-  });
-
-  return (
-    <>
-      {config.nodes.map((node, i) => (
-        <ContentNode
-          key={i}
-          node={node}
-          groupIndex={i}
-          activeRoute={activeRoute}
-          expandedKeys={getExpandedForGroup(i)}
-          onExpandedChange={(keys) => handleExpandedChange(i, keys)}
-        />
-      ))}
-    </>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Top-level node (separator | group)
-// ---------------------------------------------------------------------------
-
-interface GroupRenderProps {
-  groupIndex: number;
-  activeRoute: ActiveRoute;
-  expandedKeys: Set<string>;
-  onExpandedChange: (keys: Set<Key> | "all") => void;
-}
-
-function ContentNode({
-  node,
-  ...rest
-}: { node: SidebarNode } & GroupRenderProps) {
-  if (node.type === "separator") return <Sidebar.Separator />;
-  return <GroupNode node={node} {...rest} />;
-}
-
-/**
- * `Sidebar.Menu` 底层是 React Aria `Tree`，须具备 `aria-label` / `aria-labelledby`，
- * 否则控制台会出现 “An aria-label or aria-labelledby prop is required…”。
- */
-function ariaLabelForSidebarMenu(
-  node: SidebarGroupNode,
-  groupIndex: number,
-): string {
-  const { label } = node;
-  if (typeof label === "string" && label.trim() !== "") {
-    return `${label} 菜单`;
-  }
-  if (groupIndex === 0) return "主导航菜单";
-  return `侧栏导航第 ${groupIndex + 1} 组`;
-}
-
-function GroupNode({
-  node,
-  groupIndex,
-  activeRoute,
-  expandedKeys,
-  onExpandedChange,
-}: { node: SidebarGroupNode } & GroupRenderProps) {
-  return (
-    <Sidebar.Group>
-      {node.label && <Sidebar.GroupLabel>{node.label}</Sidebar.GroupLabel>}
-      <Sidebar.Menu
-        aria-label={ariaLabelForSidebarMenu(node, groupIndex)}
-        expandedKeys={expandedKeys}
-        onExpandedChange={onExpandedChange}
-      >
-        {node.menu.map((item, i) => (
-          <MenuItem
-            key={i}
-            item={item}
-            groupIndex={groupIndex}
-            itemPath={[i]}
-            activeLeafNorm={activeRoute.activeLeafNorm}
-          />
-        ))}
-      </Sidebar.Menu>
-    </Sidebar.Group>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Recursive item
-// ---------------------------------------------------------------------------
-
-function MenuItem({
-  item,
-  groupIndex,
-  itemPath,
-  activeLeafNorm,
-}: {
-  item: SidebarMenuItemNode;
-  groupIndex: number;
-  itemPath: number[];
-  activeLeafNorm: string | undefined;
-}) {
-  const { icon, label, chip, actions, tooltip, onPress } = item;
-  const children = "children" in item ? item.children : undefined;
-  const hasSubmenu = Boolean(children && children.length > 0);
-  const href = hasSubmenu ? undefined : "href" in item ? item.href : undefined;
-  const isCurrent = Boolean(
-    href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
-  );
-
-  return (
-    <Sidebar.MenuItem
-      id={getItemId(groupIndex, itemPath)}
-      href={href}
-      isCurrent={isCurrent}
-      onAction={onPress}
-      tooltipProps={tooltip ? toTooltipProps(tooltip) : undefined}
-    >
-      <Sidebar.MenuItemContent>
-        {icon && <Sidebar.MenuIcon>{icon}</Sidebar.MenuIcon>}
-        <Sidebar.MenuLabel>{label}</Sidebar.MenuLabel>
-        {chip && <Sidebar.MenuChip>{chip}</Sidebar.MenuChip>}
-        {actions && <Sidebar.MenuActions>{actions}</Sidebar.MenuActions>}
-        {hasSubmenu && (
-          <Sidebar.MenuTrigger>
-            <Sidebar.MenuIndicator />
-          </Sidebar.MenuTrigger>
-        )}
-      </Sidebar.MenuItemContent>
-
-      {hasSubmenu && children != null && (
-        <Sidebar.Submenu>
-          {children.map((child, i) => (
-            <MenuItem
-              key={i}
-              item={child}
-              groupIndex={groupIndex}
-              itemPath={[...itemPath, i]}
-              activeLeafNorm={activeLeafNorm}
-            />
-          ))}
-        </Sidebar.Submenu>
-      )}
-    </Sidebar.MenuItem>
-  );
-}
-
-function toTooltipProps(tooltip: TooltipConfig) {
-  return {
-    content: tooltip.content,
-    className: tooltip.className,
-    delay: tooltip.delay,
-    closeDelay: tooltip.closeDelay,
-    placement: tooltip.placement ?? "right",
-  } as const;
 }

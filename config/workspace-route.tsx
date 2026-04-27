@@ -33,7 +33,6 @@ const workspaceSidebar: SidebarContentConfig = {
         },
       ],
     },
-    { type: "separator" },
     {
       type: "group",
       label: "内容",
@@ -66,7 +65,6 @@ const workspaceSidebar: SidebarContentConfig = {
         },
       ],
     },
-    { type: "separator" },
     {
       type: "group",
       label: "产品",
