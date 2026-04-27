@@ -161,7 +161,7 @@ function GroupNode({
   return (
     <HeroSidebar.Group>
       {node.label && (
-        <HeroSidebar.GroupLabel className="text-fg-4 text-xs font-mono tracking-wide">
+        <HeroSidebar.GroupLabel className="text-fg-4 text-xs font-mono tracking-wider">
           {node.label}
         </HeroSidebar.GroupLabel>
       )}
@@ -221,8 +221,13 @@ function MenuItem({
             : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
         )}
       >
-        {icon && <HeroSidebar.MenuIcon>{icon}</HeroSidebar.MenuIcon>}
-        <HeroSidebar.MenuLabel className="text-[0.8rem]">
+        {icon && (
+          <HeroSidebar.MenuIcon className="[&>svg]:size-3.75">
+            {icon}
+          </HeroSidebar.MenuIcon>
+        )}
+
+        <HeroSidebar.MenuLabel className="text-[0.8125rem]">
           {label}
         </HeroSidebar.MenuLabel>
         {chip && <HeroSidebar.MenuChip>{chip}</HeroSidebar.MenuChip>}
