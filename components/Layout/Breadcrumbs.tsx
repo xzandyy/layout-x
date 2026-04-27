@@ -23,7 +23,6 @@ export function Breadcrumbs({ route, className }: BreadcrumbsProps) {
 
   return (
     <HeroBreadcrumbs
-      aria-label="Breadcrumb"
       className={cn(
         "breadcrumbs min-w-0 flex-wrap items-center",
         className,

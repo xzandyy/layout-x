@@ -14,12 +14,6 @@ import type {
   SidebarNode,
   TooltipConfig,
 } from "./types";
-import {
-  isExternalHref,
-  itemHasChildren,
-  normalizePath,
-  normalizedHrefMatchesPath,
-} from "./utils";
 
 export type SidebarProps = {
   className?: string;
@@ -435,6 +429,47 @@ function computeDismissed(
     else next.add(id);
   }
   return { forPath: pathname, keys: next };
+}
+
+/**
+ * 规范化 URL 路径：去 hash/query、合并多余斜杠、补前导 `/`、去尾部 `/`（根除外）。
+ */
+function normalizePath(input: string): string {
+  if (!input) return "/";
+  let p = input.split("#")[0]!.split("?")[0]!;
+  p = p.replace(/\/{2,}/g, "/");
+  if (!p.startsWith("/")) p = "/" + p;
+  if (p !== "/" && p.endsWith("/")) p = p.replace(/\/+$/, "");
+  return p || "/";
+}
+
+/**
+ * 是否外链（http/https），侧栏不当作站内路由处理。
+ */
+function isExternalHref(href: string): boolean {
+  return href.startsWith("http://") || href.startsWith("https://");
+}
+
+/**
+ * 在已规范化的路径下，判断当前 path 是否落在某 href 对应路由上（或为其子路径）。
+ */
+function normalizedHrefMatchesPath(
+  normPath: string,
+  normHref: string,
+): boolean {
+  if (normHref === "/") return normPath === "/";
+  return normPath === normHref || normPath.startsWith(`${normHref}/`);
+}
+
+/**
+ * 菜单项是否带子级（可展开的分支，而非带 `href` 的叶子）。
+ */
+function itemHasChildren(
+  item: SidebarMenuItemNode,
+): item is SidebarMenuItemNode & { children: SidebarMenuItemNode[] } {
+  return (
+    "children" in item && item.children != null && item.children.length > 0
+  );
 }
 
 /**
