@@ -1,7 +1,26 @@
-export { Layout, LayoutRoot } from "./root";
-export { useLayout, useLayoutContext } from "./root";
+import { LayoutRoot } from "./root";
+import { Rail, RailHeader, RailMain, RailRouteNav, RailFooter } from "./rail";
+import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
+import { Content, ContentHeader, ContentBody } from "./content";
 
-export type { RootProps, ContextValue } from "./root";
+export const Layout = Object.assign(LayoutRoot, {
+  Rail,
+  RailHeader,
+  RailMain,
+  RailRouteNav,
+  RailFooter,
+  Sidebar,
+  SidebarHeader,
+  SidebarMain,
+  SidebarFooter,
+  Content,
+  ContentHeader,
+  ContentBody,
+});
+
+export { LayoutRoot, useLayout, useLayoutContext } from "./root";
+
+export type { RootProps, LayoutContextValue } from "./root";
 export type {
   ContentProps,
   ContentHeaderProps,

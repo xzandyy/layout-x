@@ -5,6 +5,8 @@ import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { useLayoutContext } from "./root";
 
+// -- Rail -- //
+
 export type RailProps = {
   className?: string;
   children?: ReactNode;
@@ -27,6 +29,8 @@ export function Rail({ className, children }: RailProps) {
   );
 }
 
+// -- Rail Header -- //
+
 export type RailHeaderProps = {
   className?: string;
   children?: ReactNode;
@@ -36,6 +40,8 @@ export function RailHeader({ className, children }: RailHeaderProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
+// -- Rail Footer -- //
+
 export type RailFooterProps = {
   className?: string;
   children?: ReactNode;
@@ -44,6 +50,8 @@ export type RailFooterProps = {
 export function RailFooter({ className, children }: RailFooterProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
+
+// -- Rail Main -- //
 
 export type RailMainProps = {
   className?: string;
@@ -62,6 +70,8 @@ export function RailMain({ className, children }: RailMainProps) {
     </div>
   );
 }
+
+// -- Rail Main -> Rail Route Nav -- //
 
 export type RailRouteNavProps = {
   className?: string;

@@ -13,27 +13,11 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import type { RouteConfig, RouteEntry } from "./types";
-import {
-  Rail,
-  RailHeader,
-  RailMain,
-  RailRouteNav,
-  RailFooter,
-} from "./rail";
-import {
-  findBestEntryIdForPathname,
-  Sidebar,
-  SidebarHeader,
-  SidebarMain,
-  SidebarFooter,
-} from "./sidebar";
-import {
-  Content,
-  ContentHeader,
-  ContentBody,
-} from "./content";
+import { findBestEntryIdForPathname } from "./sidebar";
 
-export type ContextValue = {
+// -- Layout Root Context -- //
+
+export type LayoutContextValue = {
   headerHeight: number;
   railWidth: number;
   sidebarWidth: number;
@@ -43,13 +27,13 @@ export type ContextValue = {
   setActiveEntryId: (id: string) => void;
 };
 
-const LayoutContext = createContext<ContextValue | null>(null);
+const LayoutContext = createContext<LayoutContextValue | null>(null);
 
-export function useLayoutContext(): ContextValue {
+export function useLayoutContext(): LayoutContextValue {
   const ctx = useContext(LayoutContext);
   if (ctx == null) {
     throw new Error(
-      "Layout subcomponents (Rail, SidebarHeader, ContentHeader, etc.) must be used inside <Layout>.",
+      "Layout subcomponents (Rail, Sidebar, Content, etc.) must be used inside <Layout>.",
     );
   }
   return ctx;
@@ -58,6 +42,8 @@ export function useLayoutContext(): ContextValue {
 export function useLayout() {
   return useLayoutContext();
 }
+
+// -- Layout Root -- //
 
 export type RootProps = {
   headerHeight?: number;
@@ -115,7 +101,7 @@ export function LayoutRoot({
     [route, pathname],
   );
 
-  const value = useMemo<ContextValue>(
+  const value = useMemo<LayoutContextValue>(
     () => ({
       headerHeight,
       railWidth,
@@ -152,18 +138,3 @@ export function LayoutRoot({
     </LayoutContext.Provider>
   );
 }
-
-export const Layout = Object.assign(LayoutRoot, {
-  Rail,
-  RailHeader,
-  RailMain,
-  RailRouteNav,
-  RailFooter,
-  Sidebar,
-  SidebarHeader,
-  SidebarMain,
-  SidebarFooter,
-  Content,
-  ContentHeader,
-  ContentBody,
-});

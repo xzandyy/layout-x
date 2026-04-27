@@ -45,7 +45,6 @@ export function Breadcrumbs({ route, className }: BreadcrumbsProps) {
               "no-underline",
               "pointer-events-none cursor-default",
               "no-underline!",
-
               "data-hovered:no-underline",
             )}
           >

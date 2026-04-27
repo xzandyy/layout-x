@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import type { Router } from "@/components/Layout";
 
+// -- Content -- //
+
 export type ContentProps = {
   className?: string;
   children?: ReactNode;
@@ -27,6 +29,8 @@ export function Content({ className, children }: ContentProps) {
     </HeroSidebar.Main>
   );
 }
+
+// -- Content Header -- //
 
 export type ContentHeaderProps = {
   className?: string;
@@ -72,6 +76,8 @@ export function ContentHeader({
   );
 }
 
+// -- Content Body -- //
+
 export type ContentBodyProps = {
   className?: string;
   children?: ReactNode;
@@ -80,7 +86,6 @@ export type ContentBodyProps = {
 export function ContentBody({ className, children }: ContentBodyProps) {
   return (
     <main
-      aria-label="Main content"
       className={cn("min-h-0 min-w-0 flex-1 overflow-auto", className)}
     >
       {children}
