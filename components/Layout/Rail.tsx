@@ -94,6 +94,7 @@ export function RailRouteNav({ className }: RailRouteNavProps) {
             className={cn(
               "size-10 rounded-[10px]",
               "transition-all duration-150",
+              "[&>svg]:size-5",
               isActive
                 ? "bg-surface text-fg-1"
                 : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
