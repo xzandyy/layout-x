@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Sidebar as HeroSidebar } from "@heroui-pro/react";
+import { Sidebar as HeroSidebar, useSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import type { RouteConfig, RailMenuItem } from "./types";
@@ -22,7 +22,9 @@ function collectRailMenuItems(route: RouteConfig | undefined) {
   return route.rail.flatMap((b) => b.items);
 }
 
-export type LayoutContextValue = {
+type SidebarState = ReturnType<typeof useSidebar>;
+
+type LayoutBaseValue = {
   headerHeight: number;
   railWidth: number;
   sidebarWidth: number;
@@ -31,6 +33,9 @@ export type LayoutContextValue = {
   activeEntry?: RailMenuItem;
   setActiveEntryId: (id: string) => void;
 };
+
+/** Layout 域状态 + `useSidebar()` 的侧栏开闭 / 视口等（须在 `<Layout>` 内使用） */
+export type LayoutContextValue = LayoutBaseValue & SidebarState;
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
 
@@ -46,6 +51,23 @@ export function useLayoutContext(): LayoutContextValue {
 
 export function useLayout() {
   return useLayoutContext();
+}
+
+function LayoutContextBridge({
+  base,
+  children,
+}: {
+  base: LayoutBaseValue;
+  children: ReactNode;
+}) {
+  const sidebar = useSidebar();
+  const value = useMemo<LayoutContextValue>(
+    () => ({ ...base, ...sidebar }),
+    [base, sidebar],
+  );
+  return (
+    <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
+  );
 }
 
 // -- Layout Root -- //
@@ -111,7 +133,7 @@ export function LayoutRoot({
     [route, pathname],
   );
 
-  const value = useMemo<LayoutContextValue>(
+  const baseValue = useMemo<LayoutBaseValue>(
     () => ({
       headerHeight,
       railWidth,
@@ -133,8 +155,8 @@ export function LayoutRoot({
   );
 
   return (
-    <LayoutContext.Provider value={value}>
-      <HeroSidebar.Provider navigate={router.push} collapsible="offcanvas">
+    <HeroSidebar.Provider navigate={router.push} collapsible="offcanvas">
+      <LayoutContextBridge base={baseValue}>
         <div
           className={cn(
             "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0",
@@ -145,7 +167,7 @@ export function LayoutRoot({
         >
           {children}
         </div>
-      </HeroSidebar.Provider>
-    </LayoutContext.Provider>
+      </LayoutContextBridge>
+    </HeroSidebar.Provider>
   );
 }

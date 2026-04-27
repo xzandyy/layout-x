@@ -20,7 +20,7 @@ export function Rail({ className, children }: RailProps) {
         "z-100 shrink-0 bg-canvas",
         "flex min-h-0 min-w-0",
         "h-auto w-full flex-row border-t border-border-hair",
-        "md:h-full md:w-[var(--rail-width)] md:flex-col md:self-stretch md:border-t-0",
+        "md:h-full md:w-(--rail-width) md:flex-col md:self-stretch md:border-t-0",
         className,
       )}
       style={{ "--rail-width": `${railWidth}rem` } as CSSProperties}
