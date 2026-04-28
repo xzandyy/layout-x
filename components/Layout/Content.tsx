@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useLayoutContext } from "./root";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
@@ -16,8 +16,23 @@ export type ContentProps = {
 };
 
 export function Content({ className, children }: ContentProps) {
+  const { sidebarWidth, isMobile, isOpen } = useLayoutContext();
+  const isDesktop = !isMobile;
+  const isDesktopOpen = isDesktop && isOpen;
   return (
-    <HeroSidebar.Main className="min-h-0 min-w-0 p-2 md:pl-0">
+    <HeroSidebar.Main
+      className={cn(
+        "min-h-0 min-w-0 p-2 md:pl-0",
+        "transition-all duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
+      )}
+      style={
+        isDesktopOpen
+          ? ({
+              "padding-left": `calc(${sidebarWidth}rem - 240px)`,
+            } as CSSProperties)
+          : undefined
+      }
+    >
       <div
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
@@ -80,9 +95,7 @@ export type ContentBodyProps = {
 
 export function ContentBody({ className, children }: ContentBodyProps) {
   return (
-    <main
-      className={cn("min-h-0 min-w-0 flex-1 overflow-auto", className)}
-    >
+    <main className={cn("min-h-0 min-w-0 flex-1 overflow-auto", className)}>
       {children}
     </main>
   );

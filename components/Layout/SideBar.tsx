@@ -42,7 +42,7 @@ export function Sidebar({ className, children }: SidebarProps) {
     <>
       <HeroSidebar
         className={cn(
-          "bg-canvas border-none shadow-none md:pr-2",
+          "bg-canvas border-none shadow-none pl-2 md:pr-2",
           className,
         )}
         style={sidebarVars}

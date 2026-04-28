@@ -61,10 +61,7 @@ function LayoutContextBridge({
   children: ReactNode;
 }) {
   const sidebar = useSidebar();
-  const value = useMemo<LayoutContextValue>(
-    () => ({ ...base, ...sidebar }),
-    [base, sidebar],
-  );
+  const value: LayoutContextValue = { ...base, ...sidebar };
   return (
     <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
   );
