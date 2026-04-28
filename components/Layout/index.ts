@@ -4,7 +4,12 @@ import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
 import { Content, ContentHeader, ContentBody } from "./content";
 
 // -- Layout Context -- //
-export { useLayout, renderLayoutChild } from "./context";
+export {
+  useLayout,
+  renderLayoutChild,
+  useSidebarHeaderSlot,
+  useContentHeaderSlot,
+} from "./context";
 export type {
   LayoutChild,
   LayoutContextValue,

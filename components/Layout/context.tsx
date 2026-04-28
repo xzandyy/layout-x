@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useLayoutEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -54,9 +55,7 @@ export type LayoutContextValue = {
 };
 
 /** Layout 与子外壳可用的「静态节点」或「`(Layout context)` render prop」 */
-export type LayoutChild =
-  | ReactNode
-  | ((ctx: LayoutContextValue) => ReactNode);
+export type LayoutChild = ReactNode | ((ctx: LayoutContextValue) => ReactNode);
 
 export function renderLayoutChild(
   child: LayoutChild | undefined,
@@ -154,4 +153,40 @@ export function LayoutContext({
   );
 
   return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
+}
+
+/** 将工厂返回的节点写入侧栏标题区插槽；`deps` 与 `useMemo` 一致，用于稳定节点引用，避免每轮渲染 setState 导致死循环。卸载时清空。 */
+export function useSidebarHeaderSlot(
+  render: () => ReactNode | null | undefined,
+  deps: readonly unknown[],
+) {
+  const update = useLayout().slotState.updateSidebarHeader;
+  // eslint-disable-next-line react-hooks/use-memo, react-hooks/exhaustive-deps -- deps 由调用方传入，语义与 useMemo(factory, deps) 相同
+  const node = useMemo(() => render() ?? null, deps);
+
+  useLayoutEffect(() => {
+    update(node ?? null);
+  }, [node, update]);
+
+  useLayoutEffect(() => {
+    return () => update(null);
+  }, [update]);
+}
+
+/** 将工厂返回的节点写入内容区标题栏尾部插槽；`deps` 同 `useMemo`。卸载时清空。 */
+export function useContentHeaderSlot(
+  render: () => ReactNode | null | undefined,
+  deps: readonly unknown[],
+) {
+  const update = useLayout().slotState.updateContentHeader;
+  // eslint-disable-next-line react-hooks/use-memo, react-hooks/exhaustive-deps -- deps 由调用方传入，语义与 useMemo(factory, deps) 相同
+  const node = useMemo(() => render() ?? null, deps);
+
+  useLayoutEffect(() => {
+    update(node ?? null);
+  }, [node, update]);
+
+  useLayoutEffect(() => {
+    return () => update(null);
+  }, [update]);
 }
