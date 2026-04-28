@@ -23,8 +23,7 @@ export function Content({ className, children }: ContentProps) {
       className={cn(
         "min-h-0 min-w-0 md:p-2 md:pl-0",
         "md:transition-[padding-left] duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
-        isDesktopOpen &&
-          "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
+        isDesktopOpen && "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
       )}
     >
       <div
@@ -60,7 +59,7 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
       style={{ minHeight: `${headerHeight}rem` }}
     >
       <div className="flex w-full min-w-0 items-center gap-1.5">
-        <HeroSidebar.Trigger className="shrink-0 text-fg-3" />
+        <HeroSidebar.Trigger className={cn("shrink-0 text-fg-3")} />
         <Breadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
         {children != null ? (
           <div className="flex min-h-0 min-w-0 flex-1 items-center justify-end gap-2">
