@@ -5,7 +5,6 @@ import {
   useMemo,
   useState,
   type CSSProperties,
-  type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
