@@ -155,7 +155,7 @@ export function LayoutContext({
   return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
 }
 
-/** 将工厂返回的节点写入侧栏标题区插槽；`deps` 与 `useMemo` 一致，用于稳定节点引用，避免每轮渲染 setState 导致死循环。卸载时清空。 */
+/** 覆盖 Sidebar Header 区域；`deps` 与 `useMemo` 一致，用于稳定节点引用，避免每轮渲染 setState 导致死循环。卸载时清空。 */
 export function useSidebarHeaderSlot(
   render: () => ReactNode | null | undefined,
   deps: readonly unknown[],
@@ -173,7 +173,7 @@ export function useSidebarHeaderSlot(
   }, [update]);
 }
 
-/** 将工厂返回的节点写入内容区标题栏尾部插槽；`deps` 同 `useMemo`。卸载时清空。 */
+/** 覆盖 Content Header 区域；`deps` 同 `useMemo`。卸载时清空。 */
 export function useContentHeaderSlot(
   render: () => ReactNode | null | undefined,
   deps: readonly unknown[],
