@@ -1,6 +1,6 @@
 // -- Layout Root -- //
 export { Layout } from "./layout";
-export type { LayoutProps } from "./root-client";
+export type { LayoutProps } from "./layout";
 
 // -- Layout Context -- //
 export { useLayout } from "./root-client";
