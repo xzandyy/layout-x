@@ -3,16 +3,6 @@ import { Rail, RailHeader, RailMain, RailFooter } from "./rail";
 import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
 import { Content, ContentHeader, ContentBody } from "./content";
 
-// -- Layout Context -- //
-export { useLayout } from "./context";
-export type {
-  LayoutContextValue,
-  RootState,
-  RailState,
-  SidebarState,
-  SlotState,
-} from "./context";
-
 // -- Layout Root -- //
 export type { LayoutProps } from "./root";
 export const Layout = Object.assign(LayoutRoot, {
@@ -28,6 +18,16 @@ export const Layout = Object.assign(LayoutRoot, {
   ContentHeader,
   ContentBody,
 });
+
+// -- Layout Context -- //
+export { useLayout } from "./context";
+export type {
+  LayoutContextValue,
+  RootState,
+  RailState,
+  SidebarState,
+  SlotState,
+} from "./context";
 
 // -- Rail -- //
 export type {
