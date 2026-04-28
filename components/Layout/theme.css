@@ -54,6 +54,10 @@
     @apply flex min-w-0 max-w-full shrink items-center gap-1.5 text-fg-4;
   }
 
+  .breadcrumbs .breadcrumbs__link[data-current="true"] {
+    @apply text-fg-1;
+  }
+
   .breadcrumbs .breadcrumbs__separator {
     @apply inline-flex shrink-0 select-none items-center self-center text-sm font-normal leading-none text-fg-5;
   }
