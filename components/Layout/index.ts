@@ -13,6 +13,7 @@ export {
 export type {
   LayoutChild,
   LayoutContextValue,
+  MemoDeps as LayoutHeaderSlotDeps,
   RootState,
   RailState,
   SidebarState,

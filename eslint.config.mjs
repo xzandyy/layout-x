@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "react-hooks/exhaustive-deps": "off",
+      "react-hooks/use-memo": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

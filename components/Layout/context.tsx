@@ -155,13 +155,15 @@ export function LayoutContext({
   return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
 }
 
-/** 覆盖 Sidebar Header 区域；`deps` 与 `useMemo` 一致，用于稳定节点引用，避免每轮渲染 setState 导致死循环。卸载时清空。 */
+/** 与 `React.useMemo(factory, deps)` 第二个参数同构（由内置 `useMemo` 的类型参数提取）。 */
+export type MemoDeps = Parameters<typeof useMemo>[1];
+
+/** 覆盖 Sidebar Header 区域 */
 export function useSidebarHeaderSlot(
   render: () => ReactNode | null | undefined,
-  deps: readonly unknown[],
+  deps: MemoDeps,
 ) {
   const update = useLayout().slotState.updateSidebarHeader;
-  // eslint-disable-next-line react-hooks/use-memo, react-hooks/exhaustive-deps -- deps 由调用方传入，语义与 useMemo(factory, deps) 相同
   const node = useMemo(() => render() ?? null, deps);
 
   useLayoutEffect(() => {
@@ -173,13 +175,12 @@ export function useSidebarHeaderSlot(
   }, [update]);
 }
 
-/** 覆盖 Content Header 区域；`deps` 同 `useMemo`。卸载时清空。 */
+/** 覆盖 Content Header 区域 */
 export function useContentHeaderSlot(
   render: () => ReactNode | null | undefined,
-  deps: readonly unknown[],
+  deps: MemoDeps,
 ) {
   const update = useLayout().slotState.updateContentHeader;
-  // eslint-disable-next-line react-hooks/use-memo, react-hooks/exhaustive-deps -- deps 由调用方传入，语义与 useMemo(factory, deps) 相同
   const node = useMemo(() => render() ?? null, deps);
 
   useLayoutEffect(() => {
