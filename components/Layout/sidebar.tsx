@@ -12,7 +12,7 @@ import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-import { useLayout } from "./layout-context";
+import { useLayout } from "./context";
 import type {
   RouteConfig,
   SidebarGroupItem,

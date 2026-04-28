@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useLayout } from "./layout-context";
+import { useLayout } from "./context";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";

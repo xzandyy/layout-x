@@ -1,18 +1,25 @@
+import { cookies } from "next/headers";
 import { Button } from "@heroui/react";
 import { EllipsisVertical, Pencil } from "@gravity-ui/icons";
 
-import { Layout } from "@/components/Layout/layout";
+import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
 import { workspaceRoute } from "@/config/workspace-route";
 
-export default function WorkspaceLayout({
+export default async function WorkspaceLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const store = await cookies();
+  const defaultSidebarOpen = store.get("sidebar_state")?.value !== "false";
+
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <Layout routeMenu={workspaceRoute}>
+      <Layout
+        routeMenu={workspaceRoute}
+        defaultSidebarOpen={defaultSidebarOpen}
+      >
         <Layout.Rail>
           <Layout.RailHeader>
             <div className="mb-2 flex items-center justify-center py-3">

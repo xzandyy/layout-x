@@ -1,12 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import type { RouteConfig, RailMenuItem } from "./types";
-import { LayoutContext, type RootState } from "./layout-context";
+import { LayoutContext, type RootState } from "./context";
 import { findBestEntryIdForPathname } from "./sidebar";
 
 export type LayoutProps = {
@@ -19,7 +25,7 @@ export type LayoutProps = {
   defaultSidebarOpen?: boolean;
 };
 
-export function LayoutRootClient({
+export function LayoutRoot({
   headerHeight = 3.25,
   railWidth = 4,
   sidebarWidth = 16.5,
