@@ -101,8 +101,7 @@ export function RailMain({ className, children }: RailMainProps) {
     useLayout().rootState;
   const { isDesktop, setDesktopOpen } = useLayout().sidebarState;
   const items = useMemo(
-    () =>
-      menuConfig ? menuConfig.rail.flatMap((b) => b.items) : [],
+    () => (menuConfig ? menuConfig.rail.flatMap((b) => b.items) : []),
     [menuConfig],
   );
 

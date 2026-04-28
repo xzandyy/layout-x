@@ -13,7 +13,10 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
 import type { MenuConfig, RailMenuItem } from "./types";
 import { LayoutContext, type RootState } from "./context";
-import { findBestRailMenuForPathname, findActiveSidebarNavItem } from "./sidebar";
+import {
+  findBestRailMenuForPathname,
+  findActiveSidebarNavItem,
+} from "./sidebar";
 
 export type LayoutProps = {
   headerHeight?: number;
@@ -49,16 +52,15 @@ export function LayoutRoot({
 
   const urlRailMenu = useMemo(
     () =>
-      menuConfig ? findBestRailMenuForPathname(menuConfig, pathname) : undefined,
+      menuConfig
+        ? findBestRailMenuForPathname(menuConfig, pathname)
+        : undefined,
     [menuConfig, pathname],
   );
 
   const activeRailMenu = useMemo(() => {
     if (!menuConfig) return undefined;
-    if (
-      railMenuOverride != null &&
-      railMenuOverride.forPathname === pathname
-    ) {
+    if (railMenuOverride != null && railMenuOverride.forPathname === pathname) {
       return allRailItems[railMenuOverride.index];
     }
     return urlRailMenu;

@@ -99,8 +99,9 @@ export function LayoutContext({
   );
 
   // Slot（覆盖区域）
-  const [sidebarHeaderSlot, setSidebarHeaderSlot] =
-    useState<ReactNode | null>(null);
+  const [sidebarHeaderSlot, setSidebarHeaderSlot] = useState<ReactNode | null>(
+    null,
+  );
   const [contentHeaderSlot, setContentHeaderSlot] = useState<ReactNode | null>(
     null,
   );
