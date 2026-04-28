@@ -40,7 +40,6 @@ export function Rail({ className, children }: RailProps): ReactElement {
       <aside
         className={cn(
           "z-100 flex h-full min-h-0 w-(--rail-width) shrink-0 flex-col self-stretch bg-canvas",
-          "border-r border-border-hair",
           className,
         )}
         style={railVars}
@@ -162,9 +161,14 @@ function RailMenuTooltip({
   children: ReactElement;
 }) {
   return (
-    <Tooltip delay={600} closeDelay={30000}>
+    <Tooltip delay={600} closeDelay={0}>
       <Tooltip.Trigger>{children}</Tooltip.Trigger>
-      <Tooltip.Content placement="right">{label}</Tooltip.Content>
+      <Tooltip.Content
+        placement="right"
+        className="border border-border-hair shadow-card bg-surface text-fg-1"
+      >
+        {label}
+      </Tooltip.Content>
     </Tooltip>
   );
 }

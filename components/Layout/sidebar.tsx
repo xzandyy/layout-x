@@ -57,7 +57,7 @@ export function Sidebar({ className, children }: SidebarProps) {
           Sidebar
         </Heading>
         {mobileRailSlot != null ? (
-          <div className="flex h-svh max-h-svh min-h-0 w-full flex-row overflow-hidden">
+          <div className="flex h-svh max-h-svh min-h-0 w-full flex-row overflow-hidden bg-canvas">
             {mobileRailSlot}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-canvas pr-2">
               {children}
@@ -248,12 +248,17 @@ function MenuItem({
         )}
       >
         {icon && (
-          <HeroSidebar.MenuIcon className="[&>svg]:size-3.75">
+          <HeroSidebar.MenuIcon className={cn("[&>svg]:size-3.75")}>
             {icon}
           </HeroSidebar.MenuIcon>
         )}
 
-        <HeroSidebar.MenuLabel className="text-[0.8125rem]">
+        <HeroSidebar.MenuLabel
+          className={cn(
+            "text-[0.8125rem]",
+            isCurrent ? "text-fg-1" : "text-fg-3",
+          )}
+        >
           {label}
         </HeroSidebar.MenuLabel>
         {chip && <HeroSidebar.MenuChip>{chip}</HeroSidebar.MenuChip>}
