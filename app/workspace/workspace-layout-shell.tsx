@@ -91,35 +91,7 @@ export function WorkspaceLayoutShell({
         </Layout.SidebarFooter>
       </Layout.Sidebar>
       <Layout.Content>
-        <Layout.ContentHeader>
-          <div className="flex min-w-0 shrink-0 items-center gap-2">
-            <div className="hidden min-w-40 max-w-xs rounded-lg border border-border-hair bg-canvas px-3 py-1.5 text-left text-[12px] text-fg-4 md:block">
-              Search workspace…
-            </div>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="ghost"
-              aria-label="Edit"
-              className={
-                "size-7 min-w-7 shrink-0 rounded-md! p-0 text-fg-3 hover:bg-canvas-2! hover:text-fg-1!"
-              }
-            >
-              <Pencil className="size-3.5 text-current" />
-            </Button>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="ghost"
-              aria-label="More"
-              className={
-                "size-7 min-w-7 shrink-0 rounded-md! p-0 text-fg-3 hover:bg-canvas-2! hover:text-fg-1!"
-              }
-            >
-              <EllipsisVertical className="size-3.5 text-current" />
-            </Button>
-          </div>
-        </Layout.ContentHeader>
+        <Layout.ContentHeader />
         <Layout.ContentBody>{children}</Layout.ContentBody>
       </Layout.Content>
     </Layout>
