@@ -3,10 +3,6 @@
 @import "@heroui-pro/react/css";
 
 :root {
-  /* Back-compat: Tailwind `bg-background` / `text-foreground` */
-  --background: var(--bg-canvas);
-  --foreground: var(--fg-1);
-
   /* Background */
   --bg-canvas: #f4f5f7;
   --bg-canvas-2: #eef0f3;
@@ -24,8 +20,6 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
