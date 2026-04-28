@@ -14,12 +14,13 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
 import { useLayout } from "./context";
 import type {
-  RouteConfig,
+  MenuConfig,
+  SidebarCustomItem,
   SidebarGroupItem,
   SidebarMenuItem,
-  SidebarMenuItemNode,
-  SidebarMenuItemBranch,
   SidebarMenuConfig,
+  SidebarMenuItemNode,
+  SidebarSubmenu,
   TooltipConfig,
 } from "./types";
 
@@ -112,8 +113,8 @@ export type SidebarMainProps = {
 
 export function SidebarMain({ className, children }: SidebarMainProps) {
   const pathname = usePathname();
-  const { activeEntry } = useLayout().rootState;
-  const sidebar = activeEntry?.sidebar;
+  const { activeRailMenu } = useLayout().rootState;
+  const sidebar = activeRailMenu?.sidebar;
   return (
     <HeroSidebar.Content className={cn("p-0", className)}>
       {sidebar && <MenuTree config={sidebar} pathname={pathname} />}
@@ -168,7 +169,13 @@ function MenuNode({
   onExpandedChange: (keys: Set<Key> | "all") => void;
 }) {
   if (node.type === "separator") return <HeroSidebar.Separator />;
+  if (node.type === "custom")
+    return <CustomSlot node={node} />;
   return <GroupNode node={node} {...rest} />;
+}
+
+function CustomSlot({ node }: { node: SidebarCustomItem }) {
+  return <div className="contents">{node.content}</div>;
 }
 
 function GroupNode({
@@ -339,9 +346,7 @@ function normalizedHrefMatchesPath(
 /**
  * 菜单项是否带子级（可展开的分支，而非带 `href` 的叶子）。
  */
-function itemHasChildren(
-  item: SidebarMenuItemNode,
-): item is SidebarMenuItemBranch {
+function itemHasChildren(item: SidebarMenuItemNode): item is SidebarSubmenu {
   return (
     "children" in item && item.children != null && item.children.length > 0
   );
@@ -548,14 +553,14 @@ export function getActiveLeafNormForConfig(
 }
 
 /**
- * 在 `RouteConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项 id：
+ * 在 `MenuConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项 id：
  * 对每项的 `sidebar` 做 `getActiveLeafNormForConfig`，取命中 href 最长者；无匹配则 `undefined`。
  */
-export function findBestEntryIdForPathname(
-  route: RouteConfig,
+export function findBestRailMenuIdForPathname(
+  menu: MenuConfig,
   pathname: string,
 ): string | undefined {
-  const railItems = route.rail.flatMap((b) => b.items);
+  const railItems = menu.rail.flatMap((b) => b.items);
   let bestId: string | undefined;
   let bestLen = -1;
   for (const e of railItems) {

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen-routes": "node scripts/generate-routes.mjs"
+    "create-paths": "node scripts/create-workspace-paths.mjs"
   },
   "dependencies": {
     "@gravity-ui/icons": "^2.18.0",

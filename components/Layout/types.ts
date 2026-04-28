@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import appRouterJson from "@/config/routes.json";
+import workspacePathsJson from "@/config/workspace-paths.json";
 
-export type RouteConfig = {
+export type MenuConfig = {
   rail: RailMenuConfig[];
-  defaultRailItemId?: string;
-  defaultSidebarItemId?: string;
+  defaultRailMenuId?: string;
+  defaultSidebarMenuId?: string;
 };
 
 export type RailMenuConfig = {
@@ -22,7 +22,10 @@ export type SidebarMenuConfig = {
   items: SidebarMenuItem[];
 };
 
-export type SidebarMenuItem = SidebarSeparatorItem | SidebarGroupItem;
+export type SidebarMenuItem =
+  | SidebarSeparatorItem
+  | SidebarGroupItem
+  | SidebarCustomItem;
 
 export type SidebarSeparatorItem = {
   type: "separator";
@@ -34,7 +37,12 @@ export type SidebarGroupItem = {
   menu: SidebarMenuItemNode[];
 };
 
-export type SidebarMenuItemNode = SidebarMenuItemLeaf | SidebarMenuItemBranch;
+export type SidebarCustomItem = {
+  type: "custom";
+  content: ReactNode;
+};
+
+export type SidebarMenuItemNode = SidebarNavItem | SidebarSubmenu;
 
 type SidebarMenuItemBase = {
   icon?: ReactNode;
@@ -45,12 +53,12 @@ type SidebarMenuItemBase = {
   onPress?: () => void;
 };
 
-export type SidebarMenuItemBranch = SidebarMenuItemBase & {
+export type SidebarSubmenu = SidebarMenuItemBase & {
   children: SidebarMenuItemNode[];
   href?: never;
 };
 
-export type SidebarMenuItemLeaf = SidebarMenuItemBase & {
+export type SidebarNavItem = SidebarMenuItemBase & {
   href?: string;
   children?: never;
 };
@@ -63,13 +71,13 @@ export type TooltipConfig = {
   placement?: "top" | "bottom" | "left" | "right";
 };
 
-// -- 所有路径 -- //
+// -- 路径树（生成自 create-workspace-paths） -- //
 
-export type Router = {
+export type Paths = {
   path: string;
   title: string;
   hasPage?: boolean;
-  children?: Router[];
+  children?: Paths[];
 };
 
-export const appRouter = appRouterJson as Router;
+export const workspacePaths = workspacePathsJson as Paths;

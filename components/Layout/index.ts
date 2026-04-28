@@ -52,17 +52,21 @@ export type {
   ContentBodyProps,
 } from "./content";
 
-// -- Types（主要是 rail 和 sidebar 的菜单配置类型） -- //
+// -- Types（rail / sidebar 菜单与路径树） -- //
 export type {
-  RouteConfig,
+  MenuConfig,
   RailMenuConfig,
   RailMenuItem,
   SidebarMenuConfig,
   SidebarMenuItem,
   SidebarSeparatorItem,
   SidebarGroupItem,
+  SidebarCustomItem,
   SidebarMenuItemNode,
-  SidebarMenuItemLeaf,
-  SidebarMenuItemBranch,
+  SidebarNavItem,
+  SidebarSubmenu,
   TooltipConfig,
+  Paths,
 } from "./types";
+
+export { workspacePaths } from "./types";

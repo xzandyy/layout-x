@@ -10,7 +10,7 @@ const routeBase = "/workspace";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
 const appDir = path.join(root, "app", appDirSegment);
-const outFile = path.join(root, "config", "routes.json");
+const outFile = path.join(root, "config", "workspace-paths.json");
 
 function isRouteGroup(name) {
   return /^\([^/)]+\)$/.test(name);
@@ -100,7 +100,7 @@ function addPathToTrie(trie, segs) {
  * @param {string[]} segs
  * @param {Set<string>} hasPageSet
  */
-function trieToRouter(trie, segs, hasPageSet) {
+function trieToPaths(trie, segs, hasPageSet) {
   const keys = [...trie.keys()].sort((a, b) => a.localeCompare(b));
   const out = [];
   for (const k of keys) {
@@ -110,14 +110,14 @@ function trieToRouter(trie, segs, hasPageSet) {
     const fk = fullKey(newSegs);
     o.hasPage = hasPageSet.has(fk) ? true : false;
     if (sub && sub.size > 0)
-      o.children = trieToRouter(sub, newSegs, hasPageSet);
+      o.children = trieToPaths(sub, newSegs, hasPageSet);
     out.push(o);
   }
   return out;
 }
 
-/** 从旧 routes.json 收集 title，键为「完整 URL 路径」 */
-function collectTitles(router) {
+/** 从旧 workspace-paths.json 收集 title，键为「完整 URL 路径」 */
+function collectTitles(pathsRoot) {
   const m = new Map();
   function walk(n, segs) {
     if (!n) return;
@@ -131,7 +131,7 @@ function collectTitles(router) {
     if (n.path) m.set(fullKey(newSegs), n.title ?? "");
     for (const c of n.children ?? []) walk(c, newSegs);
   }
-  walk(router, []);
+  walk(pathsRoot, []);
   return m;
 }
 
@@ -195,7 +195,7 @@ function main() {
     title: "todo",
     hasPage: hasPageSet.has(routeBase) === true,
   };
-  const children = trieToRouter(trie, [], hasPageSet);
+  const children = trieToPaths(trie, [], hasPageSet);
   if (children.length) outRoot.children = children;
 
   let titleMap = new Map();
@@ -204,7 +204,7 @@ function main() {
       const old = JSON.parse(fs.readFileSync(outFile, "utf8"));
       titleMap = migrateLegacyTitleMap(collectTitles(old));
     } catch (e) {
-      console.warn("Could not parse existing routes.json:", e?.message);
+      console.warn("Could not parse existing workspace-paths.json:", e?.message);
     }
   }
   mergeTitles(outRoot, [], titleMap);

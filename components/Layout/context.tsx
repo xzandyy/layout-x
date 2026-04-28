@@ -10,17 +10,17 @@ import {
 } from "react";
 import { useSidebar } from "@heroui-pro/react";
 
-import type { RouteConfig, RailMenuItem } from "./types";
+import type { MenuConfig, RailMenuItem } from "./types";
 
 /** Root 状态 */
 export type RootState = {
   headerHeight: number;
   railWidth: number;
   sidebarWidth: number;
-  route?: RouteConfig;
-  activeEntryId?: string;
-  activeEntry?: RailMenuItem;
-  setActiveEntryId: (id: string) => void;
+  menu?: MenuConfig;
+  activeRailMenuId?: string;
+  activeRailMenu?: RailMenuItem;
+  setActiveRailMenuId: (id: string) => void;
 };
 
 /** Sidebar 状态 */

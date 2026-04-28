@@ -4,7 +4,7 @@ import { EllipsisVertical, Pencil } from "@gravity-ui/icons";
 
 import { Layout } from "@/components/Layout";
 import { cn } from "@/lib/utils";
-import { workspaceRoute } from "@/config/workspace-route";
+import { workspaceMenus } from "@/config/workspace-menus";
 
 export default async function WorkspaceLayout({
   children,
@@ -17,7 +17,7 @@ export default async function WorkspaceLayout({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <Layout
-        routeMenu={workspaceRoute}
+        menu={workspaceMenus}
         defaultSidebarOpen={defaultSidebarOpen}
       >
         <Layout.Rail>

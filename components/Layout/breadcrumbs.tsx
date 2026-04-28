@@ -4,19 +4,19 @@ import { Breadcrumbs as HeroBreadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
-import type { Router } from "./types";
+import type { Paths } from "./types";
 import { cn } from "@/lib/utils";
 
 export type BreadcrumbsProps = {
-  route: Router;
+  paths: Paths;
   className?: string;
 };
 
-export function Breadcrumbs({ route, className }: BreadcrumbsProps) {
+export function Breadcrumbs({ paths, className }: BreadcrumbsProps) {
   const pathname = usePathname() || "/";
   const items = useMemo(
-    () => buildBreadcrumbItems(pathname, route),
-    [pathname, route],
+    () => buildBreadcrumbItems(pathname, paths),
+    [pathname, paths],
   );
 
   if (items.length === 0) return null;
@@ -75,7 +75,7 @@ type BreadcrumbItem = {
   isCurrent: boolean;
 };
 
-type Step = { node: Router; endExclusive: number };
+type Step = { node: Paths; endExclusive: number };
 
 /**
  * 将路径按 `/` 拆成段数组；根路径或空串返回空数组。
@@ -123,7 +123,7 @@ function prefixPath(parts: string[], end: number) {
 /**
  * 路由树子节点在「当前这一 URL 段」下应落到哪条：先找静态 path 完全匹配，没有则用动态子路由。
  */
-function findChild(ch: Router[], seg: string) {
+function findChild(ch: Paths[], seg: string) {
   const s = ch.find((c) => !isDyn(c.path) && firstSeg(c.path) === seg);
   if (s) return s;
   return ch.find((c) => isDyn(c.path));
@@ -132,14 +132,14 @@ function findChild(ch: Router[], seg: string) {
 /**
  * 该路由节点是否对应真实页面；`hasPage === false` 时只作分组、不出可点链接。
  */
-function hasPage(n: Router) {
+function hasPage(n: Paths) {
   return n.hasPage !== false;
 }
 
 /**
- * 自根路由起沿当前路径逐级向下匹配，得到每一级命中的 `Router` 节点及在 pathname 中已消费的段数。
+ * 自根路由起沿当前路径逐级向下匹配，得到每一级命中的 `Paths` 节点及在 pathname 中已消费的段数。
  */
-function buildSteps(pathname: string, root: Router): Step[] | null {
+function buildSteps(pathname: string, root: Paths): Step[] | null {
   const parts = segs(pathname);
   const base = rootSegs(root.path);
   for (let i = 0; i < base.length; i++) {
@@ -164,11 +164,11 @@ function buildSteps(pathname: string, root: Router): Step[] | null {
 }
 
 /**
- * 将匹配步骤展开为带标题、链接、是否当前项的面包屑列表；`routes.json` 中标题为空的段会略去，并保证最后一项为「当前」。
+ * 将匹配步骤展开为带标题、链接、是否当前项的面包屑列表；`workspace-paths.json` 中标题为空的段会略去，并保证最后一项为「当前」。
  */
 function buildBreadcrumbItems(
   pathname: string,
-  root: Router,
+  root: Paths,
 ): BreadcrumbItem[] {
   const steps = buildSteps(pathname, root);
   if (steps == null || steps.length === 0) return [];

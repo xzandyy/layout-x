@@ -11,16 +11,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
-import type { RouteConfig, RailMenuItem } from "./types";
+import type { MenuConfig, RailMenuItem } from "./types";
 import { LayoutContext, type RootState } from "./context";
-import { findBestEntryIdForPathname } from "./sidebar";
+import { findBestRailMenuIdForPathname } from "./sidebar";
 
 export type LayoutProps = {
   headerHeight?: number;
   railWidth?: number;
   sidebarWidth?: number;
   className?: string;
-  routeMenu?: RouteConfig;
+  menu?: MenuConfig;
   children: ReactNode;
   defaultSidebarOpen?: boolean;
 };
@@ -31,49 +31,63 @@ export function LayoutRoot({
   sidebarWidth = 16.5,
   defaultSidebarOpen = true,
   className,
-  routeMenu,
+  menu,
   children,
 }: LayoutProps) {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
 
-  const [railOverride, setRailOverride] = useState<{
-    entryId: string;
+  const [railMenuOverride, setRailMenuOverride] = useState<{
+    railMenuId: string;
     forPathname: string;
   } | null>(null);
 
-  const allRailItems = useMemo(() => collectRailMenuItems(routeMenu), [routeMenu]);
-
-  const urlEntryId = useMemo(
-    () =>
-      routeMenu ? findBestEntryIdForPathname(routeMenu, pathname) : undefined,
-    [routeMenu, pathname],
+  const allRailItems = useMemo(
+    () => collectRailMenuItems(menu),
+    [menu],
   );
 
-  const fallbackId = useMemo(() => {
+  const urlRailMenuId = useMemo(
+    () =>
+      menu
+        ? findBestRailMenuIdForPathname(menu, pathname)
+        : undefined,
+    [menu, pathname],
+  );
+
+  const fallbackRailMenuId = useMemo(() => {
     if (!allRailItems.length) return undefined;
-    return routeMenu?.defaultRailItemId ?? allRailItems[0]!.id;
-  }, [routeMenu, allRailItems]);
+    return menu?.defaultRailMenuId ?? allRailItems[0]!.id;
+  }, [menu, allRailItems]);
 
-  const activeEntryId = useMemo(() => {
-    if (!routeMenu) return undefined;
-    if (railOverride != null && railOverride.forPathname === pathname) {
-      return railOverride.entryId;
+  const activeRailMenuId = useMemo(() => {
+    if (!menu) return undefined;
+    if (
+      railMenuOverride != null &&
+      railMenuOverride.forPathname === pathname
+    ) {
+      return railMenuOverride.railMenuId;
     }
-    return urlEntryId ?? fallbackId;
-  }, [routeMenu, railOverride, pathname, urlEntryId, fallbackId]);
+    return urlRailMenuId ?? fallbackRailMenuId;
+  }, [
+    menu,
+    railMenuOverride,
+    pathname,
+    urlRailMenuId,
+    fallbackRailMenuId,
+  ]);
 
-  const activeEntry = useMemo(() => {
-    if (activeEntryId == null) return undefined;
-    return allRailItems.find((e) => e.id === activeEntryId);
-  }, [allRailItems, activeEntryId]);
+  const activeRailMenu = useMemo(() => {
+    if (activeRailMenuId == null) return undefined;
+    return allRailItems.find((e) => e.id === activeRailMenuId);
+  }, [allRailItems, activeRailMenuId]);
 
-  const setActiveEntryId = useCallback(
+  const setActiveRailMenuId = useCallback(
     (id: string) => {
-      if (!routeMenu) return;
-      setRailOverride({ entryId: id, forPathname: pathname });
+      if (!menu) return;
+      setRailMenuOverride({ railMenuId: id, forPathname: pathname });
     },
-    [routeMenu, pathname],
+    [menu, pathname],
   );
 
   const rootState = useMemo<RootState>(
@@ -81,19 +95,19 @@ export function LayoutRoot({
       headerHeight,
       railWidth,
       sidebarWidth,
-      route: routeMenu,
-      activeEntryId,
-      activeEntry,
-      setActiveEntryId,
+      menu,
+      activeRailMenuId,
+      activeRailMenu,
+      setActiveRailMenuId,
     }),
     [
       headerHeight,
       railWidth,
       sidebarWidth,
-      routeMenu,
-      activeEntryId,
-      activeEntry,
-      setActiveEntryId,
+      menu,
+      activeRailMenuId,
+      activeRailMenu,
+      setActiveRailMenuId,
     ],
   );
 
@@ -123,7 +137,7 @@ export function LayoutRoot({
   );
 }
 
-function collectRailMenuItems(route: RouteConfig | undefined) {
-  if (!route) return [] as RailMenuItem[];
-  return route.rail.flatMap((b) => b.items);
+function collectRailMenuItems(menu: MenuConfig | undefined) {
+  if (!menu) return [] as RailMenuItem[];
+  return menu.rail.flatMap((b) => b.items);
 }

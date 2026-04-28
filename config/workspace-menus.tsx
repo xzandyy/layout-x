@@ -9,10 +9,10 @@ import {
   House,
 } from "@gravity-ui/icons";
 
-import type { RouteConfig } from "@/components/Layout";
+import type { MenuConfig } from "@/components/Layout";
 
-export const workspaceRoute: RouteConfig = {
-  defaultRailItemId: "home",
+export const workspaceMenus: MenuConfig = {
+  defaultRailMenuId: "home",
   rail: [
     {
       items: [
