@@ -20,7 +20,7 @@ export type LayoutProps = {
   railWidth?: number;
   sidebarWidth?: number;
   className?: string;
-  menu?: MenuConfig;
+  menuConfig?: MenuConfig;
   children: ReactNode;
   defaultSidebarOpen?: boolean;
 };
@@ -31,7 +31,7 @@ export function LayoutRoot({
   sidebarWidth = 16.5,
   defaultSidebarOpen = true,
   className,
-  menu,
+  menuConfig,
   children,
 }: LayoutProps) {
   const router = useRouter();
@@ -43,25 +43,25 @@ export function LayoutRoot({
   } | null>(null);
 
   const allRailItems = useMemo(
-    () => collectRailMenuItems(menu),
-    [menu],
+    () => collectRailMenuItems(menuConfig),
+    [menuConfig],
   );
 
   const urlRailMenuId = useMemo(
     () =>
-      menu
-        ? findBestRailMenuIdForPathname(menu, pathname)
+      menuConfig
+        ? findBestRailMenuIdForPathname(menuConfig, pathname)
         : undefined,
-    [menu, pathname],
+    [menuConfig, pathname],
   );
 
   const fallbackRailMenuId = useMemo(() => {
     if (!allRailItems.length) return undefined;
-    return menu?.defaultRailMenuId ?? allRailItems[0]!.id;
-  }, [menu, allRailItems]);
+    return menuConfig?.defaultRailMenuId ?? allRailItems[0]!.id;
+  }, [menuConfig, allRailItems]);
 
   const activeRailMenuId = useMemo(() => {
-    if (!menu) return undefined;
+    if (!menuConfig) return undefined;
     if (
       railMenuOverride != null &&
       railMenuOverride.forPathname === pathname
@@ -70,7 +70,7 @@ export function LayoutRoot({
     }
     return urlRailMenuId ?? fallbackRailMenuId;
   }, [
-    menu,
+    menuConfig,
     railMenuOverride,
     pathname,
     urlRailMenuId,
@@ -84,10 +84,10 @@ export function LayoutRoot({
 
   const setActiveRailMenuId = useCallback(
     (id: string) => {
-      if (!menu) return;
+      if (!menuConfig) return;
       setRailMenuOverride({ railMenuId: id, forPathname: pathname });
     },
-    [menu, pathname],
+    [menuConfig, pathname],
   );
 
   const rootState = useMemo<RootState>(
@@ -95,7 +95,7 @@ export function LayoutRoot({
       headerHeight,
       railWidth,
       sidebarWidth,
-      menu,
+      menuConfig,
       activeRailMenuId,
       activeRailMenu,
       setActiveRailMenuId,
@@ -104,7 +104,7 @@ export function LayoutRoot({
       headerHeight,
       railWidth,
       sidebarWidth,
-      menu,
+      menuConfig,
       activeRailMenuId,
       activeRailMenu,
       setActiveRailMenuId,
@@ -137,7 +137,7 @@ export function LayoutRoot({
   );
 }
 
-function collectRailMenuItems(menu: MenuConfig | undefined) {
-  if (!menu) return [] as RailMenuItem[];
-  return menu.rail.flatMap((b) => b.items);
+function collectRailMenuItems(menuConfig: MenuConfig | undefined) {
+  if (!menuConfig) return [] as RailMenuItem[];
+  return menuConfig.rail.flatMap((b) => b.items);
 }

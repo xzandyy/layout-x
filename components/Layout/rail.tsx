@@ -97,11 +97,13 @@ export type RailMainProps = {
 };
 
 export function RailMain({ className, children }: RailMainProps) {
-  const { menu, activeRailMenuId, setActiveRailMenuId } = useLayout().rootState;
+  const { menuConfig, activeRailMenuId, setActiveRailMenuId } =
+    useLayout().rootState;
   const { isDesktop, setDesktopOpen } = useLayout().sidebarState;
   const items = useMemo(
-    () => (menu ? menu.rail.flatMap((b) => b.items) : []),
-    [menu],
+    () =>
+      menuConfig ? menuConfig.rail.flatMap((b) => b.items) : [],
+    [menuConfig],
   );
 
   return (

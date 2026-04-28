@@ -17,7 +17,7 @@ export default async function WorkspaceLayout({
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       <Layout
-        menu={workspaceMenus}
+        menuConfig={workspaceMenus}
         defaultSidebarOpen={defaultSidebarOpen}
       >
         <Layout.Rail>

@@ -17,7 +17,7 @@ export type RootState = {
   headerHeight: number;
   railWidth: number;
   sidebarWidth: number;
-  menu?: MenuConfig;
+  menuConfig?: MenuConfig;
   activeRailMenuId?: string;
   activeRailMenu?: RailMenuItem;
   setActiveRailMenuId: (id: string) => void;
