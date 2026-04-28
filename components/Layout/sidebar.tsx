@@ -132,9 +132,10 @@ function MenuTree({
   config: SidebarMenuConfig;
   pathname: string;
 }) {
+  const globalActiveLeafNorm = useLayout().rootState.activeNavItemHref;
   const activeRoute = useMemo(
-    () => resolveActiveRoute(config, pathname),
-    [config, pathname],
+    () => resolveActiveRoute(config, globalActiveLeafNorm),
+    [config, globalActiveLeafNorm],
   );
 
   const { getExpandedForGroup, handleExpandedChange } = useMenuExpansion({
@@ -461,16 +462,20 @@ function computeDismissed(
 }
 
 /**
- * 解析当前 sidebar 配置下命中当前路径的活动路由：
- * 返回最深匹配的叶子 href（已规范化）以及沿途各分支 id（用于自动展开父级）。
+ * 在指定 sidebar 配置内，按 **目标 normHref**（已规范化）定位匹配的叶子项及其沿途分支 id。
+ *
+ * 与旧版「在本 config 内自挑最长匹配」不同：active 由调用方在更高层（跨所有 rail）裁决出
+ * 唯一的 `targetLeafNorm` 后传入；本函数只负责在当前 config 中**精确**查找该 norm 对应的叶子。
+ * 找不到则返回空的 `{ branchIds: [] }`。
  */
 function resolveActiveRoute(
   config: SidebarMenuConfig,
-  pathname: string,
+  targetLeafNorm: string | undefined,
 ): ActiveRoute {
-  const normPath = normalizePath(pathname);
-  let bestDepth = -1;
+  if (!targetLeafNorm) return { branchIds: [] };
+
   let result: ActiveRoute = { branchIds: [] };
+  let found = false;
 
   const visit = (
     items: readonly SidebarMenuItemNode[],
@@ -479,6 +484,7 @@ function resolveActiveRoute(
     branchIdsSoFar: readonly string[],
   ) => {
     for (let i = 0; i < items.length; i++) {
+      if (found) return;
       const item = items[i]!;
       const itemPath = [...pathSoFar, i];
       const itemId = getItemId(groupIndex, itemPath);
@@ -493,19 +499,19 @@ function resolveActiveRoute(
       if (!href || isExternalHref(href)) continue;
 
       const normHref = normalizePath(href);
-      if (!normalizedHrefMatchesPath(normPath, normHref)) continue;
+      if (normHref !== targetLeafNorm) continue;
 
-      if (normHref.length > bestDepth) {
-        bestDepth = normHref.length;
-        result = {
-          activeLeafNorm: normHref,
-          branchIds: [...branchIdsSoFar],
-        };
-      }
+      result = {
+        activeLeafNorm: normHref,
+        branchIds: [...branchIdsSoFar],
+      };
+      found = true;
+      return;
     }
   };
 
   for (let gi = 0; gi < config.items.length; gi++) {
+    if (found) break;
     const node = config.items[gi]!;
     if (node.type === "group") visit(node.menu, gi, [], []);
   }
@@ -514,76 +520,104 @@ function resolveActiveRoute(
 }
 
 /**
- * 在 sidebar 树中找出与 pathname 最匹配（规范化 href 前缀最长）的叶子项。
- * `getActiveLeafNormForConfig` 与 `findActiveSidebarNavItem` 共用此逻辑。
- */
-function getBestSidebarLeafForPathname(
-  config: SidebarMenuConfig,
-  pathname: string,
-): { norm: string; navItem: SidebarNavItem } | undefined {
-  const normPath = normalizePath(pathname);
-  let bestDepth = -1;
-  let bestNorm: string | undefined;
-  let bestItem: SidebarNavItem | undefined;
-
-  const visit = (items: readonly SidebarMenuItemNode[], groupIndex: number) => {
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i]!;
-      const isBranch = itemHasChildren(item);
-
-      if (isBranch) {
-        visit(item.children, groupIndex);
-        continue;
-      }
-
-      const href = "href" in item ? item.href : undefined;
-      if (!href || isExternalHref(href)) continue;
-
-      const normHref = normalizePath(href);
-      if (!normalizedHrefMatchesPath(normPath, normHref)) continue;
-
-      if (normHref.length > bestDepth) {
-        bestDepth = normHref.length;
-        bestNorm = normHref;
-        bestItem = item as SidebarNavItem;
-      }
-    }
-  };
-
-  for (let gi = 0; gi < config.items.length; gi++) {
-    const node = config.items[gi]!;
-    if (node.type === "group") visit(node.menu, gi);
-  }
-
-  if (bestDepth < 0 || bestNorm == null || bestItem == null) return undefined;
-  return { norm: bestNorm, navItem: bestItem };
-}
-
-/**
  * 在 sidebar 配置中找到与 pathname 最匹配（前缀最长）的叶子 href，并返回其规范化形式。
- * 与 `resolveActiveRoute` 同源，但只关心叶子，不收集沿途分支 id。
+ * 仅在「单一 config 内」挑最长，跨 rail 的全局裁决见 {@link findGlobalActiveLeafNorm}。
  */
 export function getActiveLeafNormForConfig(
   config: SidebarMenuConfig,
   pathname: string,
 ): string | undefined {
-  return getBestSidebarLeafForPathname(config, pathname)?.norm;
+  const normPath = normalizePath(pathname);
+  let bestDepth = -1;
+  let bestNorm: string | undefined;
+
+  const visit = (items: readonly SidebarMenuItemNode[]) => {
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i]!;
+      if (itemHasChildren(item)) {
+        visit(item.children);
+        continue;
+      }
+      const href = "href" in item ? item.href : undefined;
+      if (!href || isExternalHref(href)) continue;
+      const normHref = normalizePath(href);
+      if (!normalizedHrefMatchesPath(normPath, normHref)) continue;
+      if (normHref.length > bestDepth) {
+        bestDepth = normHref.length;
+        bestNorm = normHref;
+      }
+    }
+  };
+
+  for (const node of config.items) {
+    if (node.type === "group") visit(node.menu);
+  }
+  return bestNorm;
 }
 
 /**
- * 在 sidebar 树中找到与 pathname 最匹配（href 前缀最长）的 `SidebarNavItem` 叶子；无匹配则 `undefined`。
- * 与 `getActiveLeafNormForConfig` 的匹配规则一致（同属 {@link getBestSidebarLeafForPathname}）。
+ * 在指定 sidebar 配置中按 **目标 normHref** 找到对应的 `SidebarNavItem` 叶子；找不到返回 `undefined`。
+ * 与 {@link resolveActiveRoute} 共享精确匹配语义，由调用方传入跨 rail 裁决出来的 `targetLeafNorm`。
  */
 export function findActiveSidebarNavItem(
   config: SidebarMenuConfig,
-  pathname: string,
+  targetLeafNorm: string | undefined,
 ): SidebarNavItem | undefined {
-  return getBestSidebarLeafForPathname(config, pathname)?.navItem;
+  if (!targetLeafNorm) return undefined;
+
+  let found: SidebarNavItem | undefined;
+
+  const visit = (items: readonly SidebarMenuItemNode[]) => {
+    for (const item of items) {
+      if (found) return;
+      if (itemHasChildren(item)) {
+        visit(item.children);
+        continue;
+      }
+      const href = "href" in item ? item.href : undefined;
+      if (!href || isExternalHref(href)) continue;
+      if (normalizePath(href) !== targetLeafNorm) continue;
+      found = item as SidebarNavItem;
+      return;
+    }
+  };
+
+  for (const node of config.items) {
+    if (found) break;
+    if (node.type === "group") visit(node.menu);
+  }
+  return found;
+}
+
+/**
+ * 跨所有 rail 的 sidebar 全局裁决「唯一 active 叶子」：
+ * 在每个 rail 的 sidebar 中分别挑出对当前 pathname 的最长匹配 normHref，
+ * 再在所有 rail 之间取规范化字符串最长者；不存在匹配则返回 `undefined`。
+ *
+ * 这样无论用户当前看到的是哪个 rail 的 sidebar，整套布局**只有一个**叶子可能 active。
+ */
+export function findGlobalActiveLeafNorm(
+  menu: MenuConfig,
+  pathname: string,
+): string | undefined {
+  let best: string | undefined;
+  let bestLen = -1;
+  for (const e of menu.rail.flatMap((b) => b.items)) {
+    const norm = getActiveLeafNormForConfig(e.sidebar, pathname);
+    if (norm == null) continue;
+    if (norm.length > bestLen) {
+      bestLen = norm.length;
+      best = norm;
+    }
+  }
+  return best;
 }
 
 /**
  * 在 `MenuConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项：
  * 对每项的 `sidebar` 做 `getActiveLeafNormForConfig`，取命中 href 最长者；无匹配则 `undefined`。
+ *
+ * 注意：「拥有」全局 active 叶子的那个 rail 即为这里返回的 rail。
  */
 export function findBestRailMenuForPathname(
   menu: MenuConfig,

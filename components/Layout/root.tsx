@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useMemo,
-  useState,
-  type CSSProperties,
-} from "react";
+import { useCallback, useMemo, useState, type CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
@@ -21,6 +16,7 @@ import {
 import {
   findBestRailMenuForPathname,
   findActiveSidebarNavItem,
+  findGlobalActiveLeafNorm,
 } from "./sidebar";
 
 export type LayoutProps = {
@@ -71,11 +67,21 @@ export function LayoutRoot({
     return urlRailMenu;
   }, [menuConfig, railMenuOverride, pathname, urlRailMenu, allRailItems]);
 
+  /**
+   * 跨所有 rail 全局裁决出唯一 active 叶子的规范化 href；
+   * 这样即便用户切到某个非「拥有」rail，其 sidebar 也不会出现「短前缀也算 active」的情况。
+   */
+  const activeLeafNorm = useMemo(
+    () =>
+      menuConfig ? findGlobalActiveLeafNorm(menuConfig, pathname) : undefined,
+    [menuConfig, pathname],
+  );
+
   const activeSidebarMenu = useMemo(() => {
     const sidebar = activeRailMenu?.sidebar;
     if (!sidebar) return undefined;
-    return findActiveSidebarNavItem(sidebar, pathname);
-  }, [activeRailMenu, pathname]);
+    return findActiveSidebarNavItem(sidebar, activeLeafNorm);
+  }, [activeRailMenu, activeLeafNorm]);
 
   const setActiveRailMenu = useCallback(
     (item: RailMenuItem) => {
@@ -95,6 +101,7 @@ export function LayoutRoot({
       menuConfig,
       activeRailMenu,
       activeSidebarMenu,
+      activeNavItemHref: activeLeafNorm,
       setActiveRailMenu,
     }),
     [
@@ -104,6 +111,7 @@ export function LayoutRoot({
       menuConfig,
       activeRailMenu,
       activeSidebarMenu,
+      activeLeafNorm,
       setActiveRailMenu,
     ],
   );

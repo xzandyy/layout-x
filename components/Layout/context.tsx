@@ -21,6 +21,7 @@ export type RootState = {
   menuConfig?: MenuConfig;
   activeRailMenu?: RailMenuItem;
   activeSidebarMenu?: SidebarNavItem;
+  activeNavItemHref?: string;
   setActiveRailMenu: (item: RailMenuItem) => void;
 };
 
