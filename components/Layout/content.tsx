@@ -44,12 +44,12 @@ export function Content({ className, children }: ContentProps) {
 
 export type ContentHeaderProps = {
   className?: string;
-  end?: ReactNode;
+  children?: ReactNode;
 };
 
 const breadcrumbRoute = appRouter as Router;
 
-export function ContentHeader({ className, end }: ContentHeaderProps) {
+export function ContentHeader({ className, children }: ContentHeaderProps) {
   const { headerHeight } = useLayoutContext();
   return (
     <header
@@ -59,17 +59,12 @@ export function ContentHeader({ className, end }: ContentHeaderProps) {
       )}
       style={{ minHeight: `${headerHeight}rem` }}
     >
-      <div className="flex w-full min-w-0 items-center">
-        <HeroSidebar.Trigger className="shrink-0 text-fg-3 mr-1.5" />
+      <div className="flex w-full min-w-0 items-center gap-1.5">
+        <HeroSidebar.Trigger className="shrink-0 text-fg-3" />
         <Breadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
-        {end != null ? (
-          <div
-            className={cn(
-              "min-w-0",
-              "ml-auto flex min-w-0 items-center justify-end gap-2",
-            )}
-          >
-            {end}
+        {children != null ? (
+          <div className="flex min-h-0 min-w-0 flex-1 items-center justify-end gap-2">
+            {children}
           </div>
         ) : null}
       </div>
