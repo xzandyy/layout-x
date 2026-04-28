@@ -44,8 +44,6 @@
 }
 
 body {
-  background: var(--bg-canvas);
-  color: var(--fg-1);
   font-family: var(--font-sans, Arial, Helvetica, sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

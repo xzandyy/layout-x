@@ -90,22 +90,6 @@ export type RailFooterProps = {
 export function RailFooter({ className, children }: RailFooterProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
-
-function RailMenuTooltip({
-  label,
-  children,
-}: {
-  label: ReactNode;
-  children: ReactElement;
-}) {
-  return (
-    <Tooltip delay={600} closeDelay={0}>
-      <Tooltip.Trigger>{children}</Tooltip.Trigger>
-      <Tooltip.Content placement="right">{label}</Tooltip.Content>
-    </Tooltip>
-  );
-}
-
 // -- Rail Main -- //
 
 export type RailMainProps = {
@@ -165,5 +149,22 @@ export function RailMain({ className, children }: RailMainProps) {
       ) : null}
       {children}
     </div>
+  );
+}
+
+// -- Rail Menu Tooltip -- //
+
+function RailMenuTooltip({
+  label,
+  children,
+}: {
+  label: ReactNode;
+  children: ReactElement;
+}) {
+  return (
+    <Tooltip delay={600} closeDelay={30000}>
+      <Tooltip.Trigger>{children}</Tooltip.Trigger>
+      <Tooltip.Content placement="right">{label}</Tooltip.Content>
+    </Tooltip>
   );
 }
