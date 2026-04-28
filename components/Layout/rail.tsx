@@ -9,7 +9,7 @@ import {
 } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext, useLayoutRail } from "./root-client";
+import { useLayoutContext, useLayoutRail } from "./layout-context";
 
 // -- Rail -- //
 
