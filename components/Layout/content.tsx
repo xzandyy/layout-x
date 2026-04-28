@@ -51,6 +51,8 @@ const breadcrumbRoute = appRouter as Router;
 
 export function ContentHeader({ className, children }: ContentHeaderProps) {
   const { headerHeight } = useLayout().rootState;
+  const { contentHeaderSlot } = useLayout().slotState;
+  const trailing = contentHeaderSlot ?? children;
   return (
     <header
       className={cn(
@@ -62,9 +64,9 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
       <div className="flex w-full min-w-0 items-center gap-1.5">
         <HeroSidebar.Trigger className={cn("shrink-0 text-fg-3")} />
         <Breadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
-        {children != null ? (
+        {trailing != null ? (
           <div className="flex min-h-0 min-w-0 flex-1 items-center justify-end gap-2">
-            {children}
+            {trailing}
           </div>
         ) : null}
       </div>

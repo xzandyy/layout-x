@@ -9,6 +9,7 @@ export type {
   RootState,
   RailState,
   SidebarState,
+  SlotState,
 } from "./layout-context";
 
 // -- Rail -- //

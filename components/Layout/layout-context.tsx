@@ -2,6 +2,7 @@
 
 import {
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -11,8 +12,7 @@ import { useSidebar } from "@heroui-pro/react";
 
 import type { RouteConfig, RailMenuItem } from "./types";
 
-type RawSidebarState = ReturnType<typeof useSidebar>;
-
+/** Root 状态 */
 export type RootState = {
   headerHeight: number;
   railWidth: number;
@@ -23,21 +23,34 @@ export type RootState = {
   setActiveEntryId: (id: string) => void;
 };
 
+/** Sidebar 状态 */
 export type SidebarState = Omit<RawSidebarState, "isOpen" | "setOpen"> & {
   isDesktopOpen: boolean;
   setDesktopOpen: (open: boolean) => void;
   isDesktop: boolean;
 };
 
+type RawSidebarState = ReturnType<typeof useSidebar>;
+
+/** Rail 状态 */
 export type RailState = {
   mobileRailSlot: ReactNode | null;
   setMobileRailSlot: (node: ReactNode | null) => void;
+};
+
+/** Slot 状态：自外部覆盖的区域内容；null 时使用对应组件原本声明式的 children */
+export type SlotState = {
+  railHeaderSlot: ReactNode | null;
+  updateRailHeader: (node: ReactNode | null) => void;
+  contentHeaderSlot: ReactNode | null;
+  updateContentHeader: (node: ReactNode | null) => void;
 };
 
 export type LayoutContextValue = {
   rootState: RootState;
   sidebarState: SidebarState;
   railState: RailState;
+  slotState: SlotState;
 };
 
 const LayoutCtx = createContext<LayoutContextValue | null>(null);
@@ -66,23 +79,58 @@ export function LayoutContext({
   rootState,
   children,
 }: {
+  // Root
   rootState: RootState;
   children: ReactNode;
 }) {
-  const [mobileRailSlot, setMobileRailSlot] = useState<ReactNode>(null);
+  // Sidebar
   const rawSidebar = useSidebar();
   const sidebarState = useMemo(() => mapSidebarState(rawSidebar), [rawSidebar]);
 
+  // Rail（移动端适配）
+  const [mobileRailSlot, setMobileRailSlot] = useState<ReactNode>(null);
+
+  const railState = useMemo<RailState>(
+    () => ({
+      mobileRailSlot,
+      setMobileRailSlot,
+    }),
+    [mobileRailSlot, setMobileRailSlot],
+  );
+
+  // Slot（覆盖区域）
+  const [railHeaderSlot, setRailHeaderSlot] = useState<ReactNode | null>(null);
+  const [contentHeaderSlot, setContentHeaderSlot] = useState<ReactNode | null>(
+    null,
+  );
+
+  const updateRailHeader = useCallback((node: ReactNode | null) => {
+    setRailHeaderSlot(node);
+  }, []);
+
+  const updateContentHeader = useCallback((node: ReactNode | null) => {
+    setContentHeaderSlot(node);
+  }, []);
+
+  const slotState = useMemo<SlotState>(
+    () => ({
+      railHeaderSlot,
+      updateRailHeader,
+      contentHeaderSlot,
+      updateContentHeader,
+    }),
+    [railHeaderSlot, contentHeaderSlot, updateRailHeader, updateContentHeader],
+  );
+
+  // 合并状态
   const value = useMemo<LayoutContextValue>(
     () => ({
       rootState,
       sidebarState,
-      railState: {
-        mobileRailSlot,
-        setMobileRailSlot,
-      },
+      railState,
+      slotState,
     }),
-    [rootState, sidebarState, mobileRailSlot],
+    [rootState, sidebarState, railState, slotState],
   );
 
   return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
