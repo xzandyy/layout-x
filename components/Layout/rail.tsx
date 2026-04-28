@@ -99,7 +99,7 @@ function RailMenuTooltip({
   children: ReactElement;
 }) {
   return (
-    <Tooltip delay={500} closeDelay={0}>
+    <Tooltip delay={600} closeDelay={0}>
       <Tooltip.Trigger>{children}</Tooltip.Trigger>
       <Tooltip.Content placement="right">{label}</Tooltip.Content>
     </Tooltip>
