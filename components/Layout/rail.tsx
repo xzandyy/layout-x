@@ -91,7 +91,7 @@ export function RailFooter({ className, children }: RailFooterProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
-function RailEntryTooltip({
+function RailMenuTooltip({
   label,
   children,
 }: {
@@ -157,7 +157,7 @@ export function RailMain({ className, children }: RailMainProps) {
             );
             return (
               <Fragment key={e.id}>
-                <RailEntryTooltip label={e.label}>{button}</RailEntryTooltip>
+                <RailMenuTooltip label={e.label}>{button}</RailMenuTooltip>
               </Fragment>
             );
           })}
