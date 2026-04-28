@@ -22,7 +22,8 @@ export function Content({ className, children }: ContentProps) {
   return (
     <HeroSidebar.Main
       className={cn(
-        "min-h-0 min-w-0 p-2 md:pl-0",
+        isDesktop && "p-2",
+        "min-h-0 min-w-0 md:pl-0",
         "transition-all duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
       )}
       style={
@@ -35,8 +36,9 @@ export function Content({ className, children }: ContentProps) {
     >
       <div
         className={cn(
-          "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden",
-          "rounded-[14px] border border-border-hair bg-surface shadow-(--shadow-card)",
+          "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-surface",
+          isDesktop &&
+            "rounded-[14px] border border-border-hair shadow-(--shadow-card)",
           className,
         )}
       >
@@ -60,16 +62,13 @@ export function ContentHeader({ className, end }: ContentHeaderProps) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b border-border-hair bg-surface px-5",
+        "sticky top-0 z-10 flex shrink-0 items-center gap-2 border-b border-border-hair bg-surface pl-3 pr-5",
         className,
       )}
       style={{ minHeight: `${headerHeight}rem` }}
     >
-      <div className="flex w-full min-w-0 items-center gap-3">
-        <HeroSidebar.Trigger
-          className="shrink-0 text-fg-3"
-          aria-label="切换侧栏"
-        />
+      <div className="flex w-full min-w-0 items-center">
+        <HeroSidebar.Trigger className="shrink-0 text-fg-3 mr-1.5" />
         <Breadcrumbs className="min-w-0 shrink" route={breadcrumbRoute} />
         {end != null ? (
           <div
