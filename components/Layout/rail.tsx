@@ -9,7 +9,7 @@ import {
 } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext, useLayoutRailOutlet } from "./root";
+import { useLayoutContext, useLayoutRailOutlet } from "./root-client";
 
 // -- Rail -- //
 
@@ -18,7 +18,7 @@ export type RailProps = {
   children?: ReactNode;
 };
 
-export function Rail({ className, children }: RailProps): ReactElement | null {
+export function Rail({ className, children }: RailProps): ReactElement {
   const { railWidth, isMobile } = useLayoutContext();
   const { setMobileRailSlot } = useLayoutRailOutlet();
 
@@ -49,15 +49,12 @@ export function Rail({ className, children }: RailProps): ReactElement | null {
     };
   }, [isMobile, children, className, railVars, setMobileRailSlot]);
 
-  if (isMobile) {
-    return null;
-  }
-
   return (
     <aside
       className={cn(
+        "hidden md:flex",
         "z-100 shrink-0 bg-canvas",
-        "flex min-h-0 min-w-0 flex-col",
+        "min-h-0 min-w-0 flex-col",
         "h-full w-(--rail-width) self-stretch",
         className,
       )}

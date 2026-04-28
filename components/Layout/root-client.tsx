@@ -6,6 +6,7 @@ import {
   useContext,
   useMemo,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,8 +15,6 @@ import { Sidebar as HeroSidebar, useSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
 import type { RouteConfig, RailMenuItem } from "./types";
 import { findBestEntryIdForPathname } from "./sidebar";
-
-// -- Layout Root Context -- //
 
 type SidebarState = ReturnType<typeof useSidebar>;
 
@@ -79,7 +78,6 @@ function LayoutRailOutletBridge({ children }: { children: ReactNode }) {
   );
 }
 
-
 function LayoutContextBridge({
   base,
   children,
@@ -88,13 +86,18 @@ function LayoutContextBridge({
   children: ReactNode;
 }) {
   const sidebar = useSidebar();
-  const value: LayoutContextValue = { ...base, ...sidebar };
+
+  const value = useMemo<LayoutContextValue>(
+    () => ({ ...base, ...sidebar }),
+    [base, sidebar],
+  );
+
   return (
     <LayoutContext.Provider value={value}>{children}</LayoutContext.Provider>
   );
 }
 
-// -- Layout Root -- //
+// -- Layout Root（客户端实现，由 `root.tsx` 注入 `defaultSidebarOpen`） -- //
 
 export type RootProps = {
   headerHeight?: number;
@@ -105,14 +108,15 @@ export type RootProps = {
   children: ReactNode;
 };
 
-export function LayoutRoot({
+export function LayoutRootClient({
   headerHeight = 3.25,
   railWidth = 4,
   sidebarWidth = 16.5,
+  defaultSidebarOpen,
   className,
   route,
   children,
-}: RootProps) {
+}: RootProps & { defaultSidebarOpen: boolean }) {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
 
@@ -176,7 +180,11 @@ export function LayoutRoot({
   );
 
   return (
-    <HeroSidebar.Provider navigate={router.push} collapsible="offcanvas">
+    <HeroSidebar.Provider
+      navigate={router.push}
+      collapsible="offcanvas"
+      defaultOpen={defaultSidebarOpen}
+    >
       <LayoutRailOutletBridge>
         <LayoutContextBridge base={baseValue}>
           <div
@@ -185,6 +193,11 @@ export function LayoutRoot({
               "bg-canvas text-fg-1",
               className,
             )}
+            style={
+              {
+                "--layout-sidebar-width": `${sidebarWidth}rem`,
+              } as CSSProperties
+            }
           >
             {children}
           </div>

@@ -1,7 +1,7 @@
 import { Button } from "@heroui/react";
 import { EllipsisVertical, Pencil } from "@gravity-ui/icons";
 
-import { Layout } from "@/components/Layout";
+import { Layout } from "@/components/Layout/layout";
 import { cn } from "@/lib/utils";
 import { workspaceRoute } from "@/config/workspace-route";
 

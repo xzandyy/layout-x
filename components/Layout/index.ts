@@ -1,32 +1,14 @@
-import { LayoutRoot } from "./root";
-import { Rail, RailHeader, RailMain, RailFooter } from "./rail";
-import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
-import { Content, ContentHeader, ContentBody } from "./content";
-
-export const Layout = Object.assign(LayoutRoot, {
-  Rail,
-  RailHeader,
-  RailMain,
-  RailFooter,
-  Sidebar,
-  SidebarHeader,
-  SidebarMain,
-  SidebarFooter,
-  Content,
-  ContentHeader,
-  ContentBody,
-});
-
 export {
-  LayoutRoot,
   useLayoutContext,
+  useLayout,
   useLayoutRailOutlet,
-} from "./root";
+  LayoutRootClient,
+} from "./root-client";
 export type {
   RootProps,
   LayoutContextValue,
   LayoutRailOutletContextValue,
-} from "./root";
+} from "./root-client";
 export type {
   ContentProps,
   ContentHeaderProps,

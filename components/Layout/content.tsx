@@ -1,7 +1,7 @@
 "use client";
 
-import type { CSSProperties, ReactNode } from "react";
-import { useLayoutContext } from "./root";
+import type { ReactNode } from "react";
+import { useLayoutContext } from "./root-client";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
@@ -16,29 +16,21 @@ export type ContentProps = {
 };
 
 export function Content({ className, children }: ContentProps) {
-  const { sidebarWidth, isMobile, isOpen } = useLayoutContext();
-  const isDesktop = !isMobile;
-  const isDesktopOpen = isDesktop && isOpen;
+  const { isOpen, isMobile } = useLayoutContext();
+  const showDesktopInset = !isMobile && isOpen;
   return (
     <HeroSidebar.Main
       className={cn(
-        isDesktop && "p-2",
-        "min-h-0 min-w-0 md:pl-0",
-        "transition-all duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
+        "min-h-0 min-w-0 md:p-2 md:pl-0",
+        "md:transition-[padding-left] duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
+        showDesktopInset &&
+          "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
       )}
-      style={
-        isDesktopOpen
-          ? ({
-              paddingLeft: `calc(${sidebarWidth}rem - 240px)`,
-            } as CSSProperties)
-          : undefined
-      }
     >
       <div
         className={cn(
           "flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-surface",
-          isDesktop &&
-            "rounded-[14px] border border-border-hair shadow-(--shadow-card)",
+          "md:rounded-[14px] md:border md:border-border-hair md:shadow-(--shadow-card)",
           className,
         )}
       >
