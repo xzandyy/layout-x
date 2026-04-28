@@ -8,7 +8,7 @@ export default function IntegrationsPage() {
   useContentHeaderSlot(
     () => (
       <div className="flex min-w-0 items-center gap-2">
-        <code className="hidden max-w-[8rem] truncate rounded bg-canvas-2 px-1.5 py-0.5 font-mono text-[10px] text-fg-3 md:inline">
+        <code className="hidden max-w-32 truncate rounded bg-canvas-2 px-1.5 py-0.5 font-mono text-[10px] text-fg-3 md:inline">
           oauth.state=ready
         </code>
         <Button
