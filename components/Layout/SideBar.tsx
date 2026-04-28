@@ -58,7 +58,7 @@ export function Sidebar({ className, children }: SidebarProps) {
         {mobileRailSlot != null ? (
           <div className="flex h-svh max-h-svh min-h-0 w-full flex-row overflow-hidden">
             {mobileRailSlot}
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-l border-border-hair bg-canvas">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-canvas pr-2">
               {children}
             </div>
           </div>
