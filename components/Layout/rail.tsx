@@ -9,7 +9,7 @@ import {
 } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext, useLayoutRail } from "./layout-context";
+import { useLayout } from "./layout-context";
 
 // -- Rail -- //
 
@@ -19,8 +19,10 @@ export type RailProps = {
 };
 
 export function Rail({ className, children }: RailProps): ReactElement {
-  const { railWidth, isMobile } = useLayoutContext();
-  const { setMobileRailSlot } = useLayoutRail();
+  const { rootState, sidebarState, railState } = useLayout();
+  const { railWidth } = rootState;
+  const { isMobile } = sidebarState;
+  const { setMobileRailSlot } = railState;
 
   const railVars = useMemo(
     () => ({ "--rail-width": `${railWidth}rem` }) as CSSProperties,
@@ -95,7 +97,7 @@ export type RailMainProps = {
 };
 
 export function RailMain({ className, children }: RailMainProps) {
-  const { route, activeEntryId, setActiveEntryId } = useLayoutContext();
+  const { route, activeEntryId, setActiveEntryId } = useLayout().rootState;
   const items = useMemo(
     () => (route ? route.rail.flatMap((b) => b.items) : []),
     [route],

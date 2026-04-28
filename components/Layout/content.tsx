@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useLayoutContext } from "./layout-context";
+import { useLayout } from "./layout-context";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
@@ -16,7 +16,8 @@ export type ContentProps = {
 };
 
 export function Content({ className, children }: ContentProps) {
-  const { isOpen, isMobile } = useLayoutContext();
+  const { sidebarState } = useLayout();
+  const { isOpen, isMobile } = sidebarState;
   const isDesktopOpen = !isMobile && isOpen;
   return (
     <HeroSidebar.Main
@@ -49,7 +50,7 @@ export type ContentHeaderProps = {
 const breadcrumbRoute = appRouter as Router;
 
 export function ContentHeader({ className, children }: ContentHeaderProps) {
-  const { headerHeight } = useLayoutContext();
+  const { headerHeight } = useLayout().rootState;
   return (
     <header
       className={cn(

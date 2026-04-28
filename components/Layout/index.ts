@@ -3,11 +3,12 @@ export { Layout } from "./layout";
 export type { LayoutProps } from "./layout";
 
 // -- Layout Context -- //
-export { useLayout, useLayoutContext, useLayoutRail } from "./layout-context";
+export { useLayout } from "./layout-context";
 export type {
   LayoutContextValue,
-  LayoutRailContextValue,
-  LayoutBaseValue,
+  RootState,
+  RailState,
+  SidebarState,
 } from "./layout-context";
 
 // -- Rail -- //

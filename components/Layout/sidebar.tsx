@@ -12,7 +12,7 @@ import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext, useLayoutRail } from "./layout-context";
+import { useLayout } from "./layout-context";
 import type {
   RouteConfig,
   SidebarGroupItem,
@@ -31,8 +31,9 @@ export type SidebarProps = {
 };
 
 export function Sidebar({ className, children }: SidebarProps) {
-  const { sidebarWidth } = useLayoutContext();
-  const { mobileRailSlot } = useLayoutRail();
+  const { rootState, railState } = useLayout();
+  const { sidebarWidth } = rootState;
+  const { mobileRailSlot } = railState;
   const sidebarVars = useMemo(
     () =>
       ({
@@ -109,7 +110,7 @@ export type SidebarMainProps = {
 
 export function SidebarMain({ className, children }: SidebarMainProps) {
   const pathname = usePathname();
-  const { activeEntry } = useLayoutContext();
+  const { activeEntry } = useLayout().rootState;
   const sidebar = activeEntry?.sidebar;
   return (
     <HeroSidebar.Content className={cn("p-0", className)}>

@@ -6,11 +6,7 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import type { RouteConfig, RailMenuItem } from "./types";
-import {
-  LayoutContextBridge,
-  LayoutRailOutletBridge,
-  type LayoutBaseValue,
-} from "./layout-context";
+import { LayoutContext, type RootState } from "./layout-context";
 import { findBestEntryIdForPathname } from "./sidebar";
 
 export type LayoutProps = {
@@ -74,7 +70,7 @@ export function LayoutRootClient({
     [routeMenu, pathname],
   );
 
-  const baseValue = useMemo<LayoutBaseValue>(
+  const rootState = useMemo<RootState>(
     () => ({
       headerHeight,
       railWidth,
@@ -101,24 +97,22 @@ export function LayoutRootClient({
       collapsible="offcanvas"
       defaultOpen={defaultSidebarOpen}
     >
-      <LayoutRailOutletBridge>
-        <LayoutContextBridge base={baseValue}>
-          <div
-            className={cn(
-              "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row",
-              "bg-canvas text-fg-1",
-              className,
-            )}
-            style={
-              {
-                "--layout-sidebar-width": `${sidebarWidth}rem`,
-              } as CSSProperties
-            }
-          >
-            {children}
-          </div>
-        </LayoutContextBridge>
-      </LayoutRailOutletBridge>
+      <LayoutContext rootState={rootState}>
+        <div
+          className={cn(
+            "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row",
+            "bg-canvas text-fg-1",
+            className,
+          )}
+          style={
+            {
+              "--layout-sidebar-width": `${sidebarWidth}rem`,
+            } as CSSProperties
+          }
+        >
+          {children}
+        </div>
+      </LayoutContext>
     </HeroSidebar.Provider>
   );
 }
