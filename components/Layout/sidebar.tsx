@@ -15,11 +15,13 @@ import { cn } from "@/lib/utils";
 import { useLayout } from "./context";
 import type {
   MenuConfig,
+  RailMenuItem,
   SidebarCustomItem,
   SidebarGroupItem,
   SidebarMenuItem,
   SidebarMenuConfig,
   SidebarMenuItemNode,
+  SidebarNavItem,
   SidebarSubmenu,
   TooltipConfig,
 } from "./types";
@@ -510,16 +512,17 @@ function resolveActiveRoute(
 }
 
 /**
- * 在 sidebar 配置中找到与 pathname 最匹配（前缀最长）的叶子 href，并返回其规范化形式。
- * 与 `resolveActiveRoute` 同源，但只关心叶子，不收集沿途分支 id。
+ * 在 sidebar 树中找出与 pathname 最匹配（规范化 href 前缀最长）的叶子项。
+ * `getActiveLeafNormForConfig` 与 `findActiveSidebarNavItem` 共用此逻辑。
  */
-export function getActiveLeafNormForConfig(
+function getBestSidebarLeafForPathname(
   config: SidebarMenuConfig,
   pathname: string,
-): string | undefined {
+): { norm: string; navItem: SidebarNavItem } | undefined {
   const normPath = normalizePath(pathname);
   let bestDepth = -1;
   let bestNorm: string | undefined;
+  let bestItem: SidebarNavItem | undefined;
 
   const visit = (items: readonly SidebarMenuItemNode[], groupIndex: number) => {
     for (let i = 0; i < items.length; i++) {
@@ -540,6 +543,7 @@ export function getActiveLeafNormForConfig(
       if (normHref.length > bestDepth) {
         bestDepth = normHref.length;
         bestNorm = normHref;
+        bestItem = item as SidebarNavItem;
       }
     }
   };
@@ -549,29 +553,52 @@ export function getActiveLeafNormForConfig(
     if (node.type === "group") visit(node.menu, gi);
   }
 
-  return bestNorm;
+  if (bestDepth < 0 || bestNorm == null || bestItem == null) return undefined;
+  return { norm: bestNorm, navItem: bestItem };
 }
 
 /**
- * 在 `MenuConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项 id：
- * 对每项的 `sidebar` 做 `getActiveLeafNormForConfig`，取命中 href 最长者；无匹配则 `undefined`。
+ * 在 sidebar 配置中找到与 pathname 最匹配（前缀最长）的叶子 href，并返回其规范化形式。
+ * 与 `resolveActiveRoute` 同源，但只关心叶子，不收集沿途分支 id。
  */
-export function findBestRailMenuIdForPathname(
-  menu: MenuConfig,
+export function getActiveLeafNormForConfig(
+  config: SidebarMenuConfig,
   pathname: string,
 ): string | undefined {
+  return getBestSidebarLeafForPathname(config, pathname)?.norm;
+}
+
+/**
+ * 在 sidebar 树中找到与 pathname 最匹配（href 前缀最长）的 `SidebarNavItem` 叶子；无匹配则 `undefined`。
+ * 与 `getActiveLeafNormForConfig` 的匹配规则一致（同属 {@link getBestSidebarLeafForPathname}）。
+ */
+export function findActiveSidebarNavItem(
+  config: SidebarMenuConfig,
+  pathname: string,
+): SidebarNavItem | undefined {
+  return getBestSidebarLeafForPathname(config, pathname)?.navItem;
+}
+
+/**
+ * 在 `MenuConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项：
+ * 对每项的 `sidebar` 做 `getActiveLeafNormForConfig`，取命中 href 最长者；无匹配则 `undefined`。
+ */
+export function findBestRailMenuForPathname(
+  menu: MenuConfig,
+  pathname: string,
+): RailMenuItem | undefined {
   const railItems = menu.rail.flatMap((b) => b.items);
-  let bestId: string | undefined;
+  let best: RailMenuItem | undefined;
   let bestLen = -1;
   for (const e of railItems) {
     const norm = getActiveLeafNormForConfig(e.sidebar, pathname);
     const len = norm?.length ?? -1;
     if (len > bestLen) {
       bestLen = len;
-      bestId = e.id;
+      best = e;
     }
   }
-  return bestLen >= 0 ? bestId : undefined;
+  return bestLen >= 0 ? best : undefined;
 }
 
 /**

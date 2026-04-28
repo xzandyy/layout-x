@@ -97,7 +97,7 @@ export type RailMainProps = {
 };
 
 export function RailMain({ className, children }: RailMainProps) {
-  const { menuConfig, activeRailMenuId, setActiveRailMenuId } =
+  const { menuConfig, activeRailMenu, setActiveRailMenu } =
     useLayout().rootState;
   const { isDesktop, setDesktopOpen } = useLayout().sidebarState;
   const items = useMemo(
@@ -115,15 +115,16 @@ export function RailMain({ className, children }: RailMainProps) {
     >
       {items.length ? (
         <nav className="flex flex-col items-center justify-start gap-1 px-0 py-0">
-          {items.map((e: RailMenuItem) => {
-            const isActive = e.id === activeRailMenuId;
-            const name = typeof e.label === "string" ? e.label : e.id;
+          {items.map((e: RailMenuItem, index: number) => {
+            const isActive = activeRailMenu === e;
+            const name =
+              typeof e.label === "string" ? e.label : `Rail ${index + 1}`;
             const button = (
               <Button
                 aria-pressed={isActive}
                 aria-label={name}
                 onPress={() => {
-                  setActiveRailMenuId(e.id);
+                  setActiveRailMenu(e);
                   if (isDesktop) {
                     setDesktopOpen(true);
                   }
@@ -141,7 +142,7 @@ export function RailMain({ className, children }: RailMainProps) {
               </Button>
             );
             return (
-              <Fragment key={e.id}>
+              <Fragment key={index}>
                 <RailMenuTooltip label={e.label}>{button}</RailMenuTooltip>
               </Fragment>
             );

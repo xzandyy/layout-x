@@ -12,12 +12,10 @@ import {
 import type { MenuConfig } from "@/components/Layout";
 
 export const workspaceMenus: MenuConfig = {
-  defaultRailMenuId: "home",
   rail: [
     {
       items: [
         {
-          id: "home",
           label: "Home",
           icon: <House />,
           sidebar: {
@@ -37,7 +35,6 @@ export const workspaceMenus: MenuConfig = {
           },
         },
         {
-          id: "inbox",
           label: "Inbox",
           icon: <Envelope />,
           sidebar: {
@@ -62,7 +59,6 @@ export const workspaceMenus: MenuConfig = {
           },
         },
         {
-          id: "agents",
           label: "Agents",
           icon: <FaceRobot />,
           sidebar: {
@@ -82,7 +78,6 @@ export const workspaceMenus: MenuConfig = {
           },
         },
         {
-          id: "workflows",
           label: "Flows",
           icon: <FolderFlows />,
           sidebar: {
@@ -113,7 +108,6 @@ export const workspaceMenus: MenuConfig = {
           },
         },
         {
-          id: "library",
           label: "Library",
           icon: <Book />,
           sidebar: {
@@ -144,7 +138,6 @@ export const workspaceMenus: MenuConfig = {
           },
         },
         {
-          id: "integrations",
           label: "Settings",
           icon: <Gear />,
           sidebar: {

@@ -13,7 +13,7 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
 import type { MenuConfig, RailMenuItem } from "./types";
 import { LayoutContext, type RootState } from "./context";
-import { findBestRailMenuIdForPathname } from "./sidebar";
+import { findBestRailMenuForPathname, findActiveSidebarNavItem } from "./sidebar";
 
 export type LayoutProps = {
   headerHeight?: number;
@@ -38,7 +38,7 @@ export function LayoutRoot({
   const pathname = usePathname() ?? "/";
 
   const [railMenuOverride, setRailMenuOverride] = useState<{
-    railMenuId: string;
+    index: number;
     forPathname: string;
   } | null>(null);
 
@@ -47,47 +47,37 @@ export function LayoutRoot({
     [menuConfig],
   );
 
-  const urlRailMenuId = useMemo(
+  const urlRailMenu = useMemo(
     () =>
-      menuConfig
-        ? findBestRailMenuIdForPathname(menuConfig, pathname)
-        : undefined,
+      menuConfig ? findBestRailMenuForPathname(menuConfig, pathname) : undefined,
     [menuConfig, pathname],
   );
 
-  const fallbackRailMenuId = useMemo(() => {
-    if (!allRailItems.length) return undefined;
-    return menuConfig?.defaultRailMenuId ?? allRailItems[0]!.id;
-  }, [menuConfig, allRailItems]);
-
-  const activeRailMenuId = useMemo(() => {
+  const activeRailMenu = useMemo(() => {
     if (!menuConfig) return undefined;
     if (
       railMenuOverride != null &&
       railMenuOverride.forPathname === pathname
     ) {
-      return railMenuOverride.railMenuId;
+      return allRailItems[railMenuOverride.index];
     }
-    return urlRailMenuId ?? fallbackRailMenuId;
-  }, [
-    menuConfig,
-    railMenuOverride,
-    pathname,
-    urlRailMenuId,
-    fallbackRailMenuId,
-  ]);
+    return urlRailMenu;
+  }, [menuConfig, railMenuOverride, pathname, urlRailMenu, allRailItems]);
 
-  const activeRailMenu = useMemo(() => {
-    if (activeRailMenuId == null) return undefined;
-    return allRailItems.find((e) => e.id === activeRailMenuId);
-  }, [allRailItems, activeRailMenuId]);
+  const activeSidebarMenu = useMemo(() => {
+    const sidebar = activeRailMenu?.sidebar;
+    if (!sidebar) return undefined;
+    return findActiveSidebarNavItem(sidebar, pathname);
+  }, [activeRailMenu, pathname]);
 
-  const setActiveRailMenuId = useCallback(
-    (id: string) => {
+  const setActiveRailMenu = useCallback(
+    (item: RailMenuItem) => {
       if (!menuConfig) return;
-      setRailMenuOverride({ railMenuId: id, forPathname: pathname });
+      const idx = allRailItems.indexOf(item);
+      if (idx < 0) return;
+      setRailMenuOverride({ index: idx, forPathname: pathname });
     },
-    [menuConfig, pathname],
+    [menuConfig, pathname, allRailItems],
   );
 
   const rootState = useMemo<RootState>(
@@ -96,18 +86,18 @@ export function LayoutRoot({
       railWidth,
       sidebarWidth,
       menuConfig,
-      activeRailMenuId,
       activeRailMenu,
-      setActiveRailMenuId,
+      activeSidebarMenu,
+      setActiveRailMenu,
     }),
     [
       headerHeight,
       railWidth,
       sidebarWidth,
       menuConfig,
-      activeRailMenuId,
       activeRailMenu,
-      setActiveRailMenuId,
+      activeSidebarMenu,
+      setActiveRailMenu,
     ],
   );
 

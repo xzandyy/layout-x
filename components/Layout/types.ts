@@ -3,8 +3,6 @@ import workspacePathsJson from "@/config/workspace-paths.json";
 
 export type MenuConfig = {
   rail: RailMenuConfig[];
-  defaultRailMenuId?: string;
-  defaultSidebarMenuId?: string;
 };
 
 export type RailMenuConfig = {
@@ -12,7 +10,6 @@ export type RailMenuConfig = {
 };
 
 export type RailMenuItem = {
-  id: string;
   icon: ReactNode;
   label: ReactNode;
   sidebar: SidebarMenuConfig;
