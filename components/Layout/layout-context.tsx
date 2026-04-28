@@ -11,7 +11,7 @@ import { useSidebar } from "@heroui-pro/react";
 
 import type { RouteConfig, RailMenuItem } from "./types";
 
-export type SidebarState = ReturnType<typeof useSidebar>;
+type RawSidebarState = ReturnType<typeof useSidebar>;
 
 export type RootState = {
   headerHeight: number;
@@ -21,6 +21,12 @@ export type RootState = {
   activeEntryId?: string;
   activeEntry?: RailMenuItem;
   setActiveEntryId: (id: string) => void;
+};
+
+export type SidebarState = Omit<RawSidebarState, "isOpen" | "setOpen"> & {
+  isDesktopOpen: boolean;
+  setDesktopOpen: (open: boolean) => void;
+  isDesktop: boolean;
 };
 
 export type RailState = {
@@ -46,6 +52,16 @@ export function useLayout(): LayoutContextValue {
   return ctx;
 }
 
+function mapSidebarState(raw: RawSidebarState): SidebarState {
+  const { isOpen, setOpen, ...rest } = raw;
+  return {
+    ...rest,
+    isDesktopOpen: isOpen,
+    setDesktopOpen: setOpen,
+    isDesktop: !raw.isMobile,
+  };
+}
+
 export function LayoutContext({
   rootState,
   children,
@@ -54,18 +70,19 @@ export function LayoutContext({
   children: ReactNode;
 }) {
   const [mobileRailSlot, setMobileRailSlot] = useState<ReactNode>(null);
-  const sidebar = useSidebar();
+  const rawSidebar = useSidebar();
+  const sidebarState = useMemo(() => mapSidebarState(rawSidebar), [rawSidebar]);
 
   const value = useMemo<LayoutContextValue>(
     () => ({
       rootState,
-      sidebarState: sidebar,
+      sidebarState,
       railState: {
         mobileRailSlot,
         setMobileRailSlot,
       },
     }),
-    [rootState, sidebar, mobileRailSlot],
+    [rootState, sidebarState, mobileRailSlot],
   );
 
   return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;

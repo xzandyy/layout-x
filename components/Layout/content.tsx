@@ -17,14 +17,14 @@ export type ContentProps = {
 
 export function Content({ className, children }: ContentProps) {
   const { sidebarState } = useLayout();
-  const { isOpen, isMobile } = sidebarState;
-  const isDesktopOpen = !isMobile && isOpen;
+  const { isDesktopOpen, isDesktop } = sidebarState;
+  const showDesktopInsetPadding = isDesktop && isDesktopOpen;
   return (
     <HeroSidebar.Main
       className={cn(
         "min-h-0 min-w-0 md:p-2 md:pl-0",
         "md:transition-[padding-left] duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
-        isDesktopOpen && "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
+        showDesktopInsetPadding && "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
       )}
     >
       <div

@@ -21,7 +21,7 @@ export type RailProps = {
 export function Rail({ className, children }: RailProps): ReactElement {
   const { rootState, sidebarState, railState } = useLayout();
   const { railWidth } = rootState;
-  const { isMobile } = sidebarState;
+  const { isDesktop } = sidebarState;
   const { setMobileRailSlot } = railState;
 
   const railVars = useMemo(
@@ -30,7 +30,7 @@ export function Rail({ className, children }: RailProps): ReactElement {
   );
 
   useLayoutEffect(() => {
-    if (!isMobile) {
+    if (isDesktop) {
       setMobileRailSlot(null);
       return;
     }
@@ -49,7 +49,7 @@ export function Rail({ className, children }: RailProps): ReactElement {
     return () => {
       setMobileRailSlot(null);
     };
-  }, [isMobile, children, className, railVars, setMobileRailSlot]);
+  }, [isDesktop, children, className, railVars, setMobileRailSlot]);
 
   return (
     <aside
