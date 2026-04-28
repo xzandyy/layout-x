@@ -1,22 +1,12 @@
 "use client";
 
-import {
-  useCallback,
-  useMemo,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { useCallback, useMemo, useState, type CSSProperties } from "react";
 import type { Key } from "react-aria-components";
 import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-import {
-  type LayoutChild,
-  renderLayoutChild,
-  useLayout,
-} from "./context";
+import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
 import type {
   MenuConfig,
   RailMenuItem,
@@ -179,8 +169,7 @@ function MenuNode({
   onExpandedChange: (keys: Set<Key> | "all") => void;
 }) {
   if (node.type === "separator") return <HeroSidebar.Separator />;
-  if (node.type === "custom")
-    return <CustomSlot node={node} />;
+  if (node.type === "custom") return <CustomSlot node={node} />;
   return <GroupNode node={node} {...rest} />;
 }
 
@@ -265,7 +254,12 @@ function MenuItem({
         )}
       >
         {icon && (
-          <HeroSidebar.MenuIcon className={cn("[&>svg]:size-3.75")}>
+          <HeroSidebar.MenuIcon
+            className={cn(
+              "[&>svg]:size-3.75",
+              isCurrent ? "text-fg-1" : "text-fg-3",
+            )}
+          >
             {icon}
           </HeroSidebar.MenuIcon>
         )}
