@@ -17,11 +17,6 @@ import { findBestEntryIdForPathname } from "./sidebar";
 
 // -- Layout Root Context -- //
 
-function collectRailMenuItems(route: RouteConfig | undefined) {
-  if (!route) return [] as RailMenuItem[];
-  return route.rail.flatMap((b) => b.items);
-}
-
 type SidebarState = ReturnType<typeof useSidebar>;
 
 type LayoutBaseValue = {
@@ -34,7 +29,6 @@ type LayoutBaseValue = {
   setActiveEntryId: (id: string) => void;
 };
 
-/** Layout 域状态 + `useSidebar()` 的侧栏开闭 / 视口等（须在 `<Layout>` 内使用） */
 export type LayoutContextValue = LayoutBaseValue & SidebarState;
 
 const LayoutContext = createContext<LayoutContextValue | null>(null);
@@ -52,6 +46,39 @@ export function useLayoutContext(): LayoutContextValue {
 export function useLayout() {
   return useLayoutContext();
 }
+
+// -- Layout Rail Outlet -- //
+
+export type LayoutRailOutletContextValue = {
+  /** Rail 在移动端填入 Sheet：由 `<Layout.Rail>` 注册，Sidebar 并排展示 */
+  mobileRailSlot: ReactNode | null;
+  setMobileRailSlot: (node: ReactNode | null) => void;
+};
+
+const LayoutRailOutletContext =
+  createContext<LayoutRailOutletContextValue | null>(null);
+
+export function useLayoutRailOutlet(): LayoutRailOutletContextValue {
+  const ctx = useContext(LayoutRailOutletContext);
+  if (ctx == null) {
+    throw new Error("Layout rail outlet is only available inside <Layout>.");
+  }
+  return ctx;
+}
+
+function LayoutRailOutletBridge({ children }: { children: ReactNode }) {
+  const [mobileRailSlot, setMobileRailSlot] = useState<ReactNode>(null);
+  const outlet = useMemo<LayoutRailOutletContextValue>(
+    () => ({ mobileRailSlot, setMobileRailSlot }),
+    [mobileRailSlot],
+  );
+  return (
+    <LayoutRailOutletContext.Provider value={outlet}>
+      {children}
+    </LayoutRailOutletContext.Provider>
+  );
+}
+
 
 function LayoutContextBridge({
   base,
@@ -94,10 +121,7 @@ export function LayoutRoot({
     forPathname: string;
   } | null>(null);
 
-  const allRailItems = useMemo(
-    () => collectRailMenuItems(route),
-    [route],
-  );
+  const allRailItems = useMemo(() => collectRailMenuItems(route), [route]);
 
   const urlEntryId = useMemo(
     () => (route ? findBestEntryIdForPathname(route, pathname) : undefined),
@@ -153,18 +177,24 @@ export function LayoutRoot({
 
   return (
     <HeroSidebar.Provider navigate={router.push} collapsible="offcanvas">
-      <LayoutContextBridge base={baseValue}>
-        <div
-          className={cn(
-            "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0",
-            "flex-col-reverse md:flex-row",
-            "bg-canvas text-fg-1",
-            className,
-          )}
-        >
-          {children}
-        </div>
-      </LayoutContextBridge>
+      <LayoutRailOutletBridge>
+        <LayoutContextBridge base={baseValue}>
+          <div
+            className={cn(
+              "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row",
+              "bg-canvas text-fg-1",
+              className,
+            )}
+          >
+            {children}
+          </div>
+        </LayoutContextBridge>
+      </LayoutRailOutletBridge>
     </HeroSidebar.Provider>
   );
+}
+
+function collectRailMenuItems(route: RouteConfig | undefined) {
+  if (!route) return [] as RailMenuItem[];
+  return route.rail.flatMap((b) => b.items);
 }

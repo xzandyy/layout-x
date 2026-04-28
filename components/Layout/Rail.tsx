@@ -1,9 +1,15 @@
 "use client";
 
-import { useMemo, type CSSProperties, type ReactNode } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext } from "./root";
+import { useLayoutContext, useLayoutRailOutlet } from "./root";
 
 // -- Rail -- //
 
@@ -12,18 +18,50 @@ export type RailProps = {
   children?: ReactNode;
 };
 
-export function Rail({ className, children }: RailProps) {
-  const { railWidth } = useLayoutContext();
+export function Rail({ className, children }: RailProps): ReactElement | null {
+  const { railWidth, isMobile } = useLayoutContext();
+  const { setMobileRailSlot } = useLayoutRailOutlet();
+
+  const railVars = useMemo(
+    () => ({ "--rail-width": `${railWidth}rem` }) as CSSProperties,
+    [railWidth],
+  );
+
+  useLayoutEffect(() => {
+    if (!isMobile) {
+      setMobileRailSlot(null);
+      return;
+    }
+    setMobileRailSlot(
+      <aside
+        className={cn(
+          "z-100 flex h-full min-h-0 w-(--rail-width) shrink-0 flex-col self-stretch bg-canvas",
+          "border-r border-border-hair",
+          className,
+        )}
+        style={railVars}
+      >
+        {children}
+      </aside>,
+    );
+    return () => {
+      setMobileRailSlot(null);
+    };
+  }, [isMobile, children, className, railVars, setMobileRailSlot]);
+
+  if (isMobile) {
+    return null;
+  }
+
   return (
     <aside
       className={cn(
         "z-100 shrink-0 bg-canvas",
-        "flex min-h-0 min-w-0",
-        "h-auto w-full flex-row border-t border-border-hair",
-        "md:h-full md:w-(--rail-width) md:flex-col md:self-stretch md:border-t-0",
+        "flex min-h-0 min-w-0 flex-col",
+        "h-full w-(--rail-width) self-stretch",
         className,
       )}
-      style={{ "--rail-width": `${railWidth}rem` } as CSSProperties}
+      style={railVars}
     >
       {children}
     </aside>
@@ -38,9 +76,7 @@ export type RailHeaderProps = {
 };
 
 export function RailHeader({ className, children }: RailHeaderProps) {
-  return (
-    <div className={cn("hidden shrink-0 md:block", className)}>{children}</div>
-  );
+  return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
 // -- Rail Footer -- //
@@ -51,9 +87,7 @@ export type RailFooterProps = {
 };
 
 export function RailFooter({ className, children }: RailFooterProps) {
-  return (
-    <div className={cn("hidden shrink-0 md:block", className)}>{children}</div>
-  );
+  return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
 // -- Rail Main -- //
@@ -69,22 +103,16 @@ export function RailMain({ className, children }: RailMainProps) {
     () => (route ? route.rail.flatMap((b) => b.items) : []),
     [route],
   );
+
   return (
     <div
       className={cn(
-        "min-h-0 min-w-0 flex-1",
-        "overflow-x-auto overflow-y-hidden md:overflow-x-hidden md:overflow-y-auto",
+        "min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto",
         className,
       )}
     >
       {items.length ? (
-        <nav
-          className={cn(
-            "flex items-center gap-1",
-            "flex-row justify-around px-2 py-1",
-            "md:flex-col md:justify-start md:px-0 md:py-0",
-          )}
-        >
+        <nav className="flex flex-col items-center justify-start gap-1 px-0 py-0">
           {items.map((e) => {
             const isActive = e.id === activeEntryId;
             const name = typeof e.label === "string" ? e.label : e.id;
@@ -95,7 +123,7 @@ export function RailMain({ className, children }: RailMainProps) {
                 aria-label={name}
                 onPress={() => setActiveEntryId(e.id)}
                 className={cn(
-                  "size-10 rounded-[10px]",
+                  "size-10 shrink-0 rounded-[10px]",
                   "transition-all duration-150",
                   "[&>svg]:size-5",
                   isActive

@@ -17,9 +17,16 @@ export const Layout = Object.assign(LayoutRoot, {
   ContentBody,
 });
 
-export { LayoutRoot, useLayout, useLayoutContext } from "./root";
-
-export type { RootProps, LayoutContextValue } from "./root";
+export {
+  LayoutRoot,
+  useLayoutContext,
+  useLayoutRailOutlet,
+} from "./root";
+export type {
+  RootProps,
+  LayoutContextValue,
+  LayoutRailOutletContextValue,
+} from "./root";
 export type {
   ContentProps,
   ContentHeaderProps,

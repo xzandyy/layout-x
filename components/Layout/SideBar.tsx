@@ -12,7 +12,7 @@ import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext } from "./root";
+import { useLayoutContext, useLayoutRailOutlet } from "./root";
 import type {
   RouteConfig,
   SidebarGroupItem,
@@ -32,6 +32,7 @@ export type SidebarProps = {
 
 export function Sidebar({ className, children }: SidebarProps) {
   const { sidebarWidth } = useLayoutContext();
+  const { mobileRailSlot } = useLayoutRailOutlet();
   const sidebarVars = useMemo(
     () =>
       ({
@@ -54,7 +55,16 @@ export function Sidebar({ className, children }: SidebarProps) {
         <Heading slot="title" className="sr-only">
           Sidebar
         </Heading>
-        {children}
+        {mobileRailSlot != null ? (
+          <div className="flex h-svh max-h-svh min-h-0 w-full flex-row overflow-hidden">
+            {mobileRailSlot}
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden border-l border-border-hair bg-canvas">
+              {children}
+            </div>
+          </div>
+        ) : (
+          children
+        )}
       </HeroSidebar.Mobile>
     </>
   );
