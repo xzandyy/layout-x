@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { Key } from "react-aria-components";
+import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,12 @@ export function Sidebar({ className, children }: SidebarProps) {
       >
         {children}
       </HeroSidebar>
-      <HeroSidebar.Mobile>{children}</HeroSidebar.Mobile>
+      <HeroSidebar.Mobile>
+        <Heading slot="title" className="sr-only">
+          Sidebar
+        </Heading>
+        {children}
+      </HeroSidebar.Mobile>
     </>
   );
 }

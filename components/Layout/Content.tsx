@@ -28,7 +28,7 @@ export function Content({ className, children }: ContentProps) {
       style={
         isDesktopOpen
           ? ({
-              "padding-left": `calc(${sidebarWidth}rem - 240px)`,
+              paddingLeft: `calc(${sidebarWidth}rem - 240px)`,
             } as CSSProperties)
           : undefined
       }
