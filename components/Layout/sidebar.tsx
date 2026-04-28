@@ -79,9 +79,11 @@ export type SidebarHeaderProps = {
 };
 
 export function SidebarHeader({ className, children }: SidebarHeaderProps) {
+  const { sidebarHeaderSlot } = useLayout().slotState;
+  const content = sidebarHeaderSlot ?? children;
   return (
     <HeroSidebar.Header className={cn("p-0", className)}>
-      {children}
+      {content}
     </HeroSidebar.Header>
   );
 }

@@ -40,8 +40,8 @@ export type RailState = {
 
 /** Slot 状态：自外部覆盖的区域内容；null 时使用对应组件原本声明式的 children */
 export type SlotState = {
-  railHeaderSlot: ReactNode | null;
-  updateRailHeader: (node: ReactNode | null) => void;
+  sidebarHeaderSlot: ReactNode | null;
+  updateSidebarHeader: (node: ReactNode | null) => void;
   contentHeaderSlot: ReactNode | null;
   updateContentHeader: (node: ReactNode | null) => void;
 };
@@ -99,13 +99,14 @@ export function LayoutContext({
   );
 
   // Slot（覆盖区域）
-  const [railHeaderSlot, setRailHeaderSlot] = useState<ReactNode | null>(null);
+  const [sidebarHeaderSlot, setSidebarHeaderSlot] =
+    useState<ReactNode | null>(null);
   const [contentHeaderSlot, setContentHeaderSlot] = useState<ReactNode | null>(
     null,
   );
 
-  const updateRailHeader = useCallback((node: ReactNode | null) => {
-    setRailHeaderSlot(node);
+  const updateSidebarHeader = useCallback((node: ReactNode | null) => {
+    setSidebarHeaderSlot(node);
   }, []);
 
   const updateContentHeader = useCallback((node: ReactNode | null) => {
@@ -114,12 +115,17 @@ export function LayoutContext({
 
   const slotState = useMemo<SlotState>(
     () => ({
-      railHeaderSlot,
-      updateRailHeader,
+      sidebarHeaderSlot,
+      updateSidebarHeader,
       contentHeaderSlot,
       updateContentHeader,
     }),
-    [railHeaderSlot, contentHeaderSlot, updateRailHeader, updateContentHeader],
+    [
+      sidebarHeaderSlot,
+      contentHeaderSlot,
+      updateSidebarHeader,
+      updateContentHeader,
+    ],
   );
 
   // 合并状态

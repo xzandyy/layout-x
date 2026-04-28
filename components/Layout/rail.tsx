@@ -75,9 +75,7 @@ export type RailHeaderProps = {
 };
 
 export function RailHeader({ className, children }: RailHeaderProps) {
-  const { railHeaderSlot } = useLayout().slotState;
-  const content = railHeaderSlot ?? children;
-  return <div className={cn("shrink-0", className)}>{content}</div>;
+  return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
 // -- Rail Footer -- //
