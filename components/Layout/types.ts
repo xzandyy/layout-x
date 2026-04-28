@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import appRouterJson from "../../config/routes.json";
+import appRouterJson from "@/config/routes.json";
 
 export type RouteConfig = {
   rail: RailMenuConfig[];
@@ -15,7 +15,6 @@ export type RailMenuItem = {
   id: string;
   icon: ReactNode;
   label: ReactNode;
-  tooltip?: TooltipConfig;
   sidebar: SidebarMenuConfig;
 };
 

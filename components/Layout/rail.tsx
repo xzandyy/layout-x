@@ -1,15 +1,17 @@
 "use client";
 
 import {
+  Fragment,
   useLayoutEffect,
   useMemo,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
 } from "react";
-import { Button } from "@heroui/react";
+import { Button, Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { useLayout } from "./context";
+import type { RailMenuItem } from "./types";
 
 // -- Rail -- //
 
@@ -89,6 +91,21 @@ export function RailFooter({ className, children }: RailFooterProps) {
   return <div className={cn("shrink-0", className)}>{children}</div>;
 }
 
+function RailEntryTooltip({
+  label,
+  children,
+}: {
+  label: ReactNode;
+  children: ReactElement;
+}) {
+  return (
+    <Tooltip delay={500} closeDelay={0}>
+      <Tooltip.Trigger>{children}</Tooltip.Trigger>
+      <Tooltip.Content placement="right">{label}</Tooltip.Content>
+    </Tooltip>
+  );
+}
+
 // -- Rail Main -- //
 
 export type RailMainProps = {
@@ -113,12 +130,11 @@ export function RailMain({ className, children }: RailMainProps) {
     >
       {items.length ? (
         <nav className="flex flex-col items-center justify-start gap-1 px-0 py-0">
-          {items.map((e) => {
+          {items.map((e: RailMenuItem) => {
             const isActive = e.id === activeEntryId;
             const name = typeof e.label === "string" ? e.label : e.id;
-            return (
+            const button = (
               <Button
-                key={e.id}
                 aria-pressed={isActive}
                 aria-label={name}
                 onPress={() => {
@@ -138,6 +154,11 @@ export function RailMain({ className, children }: RailMainProps) {
               >
                 {e.icon}
               </Button>
+            );
+            return (
+              <Fragment key={e.id}>
+                <RailEntryTooltip label={e.label}>{button}</RailEntryTooltip>
+              </Fragment>
             );
           })}
         </nav>
