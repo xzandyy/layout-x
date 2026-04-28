@@ -12,7 +12,11 @@ import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
-import { useLayout } from "./context";
+import {
+  type LayoutChild,
+  renderLayoutChild,
+  useLayout,
+} from "./context";
 import type {
   MenuConfig,
   RailMenuItem,
@@ -30,11 +34,13 @@ import type {
 
 export type SidebarProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function Sidebar({ className, children }: SidebarProps) {
-  const { rootState, railState } = useLayout();
+  const ctx = useLayout();
+  const resolvedChildren = renderLayoutChild(children, ctx);
+  const { rootState, railState } = ctx;
   const { sidebarWidth } = rootState;
   const { mobileRailSlot } = railState;
   const sidebarVars = useMemo(
@@ -53,7 +59,7 @@ export function Sidebar({ className, children }: SidebarProps) {
         )}
         style={sidebarVars}
       >
-        {children}
+        {resolvedChildren}
       </HeroSidebar>
       <HeroSidebar.Mobile>
         <Heading slot="title" className="sr-only">
@@ -63,11 +69,11 @@ export function Sidebar({ className, children }: SidebarProps) {
           <div className="flex h-svh max-h-svh min-h-0 w-full flex-row overflow-hidden bg-canvas">
             {mobileRailSlot}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-canvas pr-2">
-              {children}
+              {resolvedChildren}
             </div>
           </div>
         ) : (
-          children
+          resolvedChildren
         )}
       </HeroSidebar.Mobile>
     </>
@@ -78,12 +84,13 @@ export function Sidebar({ className, children }: SidebarProps) {
 
 export type SidebarHeaderProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function SidebarHeader({ className, children }: SidebarHeaderProps) {
-  const { sidebarHeaderSlot } = useLayout().slotState;
-  const content = sidebarHeaderSlot ?? children;
+  const ctx = useLayout();
+  const content =
+    ctx.slotState.sidebarHeaderSlot ?? renderLayoutChild(children, ctx);
   return (
     <HeroSidebar.Header className={cn("p-0", className)}>
       {content}
@@ -95,13 +102,14 @@ export function SidebarHeader({ className, children }: SidebarHeaderProps) {
 
 export type SidebarFooterProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function SidebarFooter({ className, children }: SidebarFooterProps) {
+  const ctx = useLayout();
   return (
     <HeroSidebar.Footer className={cn("p-0", className)}>
-      {children}
+      {renderLayoutChild(children, ctx)}
     </HeroSidebar.Footer>
   );
 }
@@ -110,17 +118,17 @@ export function SidebarFooter({ className, children }: SidebarFooterProps) {
 
 export type SidebarMainProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function SidebarMain({ className, children }: SidebarMainProps) {
   const pathname = usePathname();
-  const { activeRailMenu } = useLayout().rootState;
-  const sidebar = activeRailMenu?.sidebar;
+  const ctx = useLayout();
+  const sidebar = ctx.rootState.activeRailMenu?.sidebar;
   return (
     <HeroSidebar.Content className={cn("p-0", className)}>
       {sidebar && <MenuTree config={sidebar} pathname={pathname} />}
-      {children}
+      {renderLayoutChild(children, ctx)}
     </HeroSidebar.Content>
   );
 }

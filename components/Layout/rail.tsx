@@ -10,18 +10,24 @@ import {
 } from "react";
 import { Button, Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayout } from "./context";
+import {
+  type LayoutChild,
+  renderLayoutChild,
+  useLayout,
+} from "./context";
 import type { RailMenuItem } from "./types";
 
 // -- Rail -- //
 
 export type RailProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function Rail({ className, children }: RailProps): ReactElement {
-  const { rootState, sidebarState, railState } = useLayout();
+  const ctx = useLayout();
+  const { rootState, sidebarState, railState } = ctx;
+  const resolvedChildren = renderLayoutChild(children, ctx);
   const { railWidth } = rootState;
   const { isDesktop } = sidebarState;
   const { setMobileRailSlot } = railState;
@@ -44,13 +50,19 @@ export function Rail({ className, children }: RailProps): ReactElement {
         )}
         style={railVars}
       >
-        {children}
+        {resolvedChildren}
       </aside>,
     );
     return () => {
       setMobileRailSlot(null);
     };
-  }, [isDesktop, children, className, railVars, setMobileRailSlot]);
+  }, [
+    isDesktop,
+    resolvedChildren,
+    className,
+    railVars,
+    setMobileRailSlot,
+  ]);
 
   return (
     <aside
@@ -63,7 +75,7 @@ export function Rail({ className, children }: RailProps): ReactElement {
       )}
       style={railVars}
     >
-      {children}
+      {resolvedChildren}
     </aside>
   );
 }
@@ -72,34 +84,44 @@ export function Rail({ className, children }: RailProps): ReactElement {
 
 export type RailHeaderProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function RailHeader({ className, children }: RailHeaderProps) {
-  return <div className={cn("shrink-0", className)}>{children}</div>;
+  const ctx = useLayout();
+  return (
+    <div className={cn("shrink-0", className)}>
+      {renderLayoutChild(children, ctx)}
+    </div>
+  );
 }
 
 // -- Rail Footer -- //
 
 export type RailFooterProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function RailFooter({ className, children }: RailFooterProps) {
-  return <div className={cn("shrink-0", className)}>{children}</div>;
+  const ctx = useLayout();
+  return (
+    <div className={cn("shrink-0", className)}>
+      {renderLayoutChild(children, ctx)}
+    </div>
+  );
 }
 // -- Rail Main -- //
 
 export type RailMainProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function RailMain({ className, children }: RailMainProps) {
-  const { menuConfig, activeRailMenu, setActiveRailMenu } =
-    useLayout().rootState;
-  const { isDesktop, setDesktopOpen } = useLayout().sidebarState;
+  const ctx = useLayout();
+  const { menuConfig, activeRailMenu, setActiveRailMenu } = ctx.rootState;
+  const { isDesktop, setDesktopOpen } = ctx.sidebarState;
   const items = useMemo(
     () => (menuConfig ? menuConfig.rail.flatMap((b) => b.items) : []),
     [menuConfig],
@@ -148,7 +170,7 @@ export function RailMain({ className, children }: RailMainProps) {
           })}
         </nav>
       ) : null}
-      {children}
+      {renderLayoutChild(children, ctx)}
     </div>
   );
 }

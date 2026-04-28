@@ -1,7 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useLayout } from "./context";
+import {
+  type LayoutChild,
+  renderLayoutChild,
+  useLayout,
+} from "./context";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
@@ -11,11 +14,12 @@ import { workspacePaths } from "./types";
 
 export type ContentProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function Content({ className, children }: ContentProps) {
-  const { sidebarState } = useLayout();
+  const ctx = useLayout();
+  const { sidebarState } = ctx;
   const { isDesktopOpen, isDesktop } = sidebarState;
   const showDesktopInsetPadding = isDesktop && isDesktopOpen;
   return (
@@ -33,7 +37,7 @@ export function Content({ className, children }: ContentProps) {
           className,
         )}
       >
-        {children}
+        {renderLayoutChild(children, ctx)}
       </div>
     </HeroSidebar.Main>
   );
@@ -43,13 +47,14 @@ export function Content({ className, children }: ContentProps) {
 
 export type ContentHeaderProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function ContentHeader({ className, children }: ContentHeaderProps) {
-  const { headerHeight } = useLayout().rootState;
-  const { contentHeaderSlot } = useLayout().slotState;
-  const trailing = contentHeaderSlot ?? children;
+  const ctx = useLayout();
+  const { headerHeight } = ctx.rootState;
+  const { contentHeaderSlot } = ctx.slotState;
+  const trailing = contentHeaderSlot ?? renderLayoutChild(children, ctx);
   return (
     <header
       className={cn(
@@ -75,13 +80,14 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
 
 export type ContentBodyProps = {
   className?: string;
-  children?: ReactNode;
+  children?: LayoutChild;
 };
 
 export function ContentBody({ className, children }: ContentBodyProps) {
+  const ctx = useLayout();
   return (
     <main className={cn("min-h-0 min-w-0 flex-1 overflow-auto", className)}>
-      {children}
+      {renderLayoutChild(children, ctx)}
     </main>
   );
 }

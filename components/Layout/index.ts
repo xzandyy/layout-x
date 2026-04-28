@@ -4,8 +4,9 @@ import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
 import { Content, ContentHeader, ContentBody } from "./content";
 
 // -- Layout Context -- //
-export { useLayout } from "./context";
+export { useLayout, renderLayoutChild } from "./context";
 export type {
+  LayoutChild,
   LayoutContextValue,
   RootState,
   RailState,

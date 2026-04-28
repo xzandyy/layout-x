@@ -12,7 +12,13 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
 import type { MenuConfig, RailMenuItem } from "./types";
-import { LayoutContext, type RootState } from "./context";
+import {
+  LayoutContext,
+  type RootState,
+  type LayoutChild,
+  renderLayoutChild,
+  useLayout,
+} from "./context";
 import {
   findBestRailMenuForPathname,
   findActiveSidebarNavItem,
@@ -24,7 +30,7 @@ export type LayoutProps = {
   sidebarWidth?: number;
   className?: string;
   menuConfig?: MenuConfig;
-  children: ReactNode;
+  children: LayoutChild;
   defaultSidebarOpen?: boolean;
 };
 
@@ -103,6 +109,14 @@ export function LayoutRoot({
     ],
   );
 
+  const shellStyle = useMemo(
+    () =>
+      ({
+        "--layout-sidebar-width": `${sidebarWidth}rem`,
+      }) as CSSProperties,
+    [sidebarWidth],
+  );
+
   return (
     <HeroSidebar.Provider
       navigate={router.push}
@@ -110,22 +124,35 @@ export function LayoutRoot({
       defaultOpen={defaultSidebarOpen}
     >
       <LayoutContext rootState={rootState}>
-        <div
-          className={cn(
-            "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row",
-            "bg-canvas text-fg-1",
-            className,
-          )}
-          style={
-            {
-              "--layout-sidebar-width": `${sidebarWidth}rem`,
-            } as CSSProperties
-          }
-        >
+        <LayoutRootBody className={className} style={shellStyle}>
           {children}
-        </div>
+        </LayoutRootBody>
       </LayoutContext>
     </HeroSidebar.Provider>
+  );
+}
+
+function LayoutRootBody({
+  className,
+  style,
+  children,
+}: {
+  className?: string;
+  style?: CSSProperties;
+  children: LayoutChild;
+}) {
+  const ctx = useLayout();
+  return (
+    <div
+      className={cn(
+        "flex h-dvh max-h-dvh w-dvw max-w-dvw min-h-0 min-w-0 flex-row",
+        "bg-canvas text-fg-1",
+        className,
+      )}
+      style={style}
+    >
+      {renderLayoutChild(children, ctx)}
+    </div>
   );
 }
 

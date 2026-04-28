@@ -53,6 +53,19 @@ export type LayoutContextValue = {
   slotState: SlotState;
 };
 
+/** Layout 与子外壳可用的「静态节点」或「`(Layout context)` render prop」 */
+export type LayoutChild =
+  | ReactNode
+  | ((ctx: LayoutContextValue) => ReactNode);
+
+export function renderLayoutChild(
+  child: LayoutChild | undefined,
+  ctx: LayoutContextValue,
+): ReactNode {
+  if (child === undefined) return undefined;
+  return typeof child === "function" ? child(ctx) : child;
+}
+
 const LayoutCtx = createContext<LayoutContextValue | null>(null);
 
 export function useLayout(): LayoutContextValue {
