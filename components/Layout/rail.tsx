@@ -98,6 +98,7 @@ export type RailMainProps = {
 
 export function RailMain({ className, children }: RailMainProps) {
   const { route, activeEntryId, setActiveEntryId } = useLayout().rootState;
+  const { isDesktop, setDesktopOpen } = useLayout().sidebarState;
   const items = useMemo(
     () => (route ? route.rail.flatMap((b) => b.items) : []),
     [route],
@@ -120,7 +121,12 @@ export function RailMain({ className, children }: RailMainProps) {
                 key={e.id}
                 aria-pressed={isActive}
                 aria-label={name}
-                onPress={() => setActiveEntryId(e.id)}
+                onPress={() => {
+                  setActiveEntryId(e.id);
+                  if (isDesktop) {
+                    setDesktopOpen(true);
+                  }
+                }}
                 className={cn(
                   "size-10 shrink-0 rounded-[10px]",
                   "transition-all duration-150",
