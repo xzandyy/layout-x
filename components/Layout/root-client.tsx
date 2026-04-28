@@ -16,6 +16,8 @@ import { cn } from "@/lib/utils";
 import type { RouteConfig, RailMenuItem } from "./types";
 import { findBestEntryIdForPathname } from "./sidebar";
 
+// -- Layout Context -- //
+
 type SidebarState = ReturnType<typeof useSidebar>;
 
 type LayoutBaseValue = {
@@ -46,19 +48,18 @@ export function useLayout() {
   return useLayoutContext();
 }
 
-// -- Layout Rail Outlet -- //
+// -- Layout Rail Context -- //
 
-export type LayoutRailOutletContextValue = {
+export type LayoutRailContextValue = {
   /** Rail 在移动端填入 Sheet：由 `<Layout.Rail>` 注册，Sidebar 并排展示 */
   mobileRailSlot: ReactNode | null;
   setMobileRailSlot: (node: ReactNode | null) => void;
 };
 
-const LayoutRailOutletContext =
-  createContext<LayoutRailOutletContextValue | null>(null);
+const LayoutRailContext = createContext<LayoutRailContextValue | null>(null);
 
-export function useLayoutRailOutlet(): LayoutRailOutletContextValue {
-  const ctx = useContext(LayoutRailOutletContext);
+export function useLayoutRail(): LayoutRailContextValue {
+  const ctx = useContext(LayoutRailContext);
   if (ctx == null) {
     throw new Error("Layout rail outlet is only available inside <Layout>.");
   }
@@ -67,14 +68,14 @@ export function useLayoutRailOutlet(): LayoutRailOutletContextValue {
 
 function LayoutRailOutletBridge({ children }: { children: ReactNode }) {
   const [mobileRailSlot, setMobileRailSlot] = useState<ReactNode>(null);
-  const outlet = useMemo<LayoutRailOutletContextValue>(
+  const outlet = useMemo<LayoutRailContextValue>(
     () => ({ mobileRailSlot, setMobileRailSlot }),
     [mobileRailSlot],
   );
   return (
-    <LayoutRailOutletContext.Provider value={outlet}>
+    <LayoutRailContext.Provider value={outlet}>
       {children}
-    </LayoutRailOutletContext.Provider>
+    </LayoutRailContext.Provider>
   );
 }
 
@@ -99,24 +100,25 @@ function LayoutContextBridge({
 
 // -- Layout Root（客户端实现，由 `root.tsx` 注入 `defaultSidebarOpen`） -- //
 
-export type RootProps = {
+export type LayoutProps = {
   headerHeight?: number;
   railWidth?: number;
   sidebarWidth?: number;
   className?: string;
-  route?: RouteConfig;
+  routeMenu?: RouteConfig;
   children: ReactNode;
+  defaultSidebarOpen?: boolean;
 };
 
 export function LayoutRootClient({
   headerHeight = 3.25,
   railWidth = 4,
   sidebarWidth = 16.5,
-  defaultSidebarOpen,
+  defaultSidebarOpen = true,
   className,
-  route,
+  routeMenu,
   children,
-}: RootProps & { defaultSidebarOpen: boolean }) {
+}: LayoutProps) {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
 
@@ -125,25 +127,25 @@ export function LayoutRootClient({
     forPathname: string;
   } | null>(null);
 
-  const allRailItems = useMemo(() => collectRailMenuItems(route), [route]);
+  const allRailItems = useMemo(() => collectRailMenuItems(routeMenu), [routeMenu]);
 
   const urlEntryId = useMemo(
-    () => (route ? findBestEntryIdForPathname(route, pathname) : undefined),
-    [route, pathname],
+    () => (routeMenu ? findBestEntryIdForPathname(routeMenu, pathname) : undefined),
+    [routeMenu, pathname],
   );
 
   const fallbackId = useMemo(() => {
     if (!allRailItems.length) return undefined;
-    return route?.defaultRailItemId ?? allRailItems[0]!.id;
-  }, [route, allRailItems]);
+    return routeMenu?.defaultRailItemId ?? allRailItems[0]!.id;
+  }, [routeMenu, allRailItems]);
 
   const activeEntryId = useMemo(() => {
-    if (!route) return undefined;
+    if (!routeMenu) return undefined;
     if (railOverride != null && railOverride.forPathname === pathname) {
       return railOverride.entryId;
     }
     return urlEntryId ?? fallbackId;
-  }, [route, railOverride, pathname, urlEntryId, fallbackId]);
+  }, [routeMenu, railOverride, pathname, urlEntryId, fallbackId]);
 
   const activeEntry = useMemo(() => {
     if (activeEntryId == null) return undefined;
@@ -152,10 +154,10 @@ export function LayoutRootClient({
 
   const setActiveEntryId = useCallback(
     (id: string) => {
-      if (!route) return;
+      if (!routeMenu) return;
       setRailOverride({ entryId: id, forPathname: pathname });
     },
-    [route, pathname],
+    [routeMenu, pathname],
   );
 
   const baseValue = useMemo<LayoutBaseValue>(
@@ -163,7 +165,7 @@ export function LayoutRootClient({
       headerHeight,
       railWidth,
       sidebarWidth,
-      route,
+      route: routeMenu,
       activeEntryId,
       activeEntry,
       setActiveEntryId,
@@ -172,7 +174,7 @@ export function LayoutRootClient({
       headerHeight,
       railWidth,
       sidebarWidth,
-      route,
+      routeMenu,
       activeEntryId,
       activeEntry,
       setActiveEntryId,

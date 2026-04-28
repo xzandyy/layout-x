@@ -9,7 +9,7 @@ import {
 } from "react";
 import { Button } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import { useLayoutContext, useLayoutRailOutlet } from "./root-client";
+import { useLayoutContext, useLayoutRail } from "./root-client";
 
 // -- Rail -- //
 
@@ -20,7 +20,7 @@ export type RailProps = {
 
 export function Rail({ className, children }: RailProps): ReactElement {
   const { railWidth, isMobile } = useLayoutContext();
-  const { setMobileRailSlot } = useLayoutRailOutlet();
+  const { setMobileRailSlot } = useLayoutRail();
 
   const railVars = useMemo(
     () => ({ "--rail-width": `${railWidth}rem` }) as CSSProperties,

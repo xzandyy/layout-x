@@ -1,31 +1,35 @@
-export {
-  useLayoutContext,
-  useLayout,
-  useLayoutRailOutlet,
-  LayoutRootClient,
-} from "./root-client";
-export type {
-  RootProps,
-  LayoutContextValue,
-  LayoutRailOutletContextValue,
-} from "./root-client";
-export type {
-  ContentProps,
-  ContentHeaderProps,
-  ContentBodyProps,
-} from "./content";
+// -- Layout Root -- //
+export { Layout } from "./layout";
+export type { LayoutProps } from "./root-client";
+
+// -- Layout Context -- //
+export { useLayout } from "./root-client";
+export type { LayoutContextValue } from "./root-client";
+
+// -- Rail -- //
 export type {
   RailProps,
   RailHeaderProps,
   RailFooterProps,
   RailMainProps,
 } from "./rail";
+
+// -- Sidebar -- //
 export type {
   SidebarProps,
   SidebarHeaderProps,
   SidebarFooterProps,
   SidebarMainProps,
 } from "./sidebar";
+
+// -- Content -- //
+export type {
+  ContentProps,
+  ContentHeaderProps,
+  ContentBodyProps,
+} from "./content";
+
+// -- Types（主要是 rail 和 sidebar 的菜单配置类型） -- //
 export type {
   RouteConfig,
   RailMenuConfig,
@@ -38,10 +42,4 @@ export type {
   SidebarMenuItemLeaf,
   SidebarMenuItemBranch,
   TooltipConfig,
-  Router,
 } from "./types";
-
-export { appRouter } from "./types";
-
-export { Breadcrumbs } from "./breadcrumbs";
-export type { BreadcrumbsProps } from "./breadcrumbs";

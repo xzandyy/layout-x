@@ -12,7 +12,7 @@ export default function WorkspaceLayout({
 }>) {
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <Layout route={workspaceRoute}>
+      <Layout routeMenu={workspaceRoute}>
         <Layout.Rail>
           <Layout.RailHeader>
             <div className="mb-2 flex items-center justify-center py-3">
