@@ -5,7 +5,10 @@ import { Pencil } from "@gravity-ui/icons";
 
 import { Layout } from "@/components/Layout";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { workspaceMenus, workspaceRailSettings } from "@/config/workspace-menus";
+import {
+  workspaceMenus,
+  workspaceRailSettings,
+} from "@/config/workspace-menus";
 
 export function WorkspaceLayoutShell({
   defaultSidebarOpen,
@@ -20,10 +23,10 @@ export function WorkspaceLayoutShell({
         <Layout.RailHeader>
           <div className="mb-2 flex items-center justify-center py-3">
             <div
-              className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-linear-to-br from-[#4F8AF7] to-[#2056B3] text-[11px] font-semibold tracking-[-0.01em] text-white"
+              className="flex h-8 w-8 items-center justify-center rounded-[9px] bg-linear-to-br from-[#4F8AF7] to-[#2056B3] font-semibold tracking-[-0.01em] text-white"
               title="Brand / Logo"
             >
-              LX
+              X
             </div>
           </div>
         </Layout.RailHeader>
@@ -32,9 +35,11 @@ export function WorkspaceLayoutShell({
           <div className="flex flex-col items-center gap-2 px-0 py-3">
             <Layout.RailMenuItem item={workspaceRailSettings} />
             <div
-              className="h-7 w-7 shrink-0 rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A]"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A] font-semibold text-[11px] text-white"
               title="Account"
-            />
+            >
+              LX
+            </div>
           </div>
         </Layout.RailFooter>
       </Layout.Rail>
@@ -68,10 +73,10 @@ export function WorkspaceLayoutShell({
         <Layout.SidebarMain />
         <Layout.SidebarFooter>
           <div className="flex items-center gap-2 px-2.5 py-3 text-[12.5px] text-fg-3">
-            <div className="flex size-7 items-center justify-center rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A] text-[11px] font-semibold text-white">
+            <div className="flex size-8 items-center justify-center rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A] text-[11px] font-semibold text-white">
               LX
             </div>
-            <div className="flex min-w-0 flex-col leading-tight">
+            <div className="flex min-w-0 flex-col leading-tight gap-0.5">
               <span className="truncate font-medium text-fg-1">layout-x</span>
               <span className="truncate font-mono text-[10.5px] uppercase tracking-[0.12em] text-fg-4">
                 Workspace

@@ -4,7 +4,7 @@ export default function LandingPage() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-5 py-16 text-center">
       <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-fg-4">
-        layout-x
+        Layout
       </p>
       <h1 className="text-3xl font-semibold tracking-tight text-fg-1 sm:text-4xl">
         Landing

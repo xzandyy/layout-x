@@ -29,8 +29,8 @@ export default function RootLayout({
       )}
     >
       <head>
-        <title>layout-x</title>
-        <meta name="description" content="layout-x" />
+        <title>Layout</title>
+        <meta name="description" content="Layout" />
       </head>
       <body className="flex min-h-full min-w-0 flex-col bg-canvas text-fg-1">
         <ThemeProvider>{children}</ThemeProvider>
