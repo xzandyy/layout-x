@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@gravity-ui/icons": "^2.18.0",
-    "@heroui-pro/react": "^1.0.0-alpha.10",
+    "@heroui-pro/react": "1.0.0-alpha.10",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
     "@number-flow/react": "^0.6.0",
@@ -39,5 +39,10 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "prettier": {}
+  "prettier": {},
+  "trustedDependencies": [
+    "heroui-pro",
+    "@heroui-pro/react",
+    "heroui-native-pro"
+  ]
 }
