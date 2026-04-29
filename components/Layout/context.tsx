@@ -17,10 +17,15 @@ export type RootState = {
   headerHeight: number;
   railWidth: number;
   sidebarWidth: number;
+  /** 菜单配置 */
   menuConfig?: MenuConfig;
+  /** 激活的 Rail 菜单 */
   activeRailMenu?: RailMenuItem;
+  /** 激活的 Sidebar 菜单 */
   activeSidebarMenu?: SidebarNavItem;
+  /** 激活的导航项链接 */
   activeNavItemHref?: string;
+  /** 设置激活的 Rail 菜单 */
   setActiveRailMenu: (item: RailMenuItem) => void;
 };
 
