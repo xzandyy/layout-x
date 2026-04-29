@@ -8,7 +8,7 @@ import { renderLayoutChild, useLayout, type LayoutChild } from "./context";
 export type LayoutHeaderSlotChildren = LayoutChild;
 
 /**
- * 将解析后的节点 Portal 到 `SidebarHeader` 挂载点。
+ * 将节点 Portal 到 `SidebarHeader` 挂载点。
  */
 export function useLayoutSidebarHeaderSlot(
   children?: LayoutHeaderSlotChildren,
@@ -33,7 +33,7 @@ export function useLayoutSidebarHeaderSlot(
 }
 
 /**
- * 将解析后的节点 Portal 到 `ContentHeader` 挂载点。
+ * 将节点 Portal 到 `ContentHeader` 挂载点。
  */
 export function useLayoutContentHeaderSlot(
   children?: LayoutHeaderSlotChildren,
@@ -62,12 +62,16 @@ type SlotProps = {
   children?: LayoutChild;
 };
 
-// 组件形式
+/**
+ * 将节点 Portal 到 `SidebarHeader` 挂载点。
+ */
 export function LayoutSidebarHeaderSlot({ children }: SlotProps) {
   return useLayoutSidebarHeaderSlot(children);
 }
 
-// 组件形式
+/**
+ * 将节点 Portal 到 `ContentHeader` 挂载点。
+ */
 export function LayoutContentHeaderSlot({ children }: SlotProps) {
   return useLayoutContentHeaderSlot(children);
 }
