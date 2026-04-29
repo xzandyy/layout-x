@@ -51,6 +51,29 @@ export function useLayoutContentHeaderSlot(children?: LayoutChild): ReactNode {
   return createPortal(resolved ?? null, contentHeaderAnchor);
 }
 
+/**
+ * 将节点 Portal 到 `ContentFooter` 挂载点。
+ */
+export function useLayoutContentFooterSlot(children?: LayoutChild): ReactNode {
+  const ctx = useLayout();
+  const resolved = renderLayoutChild(children, ctx);
+  const {
+    contentFooterAnchor,
+    registerContentFooterPortal,
+    unregisterContentFooterPortal,
+  } = ctx.slotState;
+
+  useLayoutEffect(() => {
+    registerContentFooterPortal();
+    return () => {
+      unregisterContentFooterPortal();
+    };
+  }, [registerContentFooterPortal, unregisterContentFooterPortal]);
+
+  if (contentFooterAnchor == null) return null;
+  return createPortal(resolved ?? null, contentFooterAnchor);
+}
+
 type SlotProps = {
   /** 静态节点，或 `(ctx) => ReactNode` */
   children?: LayoutChild;
@@ -68,4 +91,11 @@ export function LayoutSidebarHeaderSlot({ children }: SlotProps) {
  */
 export function LayoutContentHeaderSlot({ children }: SlotProps) {
   return useLayoutContentHeaderSlot(children);
+}
+
+/**
+ * 将节点 Portal 到 `ContentFooter` 挂载点。
+ */
+export function LayoutContentFooterSlot({ children }: SlotProps) {
+  return useLayoutContentFooterSlot(children);
 }

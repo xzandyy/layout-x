@@ -100,3 +100,39 @@ export function ContentBody({ className, children }: ContentBodyProps) {
     </main>
   );
 }
+
+// -- Content Footer -- //
+
+export type ContentFooterProps = {
+  className?: string;
+  children?: LayoutChild;
+};
+
+export function ContentFooter({ className, children }: ContentFooterProps) {
+  const ctx = useLayout();
+  const { contentFooterPortalMounts, setContentFooterAnchor } = ctx.slotState;
+  const content = renderLayoutChild(children, ctx);
+  const portalOpen = contentFooterPortalMounts > 0;
+  const hasNoSlot = !portalOpen;
+
+  return (
+    <footer
+      className={cn(
+        "shrink-0 bg-surface",
+        portalOpen && "border-t border-border-hair px-4 py-3",
+        className,
+      )}
+    >
+      {hasNoSlot ? <div className="w-full min-w-0">{content}</div> : null}
+      <div
+        ref={setContentFooterAnchor}
+        className={cn(
+          "flex min-h-0 min-w-0 w-full items-center justify-end gap-2",
+          hasNoSlot &&
+            "pointer-events-none size-0 min-h-0 min-w-0 overflow-hidden opacity-0",
+        )}
+        aria-hidden={hasNoSlot}
+      />
+    </footer>
+  );
+}

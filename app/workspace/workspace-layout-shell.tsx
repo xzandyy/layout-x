@@ -88,6 +88,7 @@ export function WorkspaceLayoutShell({
       <Layout.Content>
         <Layout.ContentHeader />
         <Layout.ContentBody>{children}</Layout.ContentBody>
+        <Layout.ContentFooter />
       </Layout.Content>
     </Layout>
   );

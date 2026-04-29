@@ -1,7 +1,7 @@
 import { LayoutRoot } from "./root";
 import { Rail, RailHeader, RailMain, RailFooter, RailMenuItem } from "./rail";
 import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
-import { Content, ContentHeader, ContentBody } from "./content";
+import { Content, ContentBody, ContentFooter, ContentHeader } from "./content";
 
 // -- Layout Context -- //
 export { useLayout } from "./context";
@@ -18,8 +18,10 @@ export type { LayoutChild } from "./context";
 export {
   useLayoutSidebarHeaderSlot,
   useLayoutContentHeaderSlot,
+  useLayoutContentFooterSlot,
   LayoutSidebarHeaderSlot,
   LayoutContentHeaderSlot,
+  LayoutContentFooterSlot,
 } from "./slot";
 
 // -- Layout Root -- //
@@ -38,6 +40,7 @@ export const Layout = Object.assign(LayoutRoot, {
   Content,
   ContentHeader,
   ContentBody,
+  ContentFooter,
 });
 
 // -- Rail -- //
@@ -61,6 +64,7 @@ export type {
   ContentProps,
   ContentHeaderProps,
   ContentBodyProps,
+  ContentFooterProps,
 } from "./content";
 
 // -- Types（rail / sidebar 菜单与路径树） -- //

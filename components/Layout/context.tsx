@@ -54,7 +54,7 @@ export type RailState = {
   setMobileRailSlot: (node: ReactNode | null) => void;
 };
 
-/** Slot 状态：Sidebar / Content Header 均使用 DOM 锚点 + Portal */
+/** Slot 状态：Sidebar Header / Content Header / Content Footer 均使用 DOM 锚点 + Portal */
 export type SlotState = {
   /** Sidebar Header 挂载 */
   sidebarHeaderAnchor: HTMLElement | null;
@@ -68,6 +68,12 @@ export type SlotState = {
   contentHeaderPortalMounts: number;
   registerContentHeaderPortal: () => void;
   unregisterContentHeaderPortal: () => void;
+  /** Content Footer 挂载 */
+  contentFooterAnchor: HTMLElement | null;
+  setContentFooterAnchor: (el: HTMLElement | null) => void;
+  contentFooterPortalMounts: number;
+  registerContentFooterPortal: () => void;
+  unregisterContentFooterPortal: () => void;
 };
 
 /** Layout 上下文*/
@@ -284,6 +290,10 @@ function useLayoutSlotState(): SlotState {
     useState<HTMLElement | null>(null);
   const [contentHeaderPortalMounts, setContentHeaderPortalMounts] = useState(0);
 
+  const [contentFooterAnchor, setContentFooterAnchor] =
+    useState<HTMLElement | null>(null);
+  const [contentFooterPortalMounts, setContentFooterPortalMounts] = useState(0);
+
   const registerSidebarHeaderPortal = useCallback(() => {
     setSidebarHeaderPortalMounts((n) => n + 1);
   }, []);
@@ -300,6 +310,14 @@ function useLayoutSlotState(): SlotState {
     setContentHeaderPortalMounts((n) => Math.max(0, n - 1));
   }, []);
 
+  const registerContentFooterPortal = useCallback(() => {
+    setContentFooterPortalMounts((n) => n + 1);
+  }, []);
+
+  const unregisterContentFooterPortal = useCallback(() => {
+    setContentFooterPortalMounts((n) => Math.max(0, n - 1));
+  }, []);
+
   return useMemo<SlotState>(
     () => ({
       sidebarHeaderAnchor,
@@ -312,6 +330,11 @@ function useLayoutSlotState(): SlotState {
       contentHeaderPortalMounts,
       registerContentHeaderPortal,
       unregisterContentHeaderPortal,
+      contentFooterAnchor,
+      setContentFooterAnchor,
+      contentFooterPortalMounts,
+      registerContentFooterPortal,
+      unregisterContentFooterPortal,
     }),
     [
       sidebarHeaderAnchor,
@@ -322,6 +345,10 @@ function useLayoutSlotState(): SlotState {
       contentHeaderPortalMounts,
       registerContentHeaderPortal,
       unregisterContentHeaderPortal,
+      contentFooterAnchor,
+      contentFooterPortalMounts,
+      registerContentFooterPortal,
+      unregisterContentFooterPortal,
     ],
   );
 }
