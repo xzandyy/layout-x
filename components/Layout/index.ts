@@ -23,6 +23,7 @@ export {
 } from "./slot";
 
 // -- Layout Root -- //
+export { collectRailMenuItems } from "./utils";
 export type { LayoutProps } from "./root";
 export const Layout = Object.assign(LayoutRoot, {
   Rail,

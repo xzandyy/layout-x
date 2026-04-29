@@ -8,9 +8,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { useSidebar } from "@heroui-pro/react";
 
 import type { MenuConfig, RailMenuItem, SidebarNavItem } from "./types";
+import {
+  collectRailMenuItems,
+  findActiveSidebarNavItem,
+  findBestRailMenuForPathname,
+  findGlobalActiveLeafNorm,
+} from "./utils";
 
 /** Root 状态 */
 export type RootState = {
@@ -27,6 +34,9 @@ export type RootState = {
   activeNavItemHref?: string;
   /** 设置激活的 Rail 菜单 */
   setActiveRailMenu: (item: RailMenuItem) => void;
+  /** 手动注册不在 `menuConfig` 中的 rail 项 */
+  registerManualRailItem: (item: RailMenuItem) => void;
+  unregisterManualRailItem: (item: RailMenuItem) => void;
 };
 
 /** Sidebar 状态 */
@@ -90,13 +100,128 @@ function mapSidebarState(raw: RawSidebarState): SidebarState {
 }
 
 export function LayoutContext({
-  rootState,
+  headerHeight,
+  railWidth,
+  sidebarWidth,
+  menuConfig,
   children,
 }: {
-  // Root
-  rootState: RootState;
+  headerHeight: number;
+  railWidth: number;
+  sidebarWidth: number;
+  menuConfig?: MenuConfig;
   children: ReactNode;
 }) {
+  const pathname = usePathname() ?? "/";
+
+  const [railMenuOverride, setRailMenuOverride] = useState<{
+    index: number;
+    forPathname: string;
+  } | null>(null);
+
+  const [manualRailItems, setManualRailItems] = useState<RailMenuItem[]>([]);
+
+  const registerManualRailItem = useCallback((item: RailMenuItem) => {
+    setManualRailItems((prev) =>
+      prev.includes(item) ? prev : [...prev, item],
+    );
+  }, []);
+
+  const unregisterManualRailItem = useCallback((item: RailMenuItem) => {
+    setManualRailItems((prev) => prev.filter((i) => i !== item));
+  }, []);
+
+  const declaredItems = useMemo(
+    () => collectRailMenuItems(menuConfig),
+    [menuConfig],
+  );
+
+  const effectiveRailItems = useMemo(() => {
+    const merged = [...declaredItems];
+    for (const m of manualRailItems) {
+      if (!merged.includes(m)) merged.push(m);
+    }
+    return merged;
+  }, [declaredItems, manualRailItems]);
+
+  const effectiveMenuConfig = useMemo((): MenuConfig | undefined => {
+    if (effectiveRailItems.length === 0) return undefined;
+    return { rail: [{ items: effectiveRailItems }] };
+  }, [effectiveRailItems]);
+
+  const urlRailMenu = useMemo(
+    () =>
+      effectiveMenuConfig
+        ? findBestRailMenuForPathname(effectiveMenuConfig, pathname)
+        : undefined,
+    [effectiveMenuConfig, pathname],
+  );
+
+  const activeRailMenu = useMemo(() => {
+    if (!effectiveMenuConfig) return undefined;
+    if (railMenuOverride != null && railMenuOverride.forPathname === pathname) {
+      return effectiveRailItems[railMenuOverride.index];
+    }
+    return urlRailMenu;
+  }, [
+    effectiveMenuConfig,
+    railMenuOverride,
+    pathname,
+    urlRailMenu,
+    effectiveRailItems,
+  ]);
+
+  const activeLeafNorm = useMemo(
+    () =>
+      effectiveMenuConfig
+        ? findGlobalActiveLeafNorm(effectiveMenuConfig, pathname)
+        : undefined,
+    [effectiveMenuConfig, pathname],
+  );
+
+  const activeSidebarMenu = useMemo(() => {
+    const sidebar = activeRailMenu?.sidebar;
+    if (!sidebar) return undefined;
+    return findActiveSidebarNavItem(sidebar, activeLeafNorm);
+  }, [activeRailMenu, activeLeafNorm]);
+
+  const setActiveRailMenu = useCallback(
+    (item: RailMenuItem) => {
+      if (!effectiveMenuConfig) return;
+      const idx = effectiveRailItems.indexOf(item);
+      if (idx < 0) return;
+      setRailMenuOverride({ index: idx, forPathname: pathname });
+    },
+    [effectiveMenuConfig, pathname, effectiveRailItems],
+  );
+
+  const rootState = useMemo<RootState>(
+    () => ({
+      headerHeight,
+      railWidth,
+      sidebarWidth,
+      menuConfig,
+      registerManualRailItem,
+      unregisterManualRailItem,
+      activeRailMenu,
+      activeSidebarMenu,
+      activeNavItemHref: activeLeafNorm,
+      setActiveRailMenu,
+    }),
+    [
+      headerHeight,
+      railWidth,
+      sidebarWidth,
+      menuConfig,
+      registerManualRailItem,
+      unregisterManualRailItem,
+      activeRailMenu,
+      activeSidebarMenu,
+      activeLeafNorm,
+      setActiveRailMenu,
+    ],
+  );
+
   // Sidebar
   const rawSidebar = useSidebar();
   const sidebarState = useMemo(() => mapSidebarState(rawSidebar), [rawSidebar]);
@@ -164,7 +289,6 @@ export function LayoutContext({
     ],
   );
 
-  // 合并状态
   const value = useMemo<LayoutContextValue>(
     () => ({
       rootState,

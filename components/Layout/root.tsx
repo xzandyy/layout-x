@@ -1,23 +1,17 @@
 "use client";
 
-import { useCallback, useMemo, useState, type CSSProperties } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useMemo, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 
 import { cn } from "@/lib/utils";
-import type { MenuConfig, RailMenuItem } from "./types";
+import type { MenuConfig } from "./types";
 import {
   LayoutContext,
-  type RootState,
   type LayoutChild,
   renderLayoutChild,
   useLayout,
 } from "./context";
-import {
-  findBestRailMenuForPathname,
-  findActiveSidebarNavItem,
-  findGlobalActiveLeafNorm,
-} from "./sidebar";
 
 export type LayoutProps = {
   headerHeight?: number;
@@ -39,82 +33,6 @@ export function LayoutRoot({
   children,
 }: LayoutProps) {
   const router = useRouter();
-  const pathname = usePathname() ?? "/";
-
-  const [railMenuOverride, setRailMenuOverride] = useState<{
-    index: number;
-    forPathname: string;
-  } | null>(null);
-
-  const allRailItems = useMemo(
-    () => collectRailMenuItems(menuConfig),
-    [menuConfig],
-  );
-
-  const urlRailMenu = useMemo(
-    () =>
-      menuConfig
-        ? findBestRailMenuForPathname(menuConfig, pathname)
-        : undefined,
-    [menuConfig, pathname],
-  );
-
-  const activeRailMenu = useMemo(() => {
-    if (!menuConfig) return undefined;
-    if (railMenuOverride != null && railMenuOverride.forPathname === pathname) {
-      return allRailItems[railMenuOverride.index];
-    }
-    return urlRailMenu;
-  }, [menuConfig, railMenuOverride, pathname, urlRailMenu, allRailItems]);
-
-  /**
-   * 跨所有 rail 全局裁决出唯一 active 叶子的规范化 href；
-   * 这样即便用户切到某个非「拥有」rail，其 sidebar 也不会出现「短前缀也算 active」的情况。
-   */
-  const activeLeafNorm = useMemo(
-    () =>
-      menuConfig ? findGlobalActiveLeafNorm(menuConfig, pathname) : undefined,
-    [menuConfig, pathname],
-  );
-
-  const activeSidebarMenu = useMemo(() => {
-    const sidebar = activeRailMenu?.sidebar;
-    if (!sidebar) return undefined;
-    return findActiveSidebarNavItem(sidebar, activeLeafNorm);
-  }, [activeRailMenu, activeLeafNorm]);
-
-  const setActiveRailMenu = useCallback(
-    (item: RailMenuItem) => {
-      if (!menuConfig) return;
-      const idx = allRailItems.indexOf(item);
-      if (idx < 0) return;
-      setRailMenuOverride({ index: idx, forPathname: pathname });
-    },
-    [menuConfig, pathname, allRailItems],
-  );
-
-  const rootState = useMemo<RootState>(
-    () => ({
-      headerHeight,
-      railWidth,
-      sidebarWidth,
-      menuConfig,
-      activeRailMenu,
-      activeSidebarMenu,
-      activeNavItemHref: activeLeafNorm,
-      setActiveRailMenu,
-    }),
-    [
-      headerHeight,
-      railWidth,
-      sidebarWidth,
-      menuConfig,
-      activeRailMenu,
-      activeSidebarMenu,
-      activeLeafNorm,
-      setActiveRailMenu,
-    ],
-  );
 
   const shellStyle = useMemo(
     () =>
@@ -130,7 +48,12 @@ export function LayoutRoot({
       collapsible="offcanvas"
       defaultOpen={defaultSidebarOpen}
     >
-      <LayoutContext rootState={rootState}>
+      <LayoutContext
+        headerHeight={headerHeight}
+        railWidth={railWidth}
+        sidebarWidth={sidebarWidth}
+        menuConfig={menuConfig}
+      >
         <LayoutRootBody className={className} style={shellStyle}>
           {children}
         </LayoutRootBody>
@@ -161,9 +84,4 @@ function LayoutRootBody({
       {renderLayoutChild(children, ctx)}
     </div>
   );
-}
-
-function collectRailMenuItems(menuConfig: MenuConfig | undefined) {
-  if (!menuConfig) return [] as RailMenuItem[];
-  return menuConfig.rail.flatMap((b) => b.items);
 }

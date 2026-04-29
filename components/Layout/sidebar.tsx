@@ -8,8 +8,6 @@ import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
 import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
 import type {
-  MenuConfig,
-  RailMenuItem,
   SidebarCustomItem,
   SidebarGroupItem,
   SidebarMenuItem,
@@ -19,6 +17,18 @@ import type {
   SidebarSubmenu,
   TooltipConfig,
 } from "./types";
+import {
+  isExternalHref,
+  itemHasChildren,
+  normalizePath,
+} from "./utils";
+
+export {
+  findActiveSidebarNavItem,
+  findBestRailMenuForPathname,
+  findGlobalActiveLeafNorm,
+  getActiveLeafNormForConfig,
+} from "./utils";
 
 // -- Sidebar -- //
 
@@ -333,45 +343,6 @@ const EMPTY_SET: ReadonlySet<string> = new Set<string>();
 const EMPTY_DISMISSED: DismissedState = { forPath: "", keys: EMPTY_SET };
 
 /**
- * 规范化 URL 路径：去 hash/query、合并多余斜杠、补前导 `/`、去尾部 `/`（根除外）。
- */
-function normalizePath(input: string): string {
-  if (!input) return "/";
-  let p = input.split("#")[0]!.split("?")[0]!;
-  p = p.replace(/\/{2,}/g, "/");
-  if (!p.startsWith("/")) p = "/" + p;
-  if (p !== "/" && p.endsWith("/")) p = p.replace(/\/+$/, "");
-  return p || "/";
-}
-
-/**
- * 是否外链（http/https），侧栏不当作站内路由处理。
- */
-function isExternalHref(href: string): boolean {
-  return href.startsWith("http://") || href.startsWith("https://");
-}
-
-/**
- * 在已规范化的路径下，判断当前 path 是否落在某 href 对应路由上（或为其子路径）。
- */
-function normalizedHrefMatchesPath(
-  normPath: string,
-  normHref: string,
-): boolean {
-  if (normHref === "/") return normPath === "/";
-  return normPath === normHref || normPath.startsWith(`${normHref}/`);
-}
-
-/**
- * 菜单项是否带子级（可展开的分支，而非带 `href` 的叶子）。
- */
-function itemHasChildren(item: SidebarMenuItemNode): item is SidebarSubmenu {
-  return (
-    "children" in item && item.children != null && item.children.length > 0
-  );
-}
-
-/**
  * 同一菜单分组下所有 item id 的前缀，用于按分组隔离展开 keys。
  */
 function getGroupIdPrefix(groupIndex: number): string {
@@ -531,124 +502,6 @@ function resolveActiveRoute(
   }
 
   return result;
-}
-
-/**
- * 在 sidebar 配置中找到与 pathname 最匹配（前缀最长）的叶子 href，并返回其规范化形式。
- * 仅在「单一 config 内」挑最长，跨 rail 的全局裁决见 {@link findGlobalActiveLeafNorm}。
- */
-export function getActiveLeafNormForConfig(
-  config: SidebarMenuConfig,
-  pathname: string,
-): string | undefined {
-  const normPath = normalizePath(pathname);
-  let bestDepth = -1;
-  let bestNorm: string | undefined;
-
-  const visit = (items: readonly SidebarMenuItemNode[]) => {
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i]!;
-      if (itemHasChildren(item)) {
-        visit(item.children);
-        continue;
-      }
-      const href = "href" in item ? item.href : undefined;
-      if (!href || isExternalHref(href)) continue;
-      const normHref = normalizePath(href);
-      if (!normalizedHrefMatchesPath(normPath, normHref)) continue;
-      if (normHref.length > bestDepth) {
-        bestDepth = normHref.length;
-        bestNorm = normHref;
-      }
-    }
-  };
-
-  for (const node of config.items) {
-    if (node.type === "group") visit(node.menu);
-  }
-  return bestNorm;
-}
-
-/**
- * 在指定 sidebar 配置中按 **目标 normHref** 找到对应的 `SidebarNavItem` 叶子；找不到返回 `undefined`。
- * 与 {@link resolveActiveRoute} 共享精确匹配语义，由调用方传入跨 rail 裁决出来的 `targetLeafNorm`。
- */
-export function findActiveSidebarNavItem(
-  config: SidebarMenuConfig,
-  targetLeafNorm: string | undefined,
-): SidebarNavItem | undefined {
-  if (!targetLeafNorm) return undefined;
-
-  let found: SidebarNavItem | undefined;
-
-  const visit = (items: readonly SidebarMenuItemNode[]) => {
-    for (const item of items) {
-      if (found) return;
-      if (itemHasChildren(item)) {
-        visit(item.children);
-        continue;
-      }
-      const href = "href" in item ? item.href : undefined;
-      if (!href || isExternalHref(href)) continue;
-      if (normalizePath(href) !== targetLeafNorm) continue;
-      found = item as SidebarNavItem;
-      return;
-    }
-  };
-
-  for (const node of config.items) {
-    if (found) break;
-    if (node.type === "group") visit(node.menu);
-  }
-  return found;
-}
-
-/**
- * 跨所有 rail 的 sidebar 全局裁决「唯一 active 叶子」：
- * 在每个 rail 的 sidebar 中分别挑出对当前 pathname 的最长匹配 normHref，
- * 再在所有 rail 之间取规范化字符串最长者；不存在匹配则返回 `undefined`。
- *
- * 这样无论用户当前看到的是哪个 rail 的 sidebar，整套布局**只有一个**叶子可能 active。
- */
-export function findGlobalActiveLeafNorm(
-  menu: MenuConfig,
-  pathname: string,
-): string | undefined {
-  let best: string | undefined;
-  let bestLen = -1;
-  for (const e of menu.rail.flatMap((b) => b.items)) {
-    const norm = getActiveLeafNormForConfig(e.sidebar, pathname);
-    if (norm == null) continue;
-    if (norm.length > bestLen) {
-      bestLen = norm.length;
-      best = norm;
-    }
-  }
-  return best;
-}
-
-/**
- * 在 `MenuConfig.rail` 各 `RailMenuItem` 中挑出与 pathname 最匹配的一项：
- * 对每项的 `sidebar` 做 `getActiveLeafNormForConfig`，取命中 href 最长者；无匹配则 `undefined`。
- *
- * 注意：「拥有」全局 active 叶子的那个 rail 即为这里返回的 rail。
- */
-export function findBestRailMenuForPathname(
-  menu: MenuConfig,
-  pathname: string,
-): RailMenuItem | undefined {
-  const railItems = menu.rail.flatMap((b) => b.items);
-  let best: RailMenuItem | undefined;
-  let bestLen = -1;
-  for (const e of railItems) {
-    const norm = getActiveLeafNormForConfig(e.sidebar, pathname);
-    const len = norm?.length ?? -1;
-    if (len > bestLen) {
-      bestLen = len;
-      best = e;
-    }
-  }
-  return bestLen >= 0 ? best : undefined;
 }
 
 /**

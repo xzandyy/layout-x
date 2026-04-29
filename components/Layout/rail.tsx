@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useId,
   useLayoutEffect,
   useMemo,
@@ -11,6 +12,7 @@ import {
 import { Button, Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
+import { collectRailMenuItems } from "./utils";
 import type { RailMenuItem as RailMenuItemModel } from "./types";
 
 // -- Rail -- //
@@ -135,10 +137,34 @@ export function RailMain({ className, children }: RailMainProps) {
   );
 }
 
-export function RailMenuItem({ item }: { item: RailMenuItemModel }) {
+/** 声明式 `menuConfig` 外的项应在挂载时注册进布局；`item` 须保持稳定引用（配置对象或 useMemo），避免重复注册。 */
+export function RailMenuItem({
+  item,
+}: {
+  item: RailMenuItemModel;
+}) {
   const fallbackAriaId = useId();
   const ctx = useLayout();
-  const { activeRailMenu, setActiveRailMenu } = ctx.rootState;
+  const {
+    menuConfig,
+    registerManualRailItem,
+    unregisterManualRailItem,
+    activeRailMenu,
+    setActiveRailMenu,
+  } = ctx.rootState;
+
+  useEffect(() => {
+    if (collectRailMenuItems(menuConfig).includes(item)) return;
+    registerManualRailItem(item);
+    return () => {
+      unregisterManualRailItem(item);
+    };
+  }, [
+    item,
+    menuConfig,
+    registerManualRailItem,
+    unregisterManualRailItem,
+  ]);
   const { isDesktop, setDesktopOpen } = ctx.sidebarState;
   const isActive = activeRailMenu === item;
   const name =
