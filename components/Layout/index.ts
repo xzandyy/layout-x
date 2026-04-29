@@ -15,7 +15,13 @@ export type {
 
 // -- Layout Slot -- //
 export type { LayoutChild } from "./context";
-export { LayoutSidebarHeaderSlot, LayoutContentHeaderSlot } from "./slot";
+export type { LayoutHeaderSlotChildren } from "./slot";
+export {
+  useLayoutSidebarHeaderSlot,
+  useLayoutContentHeaderSlot,
+  LayoutSidebarHeaderSlot,
+  LayoutContentHeaderSlot,
+} from "./slot";
 
 // -- Layout Root -- //
 export type { LayoutProps } from "./root";
