@@ -5,18 +5,28 @@ import {
   CheckDouble,
   Envelope,
 } from "@gravity-ui/icons";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { RailMenuItem } from "@/components/Layout";
 
+/** Demo：Rail 图标角标每秒 +1，到 99 后下一拍回到 1。 */
 export function useMenuInbox(): RailMenuItem {
-  return useMemo(() => createMenuInbox(), []);
+  const [inboxUnread, setInboxUnread] = useState(1);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setInboxUnread((prev) => (prev >= 99 ? 1 : prev + 1));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return useMemo(() => createMenuInbox(inboxUnread), [inboxUnread]);
 }
 
-export function createMenuInbox(): RailMenuItem {
+export function createMenuInbox(inboxUnread = 3): RailMenuItem {
   return {
     label: "Inbox",
-    icon: <RailInboxIcon unread={3} />,
+    icon: <RailInboxIcon unread={inboxUnread} />,
     sidebar: {
       items: [
         {
