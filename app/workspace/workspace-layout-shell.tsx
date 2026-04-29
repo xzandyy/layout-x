@@ -17,7 +17,7 @@ export function WorkspaceLayoutShell({
   defaultSidebarOpen: boolean;
   children: React.ReactNode;
 }) {
-  const { menuConfig } = useWorkspaceMenus();
+  const menuConfig = useWorkspaceMenus();
 
   return (
     <Layout menuConfig={menuConfig} defaultSidebarOpen={defaultSidebarOpen}>
