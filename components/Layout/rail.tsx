@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Fragment,
+  useId,
   useLayoutEffect,
   useMemo,
   type CSSProperties,
@@ -11,7 +11,7 @@ import {
 import { Button, Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
 import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
-import type { RailMenuItem } from "./types";
+import type { RailMenuItem as RailMenuItemModel } from "./types";
 
 // -- Rail -- //
 
@@ -110,8 +110,7 @@ export type RailMainProps = {
 
 export function RailMain({ className, children }: RailMainProps) {
   const ctx = useLayout();
-  const { menuConfig, activeRailMenu, setActiveRailMenu } = ctx.rootState;
-  const { isDesktop, setDesktopOpen } = ctx.sidebarState;
+  const { menuConfig } = ctx.rootState;
   const items = useMemo(
     () => (menuConfig ? menuConfig.rail.flatMap((b) => b.items) : []),
     [menuConfig],
@@ -126,43 +125,50 @@ export function RailMain({ className, children }: RailMainProps) {
     >
       {items.length ? (
         <nav className="flex flex-col items-center justify-start gap-1 px-0 py-0">
-          {items.map((e: RailMenuItem, index: number) => {
-            const isActive = activeRailMenu === e;
-            const name =
-              typeof e.label === "string" ? e.label : `Rail ${index + 1}`;
-            const button = (
-              <Button
-                aria-pressed={isActive}
-                aria-label={name}
-                onPress={() => {
-                  setActiveRailMenu(e);
-                  if (isDesktop) {
-                    setDesktopOpen(true);
-                  }
-                }}
-                className={cn(
-                  "size-10 shrink-0 rounded-[10px]",
-                  "transition-all duration-150",
-                  "[&>svg]:size-5",
-                  isActive
-                    ? "bg-surface text-fg-1"
-                    : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
-                )}
-              >
-                {e.icon}
-              </Button>
-            );
-            return (
-              <Fragment key={index}>
-                <RailMenuTooltip label={e.label}>{button}</RailMenuTooltip>
-              </Fragment>
-            );
-          })}
+          {items.map((item, index) => (
+            <RailMenuItem key={index} item={item} />
+          ))}
         </nav>
       ) : null}
       {renderLayoutChild(children, ctx)}
     </div>
   );
+}
+
+export function RailMenuItem({ item }: { item: RailMenuItemModel }) {
+  const fallbackAriaId = useId();
+  const ctx = useLayout();
+  const { activeRailMenu, setActiveRailMenu } = ctx.rootState;
+  const { isDesktop, setDesktopOpen } = ctx.sidebarState;
+  const isActive = activeRailMenu === item;
+  const name =
+    typeof item.label === "string"
+      ? item.label
+      : `Rail menu item ${fallbackAriaId.replace(/:/g, "")}`;
+
+  const button = (
+    <Button
+      aria-pressed={isActive}
+      aria-label={name}
+      onPress={() => {
+        setActiveRailMenu(item);
+        if (isDesktop) {
+          setDesktopOpen(true);
+        }
+      }}
+      className={cn(
+        "size-10 shrink-0 rounded-[10px]",
+        "transition-all duration-150",
+        "[&>svg]:size-5",
+        isActive
+          ? "bg-surface text-fg-1"
+          : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
+      )}
+    >
+      {item.icon}
+    </Button>
+  );
+  return <RailMenuTooltip label={item.label}>{button}</RailMenuTooltip>;
 }
 
 // -- Rail Menu Tooltip -- //

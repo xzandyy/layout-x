@@ -1,5 +1,5 @@
 import { LayoutRoot } from "./root";
-import { Rail, RailHeader, RailMain, RailFooter } from "./rail";
+import { Rail, RailHeader, RailMain, RailFooter, RailMenuItem } from "./rail";
 import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
 import { Content, ContentHeader, ContentBody } from "./content";
 
@@ -29,6 +29,7 @@ export const Layout = Object.assign(LayoutRoot, {
   RailHeader,
   RailMain,
   RailFooter,
+  RailMenuItem,
   Sidebar,
   SidebarHeader,
   SidebarMain,
