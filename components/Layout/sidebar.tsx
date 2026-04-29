@@ -13,8 +13,6 @@ import type {
   SidebarMenuItem,
   SidebarMenuConfig,
   SidebarMenuItemNode,
-  SidebarNavItem,
-  SidebarSubmenu,
   TooltipConfig,
 } from "./types";
 import {

@@ -1,171 +1,25 @@
-import {
-  Book,
-  CheckDouble,
-  Envelope,
-  FaceRobot,
-  FileText,
-  FolderFlows,
-  Gear,
-  House,
-} from "@gravity-ui/icons";
+/**
+ * Workspace 侧栏 / Rail 菜单：使用 {@link useWorkspaceMenus} 运行时组装。
+ */
+export {
+  buildWorkspaceMenuConfig,
+  workspaceRailSettings,
+} from "./workspace-menu-builders";
+export type { WorkspaceMenuState } from "./workspace-menu-types";
+export {
+  defaultWorkspaceMenuState,
+} from "./workspace-menu-types";
+export {
+  useWorkspaceMenus,
+  type UseWorkspaceMenusResult,
+} from "./use-workspace-menus";
 
-import type { MenuConfig, RailMenuItem } from "@/components/Layout";
+import type { MenuConfig } from "@/components/Layout";
 
-export const workspaceRailHome: RailMenuItem = {
-  label: "Home",
-  icon: <House />,
-  sidebar: {
-    items: [
-      {
-        type: "group",
-        label: "Overview",
-        menu: [
-          {
-            icon: <House />,
-            label: "Home",
-            href: "/workspace",
-          },
-        ],
-      },
-    ],
-  },
-};
+import { buildWorkspaceMenuConfig } from "./workspace-menu-builders";
+import { defaultWorkspaceMenuState } from "./workspace-menu-types";
 
-export const workspaceRailInbox: RailMenuItem = {
-  label: "Inbox",
-  icon: <Envelope />,
-  sidebar: {
-    items: [
-      {
-        type: "group",
-        label: "Inbox",
-        menu: [
-          {
-            icon: <Envelope />,
-            label: "Inbox",
-            href: "/workspace/inbox",
-          },
-          {
-            icon: <CheckDouble />,
-            label: "Review",
-            href: "/workspace/inbox/review",
-          },
-        ],
-      },
-    ],
-  },
-};
-
-export const workspaceRailAgents: RailMenuItem = {
-  label: "Agents",
-  icon: <FaceRobot />,
-  sidebar: {
-    items: [
-      {
-        type: "group",
-        label: "Agents",
-        menu: [
-          {
-            icon: <FaceRobot />,
-            label: "Overview",
-            href: "/workspace/agents",
-          },
-        ],
-      },
-    ],
-  },
-};
-
-export const workspaceRailFlows: RailMenuItem = {
-  label: "Flows",
-  icon: <FolderFlows />,
-  sidebar: {
-    items: [
-      {
-        type: "group",
-        label: "Workflows",
-        menu: [
-          {
-            icon: <FolderFlows />,
-            label: "All",
-            children: [
-              {
-                icon: <FolderFlows />,
-                label: "Board",
-                href: "/workspace/workflows",
-              },
-              {
-                icon: <FolderFlows />,
-                label: "Lead → CRM",
-                href: "/workspace/workflows/lead-crm",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-};
-
-export const workspaceRailLibrary: RailMenuItem = {
-  label: "Library",
-  icon: <Book />,
-  sidebar: {
-    items: [
-      {
-        type: "group",
-        label: "Library",
-        menu: [
-          {
-            icon: <Book />,
-            label: "Catalog",
-            children: [
-              {
-                icon: <Book />,
-                label: "Main",
-                href: "/workspace/library",
-              },
-              {
-                icon: <FileText />,
-                label: "Playbooks",
-                href: "/workspace/library/playbooks",
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-};
-
-export const workspaceRailSettings: RailMenuItem = {
-  label: "Settings",
-  icon: <Gear />,
-  sidebar: {
-    items: [
-      {
-        type: "group",
-        label: "Settings",
-        menu: [
-          {
-            icon: <Gear />,
-            label: "Integrations",
-            href: "/workspace/integrations",
-          },
-        ],
-      },
-    ],
-  },
-};
-
-export const workspaceRailItems: RailMenuItem[] = [
-  workspaceRailHome,
-  workspaceRailInbox,
-  workspaceRailAgents,
-  workspaceRailFlows,
-  workspaceRailLibrary,
-];
-
-export const workspaceMenus: MenuConfig = {
-  rail: [{ items: workspaceRailItems }],
-};
+/** @deprecated 仅兼容旧用法；请改用 `useWorkspaceMenus()` */
+export const workspaceMenus: MenuConfig = buildWorkspaceMenuConfig(
+  defaultWorkspaceMenuState,
+);

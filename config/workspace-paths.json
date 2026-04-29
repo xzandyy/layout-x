@@ -4,12 +4,66 @@
   "children": [
     {
       "path": "agents",
-      "title": "Agents"
+      "title": "Agents",
+      "children": [
+        {
+          "path": ":slug",
+          "title": "Agent"
+        },
+        {
+          "path": "templates",
+          "title": "Templates",
+          "hasPage": false,
+          "children": [
+            {
+              "path": ":slug",
+              "title": "Template"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "channels",
+      "title": "Channels",
+      "hasPage": false,
+      "children": [
+        {
+          "path": ":slug",
+          "title": "Channel"
+        }
+      ]
+    },
+    {
+      "path": "dm",
+      "title": "Direct messages",
+      "hasPage": false,
+      "children": [
+        {
+          "path": ":slug",
+          "title": "Conversation"
+        }
+      ]
     },
     {
       "path": "inbox",
       "title": "Inbox",
       "children": [
+        {
+          "path": "archive",
+          "title": "Archive"
+        },
+        {
+          "path": "labels",
+          "title": "Labels",
+          "hasPage": false,
+          "children": [
+            {
+              "path": ":slug",
+              "title": "Label"
+            }
+          ]
+        },
         {
           "path": "review",
           "title": "Review"
@@ -31,12 +85,54 @@
       ]
     },
     {
+      "path": "views",
+      "title": "Views",
+      "hasPage": false,
+      "children": [
+        {
+          "path": "drafts",
+          "title": "Drafts"
+        },
+        {
+          "path": "pinned",
+          "title": "Pinned"
+        },
+        {
+          "path": "today",
+          "title": "Today"
+        }
+      ]
+    },
+    {
       "path": "workflows",
       "title": "Workflows",
       "children": [
         {
+          "path": "contract-flag",
+          "title": "Contract flag"
+        },
+        {
+          "path": "drafts",
+          "title": "Drafts",
+          "hasPage": false,
+          "children": [
+            {
+              "path": ":slug",
+              "title": "Draft workflow"
+            }
+          ]
+        },
+        {
+          "path": "inbox-sort-draft",
+          "title": "Inbox sort + draft"
+        },
+        {
           "path": "lead-crm",
           "title": "Lead → CRM"
+        },
+        {
+          "path": "weekly-brief",
+          "title": "Weekly brief"
         }
       ]
     }

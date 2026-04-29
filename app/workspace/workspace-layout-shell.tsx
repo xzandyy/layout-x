@@ -6,7 +6,7 @@ import { Pencil } from "@gravity-ui/icons";
 import { Layout } from "@/components/Layout";
 import { ThemeToggle } from "@/components/Theme";
 import {
-  workspaceMenus,
+  useWorkspaceMenus,
   workspaceRailSettings,
 } from "@/config/workspace-menus";
 
@@ -17,8 +17,10 @@ export function WorkspaceLayoutShell({
   defaultSidebarOpen: boolean;
   children: React.ReactNode;
 }) {
+  const { menuConfig } = useWorkspaceMenus();
+
   return (
-    <Layout menuConfig={workspaceMenus} defaultSidebarOpen={defaultSidebarOpen}>
+    <Layout menuConfig={menuConfig} defaultSidebarOpen={defaultSidebarOpen}>
       <Layout.Rail>
         <Layout.RailHeader>
           <div className="mb-2 flex items-center justify-center py-3">
