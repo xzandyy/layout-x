@@ -8,7 +8,7 @@ import { ThemeToggle } from "@/components/Theme";
 import {
   useWorkspaceMenus,
   workspaceRailSettings,
-} from "@/config/workspace-menus";
+} from "@/config/workspace-menus/workspace-menus";
 
 export function WorkspaceLayoutShell({
   defaultSidebarOpen,

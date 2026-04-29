@@ -1,8 +1,5 @@
 "use client";
 
-/**
- * Workspace Rail / 侧栏菜单：`useWorkspaceMenus`、`buildWorkspaceMenuConfig`、各 rail builder 均在本文件。
- */
 import { Button } from "@heroui/react";
 import {
   Archive,
