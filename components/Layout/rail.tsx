@@ -10,11 +10,7 @@ import {
 } from "react";
 import { Button, Tooltip } from "@heroui/react";
 import { cn } from "@/lib/utils";
-import {
-  type LayoutChild,
-  renderLayoutChild,
-  useLayout,
-} from "./context";
+import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
 import type { RailMenuItem } from "./types";
 
 // -- Rail -- //
@@ -56,13 +52,7 @@ export function Rail({ className, children }: RailProps): ReactElement {
     return () => {
       setMobileRailSlot(null);
     };
-  }, [
-    isDesktop,
-    resolvedChildren,
-    className,
-    railVars,
-    setMobileRailSlot,
-  ]);
+  }, [isDesktop, resolvedChildren, className, railVars, setMobileRailSlot]);
 
   return (
     <aside
