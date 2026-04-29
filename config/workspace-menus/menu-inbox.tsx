@@ -79,7 +79,7 @@ function RailInboxIcon({ unread }: { unread: number }) {
     <span className="relative inline-flex [&>svg]:size-5">
       <Envelope className="size-5" />
       <span
-        className="absolute -right-1 -top-0.5 flex min-h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-600 px-[3px] text-[9px] font-semibold leading-none text-white"
+        className="absolute -right-2.5 -top-0.5 flex min-h-4 min-w-4 shrink-0 items-center justify-center rounded-full bg-red-600 px-[3px] text-[9px] font-semibold leading-none text-white"
         aria-hidden
       >
         {unread > 99 ? "99+" : unread}
