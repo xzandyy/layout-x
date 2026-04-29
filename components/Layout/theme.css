@@ -1,50 +1,75 @@
+/*
+ * Layout 样式扩展
+ */
+
 :root {
-  /* Background */
+  /* -- Light Theme -- */
   --bg-canvas: #f4f5f7;
   --bg-canvas-2: #eef0f3;
   --bg-surface: #ffffff;
-  /* Text */
   --fg-1: #0f172a;
   --fg-2: #334155;
   --fg-3: #64748b;
   --fg-4: #94a3b8;
   --fg-5: #cbd5e1;
-  /* Border */
   --border-hair: #eef0f3;
-  /* Shadow */
   --shadow-card: 0 1px 1px rgba(15, 23, 42, 0.03);
+
+  /* -- Dark Theme -- */
+  --dark-bg-canvas: #0c0d10;
+  --dark-bg-canvas-2: #161820;
+  --dark-bg-surface: #1a1c22;
+  --dark-fg-1: #f3f4f6;
+  --dark-fg-2: #d1d5db;
+  --dark-fg-3: #9ca3af;
+  --dark-fg-4: #6b7280;
+  --dark-fg-5: #4b5563;
+  --dark-border-hair: #23262d;
+  --dark-shadow-card: 0 1px 1px rgba(0, 0, 0, 0.45);
 }
 
+/* 显式暗黑：与 <html class="dark" data-theme="dark"> */
+:root.dark,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-canvas: var(--dark-bg-canvas);
+  --bg-canvas-2: var(--dark-bg-canvas-2);
+  --bg-surface: var(--dark-bg-surface);
+  --fg-1: var(--dark-fg-1);
+  --fg-2: var(--dark-fg-2);
+  --fg-3: var(--dark-fg-3);
+  --fg-4: var(--dark-fg-4);
+  --fg-5: var(--dark-fg-5);
+  --border-hair: var(--dark-border-hair);
+  --shadow-card: var(--dark-shadow-card);
+}
+
+/* html 未标 light/dark 时的系统偏好回落 */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg-canvas: #0c0d10;
-    --bg-canvas-2: #161820;
-    --bg-surface: #1a1c22;
-
-    --fg-1: #f3f4f6;
-    --fg-2: #d1d5db;
-    --fg-3: #9ca3af;
-    --fg-4: #6b7280;
-    --fg-5: #4b5563;
-
-    --border-hair: #23262d;
-
-    --shadow-card: 0 1px 1px rgba(0, 0, 0, 0.45);
+  :root:not(.light):not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg-canvas: var(--dark-bg-canvas);
+    --bg-canvas-2: var(--dark-bg-canvas-2);
+    --bg-surface: var(--dark-bg-surface);
+    --fg-1: var(--dark-fg-1);
+    --fg-2: var(--dark-fg-2);
+    --fg-3: var(--dark-fg-3);
+    --fg-4: var(--dark-fg-4);
+    --fg-5: var(--dark-fg-5);
+    --border-hair: var(--dark-border-hair);
+    --shadow-card: var(--dark-shadow-card);
   }
 }
 
 @theme inline {
-  /* Background */
   --color-canvas: var(--bg-canvas);
   --color-canvas-2: var(--bg-canvas-2);
   --color-surface: var(--bg-surface);
-  /* Text */
   --color-fg-1: var(--fg-1);
   --color-fg-2: var(--fg-2);
   --color-fg-3: var(--fg-3);
   --color-fg-4: var(--fg-4);
   --color-fg-5: var(--fg-5);
-  /* Border */
   --color-border-hair: var(--border-hair);
 }
 
