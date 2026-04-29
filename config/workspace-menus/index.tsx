@@ -2,15 +2,19 @@
 
 import { useMemo } from "react";
 
-import type { MenuConfig } from "@/components/Layout";
+import type { MenuConfig, RailMenuItem } from "@/components/Layout";
 
-import { useMenuAgents } from "./use-menu-agents";
-import { useMenuFlows } from "./use-menu-flows";
-import { useMenuHome } from "./use-menu-home";
-import { useMenuInbox } from "./use-menu-inbox";
-import { useMenuLibrary } from "./use-menu-library";
+import { useMenuAgents } from "./menu-agents";
+import { useMenuFlows } from "./menu-flows";
+import { useMenuHome } from "./menu-home";
+import { useMenuInbox } from "./menu-inbox";
+import { useMenuLibrary } from "./menu-library";
+import { workspaceRailSettings } from "./menu-settings";
 
-export function useWorkspaceMenus(): MenuConfig {
+export function useWorkspaceMenus(): {
+  menuConfig: MenuConfig;
+  manualMenuItems: RailMenuItem[];
+} {
   const home = useMenuHome();
   const inbox = useMenuInbox();
   const agents = useMenuAgents();
@@ -19,7 +23,8 @@ export function useWorkspaceMenus(): MenuConfig {
 
   return useMemo(
     () => ({
-      rail: [{ items: [home, inbox, agents, flows, library] }],
+      menuConfig: { rail: [{ items: [home, inbox, agents, flows, library] }] },
+      manualMenuItems: [workspaceRailSettings],
     }),
     [home, inbox, agents, flows, library],
   );

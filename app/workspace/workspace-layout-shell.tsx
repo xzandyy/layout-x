@@ -5,10 +5,7 @@ import { Pencil } from "@gravity-ui/icons";
 
 import { Layout } from "@/components/Layout";
 import { ThemeToggle } from "@/components/Theme";
-import {
-  useMenuSettings,
-  useWorkspaceMenus,
-} from "@/config/workspace-menus";
+import { useWorkspaceMenus } from "@/config/workspace-menus";
 
 export function WorkspaceLayoutShell({
   defaultSidebarOpen,
@@ -17,8 +14,7 @@ export function WorkspaceLayoutShell({
   defaultSidebarOpen: boolean;
   children: React.ReactNode;
 }) {
-  const menuConfig = useWorkspaceMenus();
-  const settingsRailItem = useMenuSettings();
+  const { menuConfig, manualMenuItems } = useWorkspaceMenus();
 
   return (
     <Layout menuConfig={menuConfig} defaultSidebarOpen={defaultSidebarOpen}>
@@ -36,7 +32,9 @@ export function WorkspaceLayoutShell({
         <Layout.RailMain />
         <Layout.RailFooter>
           <div className="flex flex-col items-center gap-2 px-0 py-3">
-            <Layout.RailMenuItem item={settingsRailItem} />
+            {manualMenuItems.map((item, index) => (
+              <Layout.RailMenuItem key={index} item={item} />
+            ))}
             <div
               className="flex size-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A] font-semibold text-[11px] text-white"
               title="Account"
