@@ -4,19 +4,18 @@ import { Sidebar, SidebarHeader, SidebarMain, SidebarFooter } from "./sidebar";
 import { Content, ContentHeader, ContentBody } from "./content";
 
 // -- Layout Context -- //
-export {
-  useLayout,
-  renderLayoutChild,
-} from "./context";
-export { LayoutSidebarHeaderSlot, LayoutContentHeaderSlot } from "./slot";
+export { useLayout } from "./context";
 export type {
-  LayoutChild,
   LayoutContextValue,
   RootState,
   RailState,
   SidebarState,
   SlotState,
 } from "./context";
+
+// -- Layout Slot -- //
+export type { LayoutChild } from "./context";
+export { LayoutSidebarHeaderSlot, LayoutContentHeaderSlot } from "./slot";
 
 // -- Layout Root -- //
 export type { LayoutProps } from "./root";
