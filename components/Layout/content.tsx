@@ -127,7 +127,7 @@ export function ContentFooter({ className, children }: ContentFooterProps) {
       <div
         ref={setContentFooterAnchor}
         className={cn(
-          "flex min-h-0 min-w-0 w-full items-center justify-end gap-2",
+          "flex min-h-0 min-w-0 w-full items-center justify-end",
           hasNoSlot &&
             "pointer-events-none size-0 min-h-0 min-w-0 overflow-hidden opacity-0",
         )}

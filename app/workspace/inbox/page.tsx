@@ -2,7 +2,10 @@
 
 import { Button } from "@heroui/react";
 import { Envelope } from "@gravity-ui/icons";
-import { LayoutContentHeaderSlot } from "@/components/Layout";
+import {
+  LayoutContentFooterSlot,
+  LayoutContentHeaderSlot,
+} from "@/components/Layout";
 
 export default function InboxPage() {
   return (
@@ -17,6 +20,19 @@ export default function InboxPage() {
           Compose
         </Button>
       </LayoutContentHeaderSlot>
+
+      <LayoutContentFooterSlot>
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-3">
+          <span className="text-[11px] text-fg-4">Sync · ready</span>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="shrink-0 rounded-md gap-1.5 px-2.5! text-fg-2!"
+          >
+            Refresh
+          </Button>
+        </div>
+      </LayoutContentFooterSlot>
 
       <div className="w-full space-y-4 p-5 text-left">
         <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-fg-4">

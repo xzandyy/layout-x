@@ -2,7 +2,10 @@
 
 import { Button } from "@heroui/react";
 import { FaceRobot } from "@gravity-ui/icons";
-import { LayoutContentHeaderSlot } from "@/components/Layout";
+import {
+  LayoutContentFooterSlot,
+  LayoutContentHeaderSlot,
+} from "@/components/Layout";
 
 export default function AgentsPage() {
   return (
@@ -22,6 +25,24 @@ export default function AgentsPage() {
           </Button>
         </div>
       </LayoutContentHeaderSlot>
+
+      <LayoutContentFooterSlot>
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <span className="hidden text-[11px] text-fg-4 sm:inline">
+            Session · not persisted
+          </span>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="shrink-0 rounded-md px-2.5 text-fg-2! hover:bg-canvas-2!"
+          >
+            Reset
+          </Button>
+          <Button size="sm" variant="secondary" className="shrink-0 rounded-md px-2.5!">
+            Apply
+          </Button>
+        </div>
+      </LayoutContentFooterSlot>
 
       <div className="w-full space-y-4 p-5 text-left">
         <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-fg-4">

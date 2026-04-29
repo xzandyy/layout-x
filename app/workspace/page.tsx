@@ -1,6 +1,9 @@
 "use client";
 
-import { LayoutContentHeaderSlot } from "@/components/Layout";
+import {
+  LayoutContentFooterSlot,
+  LayoutContentHeaderSlot,
+} from "@/components/Layout";
 
 export default function WorkspaceHomePage() {
   return (
@@ -15,6 +18,12 @@ export default function WorkspaceHomePage() {
           </span>
         </div>
       </LayoutContentHeaderSlot>
+
+      <LayoutContentFooterSlot>
+        <span className="text-[11px] text-fg-4">
+          Content footer slot · workspace shell
+        </span>
+      </LayoutContentFooterSlot>
 
       <div className="w-full space-y-4 p-5 text-left">
         <p className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-fg-4">
