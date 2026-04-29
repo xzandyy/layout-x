@@ -4,7 +4,7 @@ import { Button } from "@heroui/react";
 import { Pencil } from "@gravity-ui/icons";
 
 import { Layout } from "@/components/Layout";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/Theme";
 import {
   workspaceMenus,
   workspaceRailSettings,
