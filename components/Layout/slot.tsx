@@ -1,19 +1,26 @@
 "use client";
 
-import { type ReactNode, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 
-import { useLayout } from "./context";
+import {
+  renderLayoutChild,
+  useLayout,
+  type LayoutChild,
+} from "./context";
+
+type SlotProps = {
+  /** 静态节点，或 `(ctx) => ReactNode` */
+  children?: LayoutChild;
+};
 
 /**
- * 将 `children` Portal 到 `SidebarHeader` 挂载点。
+ * 将解析后的节点 Portal 到 `SidebarHeader` 挂载点。
  */
-export function LayoutSidebarHeaderSlot({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const { slotState } = useLayout();
+export function LayoutSidebarHeaderSlot({ children }: SlotProps) {
+  const ctx = useLayout();
+  const resolved = renderLayoutChild(children, ctx);
+  const { slotState } = ctx;
   const anchor = slotState.sidebarHeaderAnchor;
   const { registerSidebarHeaderPortal, unregisterSidebarHeaderPortal } =
     slotState;
@@ -26,18 +33,16 @@ export function LayoutSidebarHeaderSlot({
   }, [registerSidebarHeaderPortal, unregisterSidebarHeaderPortal]);
 
   if (anchor == null) return null;
-  return createPortal(children, anchor);
+  return createPortal(resolved ?? null, anchor);
 }
 
 /**
- * 将 `children` Portal 到 `ContentHeader` 挂载点。
+ * 将解析后的节点 Portal 到 `ContentHeader` 挂载点。
  */
-export function LayoutContentHeaderSlot({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const { slotState } = useLayout();
+export function LayoutContentHeaderSlot({ children }: SlotProps) {
+  const ctx = useLayout();
+  const resolved = renderLayoutChild(children, ctx);
+  const { slotState } = ctx;
   const anchor = slotState.contentHeaderAnchor;
   const { registerContentHeaderPortal, unregisterContentHeaderPortal } =
     slotState;
@@ -50,5 +55,5 @@ export function LayoutContentHeaderSlot({
   }, [registerContentHeaderPortal, unregisterContentHeaderPortal]);
 
   if (anchor == null) return null;
-  return createPortal(children, anchor);
+  return createPortal(resolved ?? null, anchor);
 }
