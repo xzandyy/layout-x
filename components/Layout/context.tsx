@@ -70,6 +70,7 @@ export type SlotState = {
   unregisterContentHeaderPortal: () => void;
 };
 
+/** Layout 上下文*/
 export type LayoutContextValue = {
   rootState: RootState;
   sidebarState: SidebarState;
@@ -79,6 +80,7 @@ export type LayoutContextValue = {
 
 const LayoutCtx = createContext<LayoutContextValue | null>(null);
 
+/** 获取 Layout 上下文 */
 export function useLayout(): LayoutContextValue {
   const ctx = useContext(LayoutCtx);
   if (ctx == null) {
@@ -87,16 +89,6 @@ export function useLayout(): LayoutContextValue {
     );
   }
   return ctx;
-}
-
-function mapSidebarState(raw: RawSidebarState): SidebarState {
-  const { isOpen, setOpen, ...rest } = raw;
-  return {
-    ...rest,
-    isDesktopOpen: isOpen,
-    setDesktopOpen: setOpen,
-    isDesktop: !raw.isMobile,
-  };
 }
 
 export function LayoutContext({
@@ -112,6 +104,40 @@ export function LayoutContext({
   menuConfig?: MenuConfig;
   children: ReactNode;
 }) {
+  const rootState = useLayoutRootState({
+    headerHeight,
+    railWidth,
+    sidebarWidth,
+    menuConfig,
+  });
+  const sidebarState = useLayoutSidebarState();
+  const railState = useLayoutRailState();
+  const slotState = useLayoutSlotState();
+
+  const value = useMemo<LayoutContextValue>(
+    () => ({
+      rootState,
+      sidebarState,
+      railState,
+      slotState,
+    }),
+    [rootState, sidebarState, railState, slotState],
+  );
+
+  return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
+}
+
+function useLayoutRootState({
+  headerHeight,
+  railWidth,
+  sidebarWidth,
+  menuConfig,
+}: {
+  headerHeight: number;
+  railWidth: number;
+  sidebarWidth: number;
+  menuConfig?: MenuConfig;
+}): RootState {
   const pathname = usePathname() ?? "/";
 
   const [railMenuOverride, setRailMenuOverride] = useState<{
@@ -171,7 +197,7 @@ export function LayoutContext({
     effectiveRailItems,
   ]);
 
-  const activeLeafNorm = useMemo(
+  const activeNavItemHref = useMemo(
     () =>
       effectiveMenuConfig
         ? findGlobalActiveLeafNorm(effectiveMenuConfig, pathname)
@@ -182,8 +208,8 @@ export function LayoutContext({
   const activeSidebarMenu = useMemo(() => {
     const sidebar = activeRailMenu?.sidebar;
     if (!sidebar) return undefined;
-    return findActiveSidebarNavItem(sidebar, activeLeafNorm);
-  }, [activeRailMenu, activeLeafNorm]);
+    return findActiveSidebarNavItem(sidebar, activeNavItemHref);
+  }, [activeRailMenu, activeNavItemHref]);
 
   const setActiveRailMenu = useCallback(
     (item: RailMenuItem) => {
@@ -195,58 +221,68 @@ export function LayoutContext({
     [effectiveMenuConfig, pathname, effectiveRailItems],
   );
 
-  const rootState = useMemo<RootState>(
+  return useMemo<RootState>(
     () => ({
       headerHeight,
       railWidth,
       sidebarWidth,
       menuConfig,
-      registerManualRailItem,
-      unregisterManualRailItem,
       activeRailMenu,
       activeSidebarMenu,
-      activeNavItemHref: activeLeafNorm,
+      activeNavItemHref,
       setActiveRailMenu,
+      registerManualRailItem,
+      unregisterManualRailItem,
     }),
     [
       headerHeight,
       railWidth,
       sidebarWidth,
       menuConfig,
-      registerManualRailItem,
-      unregisterManualRailItem,
       activeRailMenu,
       activeSidebarMenu,
-      activeLeafNorm,
+      activeNavItemHref,
       setActiveRailMenu,
+      registerManualRailItem,
+      unregisterManualRailItem,
     ],
   );
+}
 
-  // Sidebar
+function useLayoutSidebarState(): SidebarState {
   const rawSidebar = useSidebar();
-  const sidebarState = useMemo(() => mapSidebarState(rawSidebar), [rawSidebar]);
+  const { isOpen, setOpen, ...rest } = rawSidebar;
+  return useMemo(
+    () => ({
+      ...rest,
+      isDesktopOpen: isOpen,
+      setDesktopOpen: setOpen,
+      isDesktop: !rawSidebar.isMobile,
+    }),
+    [rawSidebar],
+  );
+}
 
-  // Rail（移动端适配）
+function useLayoutRailState(): RailState {
   const [mobileRailSlot, setMobileRailSlot] = useState<ReactNode>(null);
 
-  const railState = useMemo<RailState>(
+  return useMemo<RailState>(
     () => ({
       mobileRailSlot,
       setMobileRailSlot,
     }),
     [mobileRailSlot, setMobileRailSlot],
   );
+}
 
-  // Slot（覆盖区域）：Portal 锚点
+function useLayoutSlotState(): SlotState {
   const [sidebarHeaderAnchor, setSidebarHeaderAnchor] =
     useState<HTMLElement | null>(null);
-  const [sidebarHeaderPortalMounts, setSidebarHeaderPortalMounts] =
-    useState(0);
+  const [sidebarHeaderPortalMounts, setSidebarHeaderPortalMounts] = useState(0);
 
   const [contentHeaderAnchor, setContentHeaderAnchor] =
     useState<HTMLElement | null>(null);
-  const [contentHeaderPortalMounts, setContentHeaderPortalMounts] =
-    useState(0);
+  const [contentHeaderPortalMounts, setContentHeaderPortalMounts] = useState(0);
 
   const registerSidebarHeaderPortal = useCallback(() => {
     setSidebarHeaderPortalMounts((n) => n + 1);
@@ -264,7 +300,7 @@ export function LayoutContext({
     setContentHeaderPortalMounts((n) => Math.max(0, n - 1));
   }, []);
 
-  const slotState = useMemo<SlotState>(
+  return useMemo<SlotState>(
     () => ({
       sidebarHeaderAnchor,
       setSidebarHeaderAnchor,
@@ -288,21 +324,9 @@ export function LayoutContext({
       unregisterContentHeaderPortal,
     ],
   );
-
-  const value = useMemo<LayoutContextValue>(
-    () => ({
-      rootState,
-      sidebarState,
-      railState,
-      slotState,
-    }),
-    [rootState, sidebarState, railState, slotState],
-  );
-
-  return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
 }
 
-/** Layout 各组件的子节点类型 */
+/** Layout 各组件的子节点 */
 export type LayoutChild = ReactNode | ((ctx: LayoutContextValue) => ReactNode);
 
 export function renderLayoutChild(
