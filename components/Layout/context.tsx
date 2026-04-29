@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useLayoutEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -40,12 +39,20 @@ export type RailState = {
   setMobileRailSlot: (node: ReactNode | null) => void;
 };
 
-/** Slot 状态：自外部覆盖的区域内容；null 时使用对应组件原本声明式的 children */
+/** Slot 状态：Sidebar / Content Header 均使用 DOM 锚点 + Portal */
 export type SlotState = {
-  sidebarHeaderSlot: ReactNode | null;
-  updateSidebarHeader: (node: ReactNode | null) => void;
-  contentHeaderSlot: ReactNode | null;
-  updateContentHeader: (node: ReactNode | null) => void;
+  /** Sidebar Header 挂载 */
+  sidebarHeaderAnchor: HTMLElement | null;
+  setSidebarHeaderAnchor: (el: HTMLElement | null) => void;
+  sidebarHeaderPortalMounts: number;
+  registerSidebarHeaderPortal: () => void;
+  unregisterSidebarHeaderPortal: () => void;
+  /** Content Header 挂载 */
+  contentHeaderAnchor: HTMLElement | null;
+  setContentHeaderAnchor: (el: HTMLElement | null) => void;
+  contentHeaderPortalMounts: number;
+  registerContentHeaderPortal: () => void;
+  unregisterContentHeaderPortal: () => void;
 };
 
 export type LayoutContextValue = {
@@ -111,34 +118,55 @@ export function LayoutContext({
     [mobileRailSlot, setMobileRailSlot],
   );
 
-  // Slot（覆盖区域）
-  const [sidebarHeaderSlot, setSidebarHeaderSlot] = useState<ReactNode | null>(
-    null,
-  );
-  const [contentHeaderSlot, setContentHeaderSlot] = useState<ReactNode | null>(
-    null,
-  );
+  // Slot（覆盖区域）：Portal 锚点
+  const [sidebarHeaderAnchor, setSidebarHeaderAnchor] =
+    useState<HTMLElement | null>(null);
+  const [sidebarHeaderPortalMounts, setSidebarHeaderPortalMounts] =
+    useState(0);
 
-  const updateSidebarHeader = useCallback((node: ReactNode | null) => {
-    setSidebarHeaderSlot(node);
+  const [contentHeaderAnchor, setContentHeaderAnchor] =
+    useState<HTMLElement | null>(null);
+  const [contentHeaderPortalMounts, setContentHeaderPortalMounts] =
+    useState(0);
+
+  const registerSidebarHeaderPortal = useCallback(() => {
+    setSidebarHeaderPortalMounts((n) => n + 1);
   }, []);
 
-  const updateContentHeader = useCallback((node: ReactNode | null) => {
-    setContentHeaderSlot(node);
+  const unregisterSidebarHeaderPortal = useCallback(() => {
+    setSidebarHeaderPortalMounts((n) => Math.max(0, n - 1));
+  }, []);
+
+  const registerContentHeaderPortal = useCallback(() => {
+    setContentHeaderPortalMounts((n) => n + 1);
+  }, []);
+
+  const unregisterContentHeaderPortal = useCallback(() => {
+    setContentHeaderPortalMounts((n) => Math.max(0, n - 1));
   }, []);
 
   const slotState = useMemo<SlotState>(
     () => ({
-      sidebarHeaderSlot,
-      updateSidebarHeader,
-      contentHeaderSlot,
-      updateContentHeader,
+      sidebarHeaderAnchor,
+      setSidebarHeaderAnchor,
+      sidebarHeaderPortalMounts,
+      registerSidebarHeaderPortal,
+      unregisterSidebarHeaderPortal,
+      contentHeaderAnchor,
+      setContentHeaderAnchor,
+      contentHeaderPortalMounts,
+      registerContentHeaderPortal,
+      unregisterContentHeaderPortal,
     }),
     [
-      sidebarHeaderSlot,
-      contentHeaderSlot,
-      updateSidebarHeader,
-      updateContentHeader,
+      sidebarHeaderAnchor,
+      sidebarHeaderPortalMounts,
+      registerSidebarHeaderPortal,
+      unregisterSidebarHeaderPortal,
+      contentHeaderAnchor,
+      contentHeaderPortalMounts,
+      registerContentHeaderPortal,
+      unregisterContentHeaderPortal,
     ],
   );
 
@@ -154,41 +182,4 @@ export function LayoutContext({
   );
 
   return <LayoutCtx.Provider value={value}>{children}</LayoutCtx.Provider>;
-}
-
-/** 与 `React.useMemo(factory, deps)` 第二个参数同构（由内置 `useMemo` 的类型参数提取）。 */
-export type MemoDeps = Parameters<typeof useMemo>[1];
-
-/** 覆盖 Sidebar Header 区域 */
-export function useSidebarHeaderSlot(
-  render: () => ReactNode | null | undefined,
-  deps: MemoDeps,
-) {
-  const update = useLayout().slotState.updateSidebarHeader;
-  const node = useMemo(() => render() ?? null, deps);
-
-  useLayoutEffect(() => {
-    update(node ?? null);
-  }, [node, update]);
-
-  useLayoutEffect(() => {
-    return () => update(null);
-  }, [update]);
-}
-
-/** 覆盖 Content Header 区域 */
-export function useContentHeaderSlot(
-  render: () => ReactNode | null | undefined,
-  deps: MemoDeps,
-) {
-  const update = useLayout().slotState.updateContentHeader;
-  const node = useMemo(() => render() ?? null, deps);
-
-  useLayoutEffect(() => {
-    update(node ?? null);
-  }, [node, update]);
-
-  useLayoutEffect(() => {
-    return () => update(null);
-  }, [update]);
 }

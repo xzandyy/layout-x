@@ -79,11 +79,25 @@ export type SidebarHeaderProps = {
 
 export function SidebarHeader({ className, children }: SidebarHeaderProps) {
   const ctx = useLayout();
-  const content =
-    ctx.slotState.sidebarHeaderSlot ?? renderLayoutChild(children, ctx);
+  const { sidebarHeaderPortalMounts, setSidebarHeaderAnchor } = ctx.slotState;
+  const defaultTrailing = renderLayoutChild(children, ctx);
+  const portalOpen = sidebarHeaderPortalMounts > 0;
+  const hasNoSlot = !portalOpen;
+
   return (
     <HeroSidebar.Header className={cn("p-0", className)}>
-      {content}
+      {!portalOpen && defaultTrailing != null ? (
+        <div className="w-full min-w-0">{defaultTrailing}</div>
+      ) : null}
+      <div
+        ref={setSidebarHeaderAnchor}
+        className={cn(
+          "w-full min-h-0 min-w-0",
+          hasNoSlot &&
+            "pointer-events-none size-0 min-h-0 min-w-0 overflow-hidden opacity-0",
+        )}
+        aria-hidden={hasNoSlot}
+      />
     </HeroSidebar.Header>
   );
 }

@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  type LayoutChild,
-  renderLayoutChild,
-  useLayout,
-} from "./context";
+import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
 import { Breadcrumbs } from "./breadcrumbs";
 import { cn } from "@/lib/utils";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
@@ -27,7 +23,8 @@ export function Content({ className, children }: ContentProps) {
       className={cn(
         "min-h-0 min-w-0 md:p-2 md:pl-0",
         "md:transition-[padding-left] duration-(--sidebar-duration,200ms) ease-(--sidebar-ease,ease)",
-        showDesktopInsetPadding && "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
+        showDesktopInsetPadding &&
+          "md:pl-[calc(var(--layout-sidebar-width)-240px)]",
       )}
     >
       <div
@@ -53,8 +50,11 @@ export type ContentHeaderProps = {
 export function ContentHeader({ className, children }: ContentHeaderProps) {
   const ctx = useLayout();
   const { headerHeight } = ctx.rootState;
-  const { contentHeaderSlot } = ctx.slotState;
-  const trailing = contentHeaderSlot ?? renderLayoutChild(children, ctx);
+  const { contentHeaderPortalMounts, setContentHeaderAnchor } = ctx.slotState;
+  const defaultTrailing = renderLayoutChild(children, ctx);
+  const portalOpen = contentHeaderPortalMounts > 0;
+  const hasNoSlot = !portalOpen;
+
   return (
     <header
       className={cn(
@@ -66,11 +66,20 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
       <div className="flex w-full min-w-0 items-center gap-1.5">
         <HeroSidebar.Trigger className={cn("shrink-0 text-fg-3")} />
         <Breadcrumbs className="min-w-0 shrink" paths={workspacePaths} />
-        {trailing != null ? (
+        {hasNoSlot ? (
           <div className="flex min-h-0 min-w-0 flex-1 items-center justify-end gap-2">
-            {trailing}
+            {defaultTrailing}
           </div>
         ) : null}
+        <div
+          ref={setContentHeaderAnchor}
+          className={cn(
+            "flex min-h-0 min-w-0 flex-1 items-center justify-end gap-2",
+            hasNoSlot &&
+              "pointer-events-none size-0 min-h-0 min-w-0 overflow-hidden opacity-0",
+          )}
+          aria-hidden={hasNoSlot}
+        />
       </div>
     </header>
   );

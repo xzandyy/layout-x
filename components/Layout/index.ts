@@ -7,13 +7,11 @@ import { Content, ContentHeader, ContentBody } from "./content";
 export {
   useLayout,
   renderLayoutChild,
-  useSidebarHeaderSlot,
-  useContentHeaderSlot,
 } from "./context";
+export { LayoutSidebarHeaderSlot, LayoutContentHeaderSlot } from "./slot";
 export type {
   LayoutChild,
   LayoutContextValue,
-  MemoDeps as LayoutHeaderSlotDeps,
   RootState,
   RailState,
   SidebarState,
