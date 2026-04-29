@@ -5,7 +5,7 @@ import { Pencil } from "@gravity-ui/icons";
 
 import { Layout } from "@/components/Layout";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { workspaceMenus } from "@/config/workspace-menus";
+import { workspaceMenus, workspaceRailSettings } from "@/config/workspace-menus";
 
 export function WorkspaceLayoutShell({
   defaultSidebarOpen,
@@ -29,9 +29,10 @@ export function WorkspaceLayoutShell({
         </Layout.RailHeader>
         <Layout.RailMain />
         <Layout.RailFooter>
-          <div className="flex justify-center py-3">
+          <div className="flex flex-col items-center gap-2 px-0 py-3">
+            <Layout.RailMenuItem item={workspaceRailSettings} />
             <div
-              className="h-7 w-7 rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A]"
+              className="h-7 w-7 shrink-0 rounded-full bg-linear-to-br from-[#EFC6A7] to-[#E8763A]"
               title="Account"
             />
           </div>
