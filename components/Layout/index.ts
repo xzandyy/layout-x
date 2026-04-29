@@ -15,7 +15,6 @@ export type {
 
 // -- Layout Slot -- //
 export type { LayoutChild } from "./context";
-export type { LayoutHeaderSlotChildren } from "./slot";
 export {
   useLayoutSidebarHeaderSlot,
   useLayoutContentHeaderSlot,

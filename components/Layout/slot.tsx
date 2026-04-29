@@ -5,14 +5,10 @@ import { createPortal } from "react-dom";
 
 import { renderLayoutChild, useLayout, type LayoutChild } from "./context";
 
-export type LayoutHeaderSlotChildren = LayoutChild;
-
 /**
  * 将节点 Portal 到 `SidebarHeader` 挂载点。
  */
-export function useLayoutSidebarHeaderSlot(
-  children?: LayoutHeaderSlotChildren,
-): ReactNode {
+export function useLayoutSidebarHeaderSlot(children?: LayoutChild): ReactNode {
   const ctx = useLayout();
   const resolved = renderLayoutChild(children, ctx);
   const {
@@ -35,9 +31,7 @@ export function useLayoutSidebarHeaderSlot(
 /**
  * 将节点 Portal 到 `ContentHeader` 挂载点。
  */
-export function useLayoutContentHeaderSlot(
-  children?: LayoutHeaderSlotChildren,
-): ReactNode {
+export function useLayoutContentHeaderSlot(children?: LayoutChild): ReactNode {
   const ctx = useLayout();
   const resolved = renderLayoutChild(children, ctx);
   const {
