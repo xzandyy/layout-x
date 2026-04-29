@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@heroui/react";
-import { EllipsisVertical, Pencil } from "@gravity-ui/icons";
+import { Pencil } from "@gravity-ui/icons";
 
 import { Layout } from "@/components/Layout";
-import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { workspaceMenus } from "@/config/workspace-menus";
 
 export function WorkspaceLayoutShell({
@@ -60,18 +60,7 @@ export function WorkspaceLayoutShell({
               >
                 <Pencil className="size-3.5 text-current" />
               </Button>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="ghost"
-                aria-label="More"
-                className={cn(
-                  "size-7 min-w-7 shrink-0 rounded-md! p-0 text-fg-3 hover:bg-canvas-2! hover:text-fg-1!",
-                  "ml-1",
-                )}
-              >
-                <EllipsisVertical className="size-3.5 text-current" />
-              </Button>
+              <ThemeToggle className="ml-1" />
             </div>
           )}
         </Layout.SidebarHeader>
