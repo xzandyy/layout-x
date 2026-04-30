@@ -104,19 +104,19 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
             >
               <HeaderOverflowDotsIcon className="size-5" />
             </Popover.Trigger>
-            <Popover.Dialog>
-              <Popover.Content
-                placement="bottom end"
-                className="max-w-[min(calc(100vw-1.5rem),20rem)] p-2"
-              >
+            <Popover.Content
+              placement="bottom end"
+              className="max-w-[min(calc(100vw-1.5rem),20rem)] p-2"
+            >
+              <Popover.Dialog>
                 <div
                   ref={setContentHeaderAnchor}
                   className="flex min-w-48 flex-col items-stretch gap-2"
                 >
                   {hasNoSlot ? defaultTrailing : null}
                 </div>
-              </Popover.Content>
-            </Popover.Dialog>
+              </Popover.Dialog>
+            </Popover.Content>
           </Popover.Root>
         ) : null}
       </div>
@@ -127,9 +127,9 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
 function HeaderOverflowDotsIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
-      <circle cx="5" cy="12" r="1.75" />
+      <circle cx="12" cy="5" r="1.75" />
       <circle cx="12" cy="12" r="1.75" />
-      <circle cx="19" cy="12" r="1.75" />
+      <circle cx="12" cy="19" r="1.75" />
     </svg>
   );
 }
