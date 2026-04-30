@@ -23,11 +23,7 @@ import type {
   SidebarMenuItemNode,
   TooltipConfig,
 } from "./types";
-import {
-  isExternalHref,
-  itemHasChildren,
-  normalizePath,
-} from "./utils";
+import { isExternalHref, itemHasChildren, normalizePath } from "./utils";
 
 export {
   findActiveSidebarNavItem,
@@ -161,8 +157,7 @@ export function SidebarMain({ className, children }: SidebarMainProps) {
   const { isMobile, isMobileOpen } = useSidebar();
 
   const showMenuTree = Boolean(
-    sidebar &&
-      (!isMobile || (insideMobileSheet && isMobileOpen)),
+    sidebar && (!isMobile || (insideMobileSheet && isMobileOpen)),
   );
 
   return (
@@ -298,7 +293,11 @@ const MenuItem = memo(
     const { icon, label, chip, actions, tooltip, onPress } = item;
     const children = "children" in item ? item.children : undefined;
     const hasSubmenu = Boolean(children && children.length > 0);
-    const href = hasSubmenu ? undefined : "href" in item ? item.href : undefined;
+    const href = hasSubmenu
+      ? undefined
+      : "href" in item
+        ? item.href
+        : undefined;
     const isCurrent = Boolean(
       href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
     );
@@ -557,8 +556,9 @@ function resolveActiveRoute(
 /**
  * 管理侧栏菜单展开/收起状态：
  * - URL 命中的分支默认展开；
- * - 用户主动折叠后会记下来，避免被自动展开覆盖；
- * - 切换路径时会清空这份「主动折叠」记录。
+ * - 上述分支 id 会并入 `userExpanded`，便于与 Hero 受控 `expandedKeys` 对齐；
+ * - 用户主动折叠后会记入 `dismissed`，避免被自动展开覆盖；
+ * - 切换路径时仅作用于当前 pathname 对应的 dismissed 切片。
  */
 function useMenuExpansion({
   pathname,
@@ -569,9 +569,33 @@ function useMenuExpansion({
   requiredBranchIds: readonly string[];
   groupCount: number;
 }) {
+  const requiredSig = requiredBranchIds.join("\0");
+
   const [userExpanded, setUserExpanded] =
     useState<ReadonlySet<string>>(EMPTY_SET);
   const [dismissed, setDismissed] = useState<DismissedState>(EMPTY_DISMISSED);
+
+  const [prevPathname, setPrevPathname] = useState("");
+  const [prevRequiredSig, setPrevRequiredSig] = useState("");
+
+  if (pathname !== prevPathname || requiredSig !== prevRequiredSig) {
+    setPrevPathname(pathname);
+    setPrevRequiredSig(requiredSig);
+    const dismissedKeys =
+      dismissed.forPath === pathname ? dismissed.keys : EMPTY_SET;
+    setUserExpanded((prev) => {
+      const next = new Set(prev);
+      let changed = false;
+      for (const id of requiredBranchIds) {
+        if (dismissedKeys.has(id)) continue;
+        if (!next.has(id)) {
+          next.add(id);
+          changed = true;
+        }
+      }
+      return changed ? next : prev;
+    });
+  }
 
   const activeDismissed =
     dismissed.forPath === pathname ? dismissed.keys : EMPTY_SET;
