@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, type CSSProperties } from "react";
+import { useCallback, useMemo, memo, useState, type CSSProperties } from "react";
 import type { Key } from "react-aria-components";
 import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
@@ -147,7 +147,7 @@ export function SidebarMain({ className, children }: SidebarMainProps) {
 
 // -- MenuTree -- //
 
-function MenuTree({
+const MenuTree = memo(function MenuTree({
   config,
   pathname,
 }: {
@@ -160,10 +160,20 @@ function MenuTree({
     [config, globalActiveLeafNorm],
   );
 
-  const { getExpandedForGroup, handleExpandedChange } = useMenuExpansion({
+  const groupCount = config.items.length;
+  const { expandedByGroup, handleExpandedChange } = useMenuExpansion({
     pathname,
     requiredBranchIds: activeRoute.branchIds,
+    groupCount,
   });
+
+  const expandHandlers = useMemo(
+    () =>
+      Array.from({ length: groupCount }, (_, i) => (keys: Set<Key> | "all") => {
+        handleExpandedChange(i, keys);
+      }),
+    [groupCount, handleExpandedChange],
+  );
 
   return (
     <>
@@ -173,34 +183,37 @@ function MenuTree({
           node={node}
           groupIndex={i}
           activeRoute={activeRoute}
-          expandedKeys={getExpandedForGroup(i)}
-          onExpandedChange={(keys) => handleExpandedChange(i, keys)}
+          expandedKeys={expandedByGroup[i] ?? EMPTY_STRING_SET}
+          onExpandedChange={expandHandlers[i]!}
         />
       ))}
     </>
   );
-}
+});
 
-function MenuNode({
+/** 稳定的空 Set，用于分组尚无展开状态时的占位（避免每次渲染新引用）。 */
+const EMPTY_STRING_SET: ReadonlySet<string> = new Set<string>();
+
+const MenuNode = memo(function MenuNode({
   node,
   ...rest
 }: {
   node: SidebarMenuItem;
   groupIndex: number;
   activeRoute: ActiveRoute;
-  expandedKeys: Set<string>;
+  expandedKeys: ReadonlySet<string>;
   onExpandedChange: (keys: Set<Key> | "all") => void;
 }) {
   if (node.type === "separator") return <HeroSidebar.Separator />;
   if (node.type === "custom") return <CustomSlot node={node} />;
   return <GroupNode node={node} {...rest} />;
-}
+});
 
 function CustomSlot({ node }: { node: SidebarCustomItem }) {
   return <div className="contents">{node.content}</div>;
 }
 
-function GroupNode({
+const GroupNode = memo(function GroupNode({
   node,
   groupIndex,
   activeRoute,
@@ -210,7 +223,7 @@ function GroupNode({
   node: SidebarGroupItem;
   groupIndex: number;
   activeRoute: ActiveRoute;
-  expandedKeys: Set<string>;
+  expandedKeys: ReadonlySet<string>;
   onExpandedChange: (keys: Set<Key> | "all") => void;
 }) {
   return (
@@ -224,6 +237,7 @@ function GroupNode({
         aria-label={ariaLabelForSidebarMenu(node, groupIndex)}
         expandedKeys={expandedKeys}
         onExpandedChange={onExpandedChange}
+        showGuideLines="hover"
       >
         {node.menu.map((item, i) => (
           <MenuItem
@@ -237,91 +251,99 @@ function GroupNode({
       </HeroSidebar.Menu>
     </HeroSidebar.Group>
   );
-}
+});
 
-function MenuItem({
-  item,
-  groupIndex,
-  itemPath,
-  activeLeafNorm,
-}: {
-  item: SidebarMenuItemNode;
-  groupIndex: number;
-  itemPath: number[];
-  activeLeafNorm: string | undefined;
-}) {
-  const { icon, label, chip, actions, tooltip, onPress } = item;
-  const children = "children" in item ? item.children : undefined;
-  const hasSubmenu = Boolean(children && children.length > 0);
-  const href = hasSubmenu ? undefined : "href" in item ? item.href : undefined;
-  const isCurrent = Boolean(
-    href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
-  );
+const MenuItem = memo(
+  function MenuItem({
+    item,
+    groupIndex,
+    itemPath,
+    activeLeafNorm,
+  }: {
+    item: SidebarMenuItemNode;
+    groupIndex: number;
+    itemPath: number[];
+    activeLeafNorm: string | undefined;
+  }) {
+    const { icon, label, chip, actions, tooltip, onPress } = item;
+    const children = "children" in item ? item.children : undefined;
+    const hasSubmenu = Boolean(children && children.length > 0);
+    const href = hasSubmenu ? undefined : "href" in item ? item.href : undefined;
+    const isCurrent = Boolean(
+      href && activeLeafNorm && normalizePath(href) === activeLeafNorm,
+    );
 
-  return (
-    <HeroSidebar.MenuItem
-      id={getItemId(groupIndex, itemPath)}
-      href={href}
-      isCurrent={isCurrent}
-      onAction={onPress}
-      tooltipProps={tooltip ? toTooltipProps(tooltip) : undefined}
-    >
-      <HeroSidebar.MenuItemContent
-        className={cn(
-          "flex items-center gap-2 min-h-8 my-px",
-          "px-2.5 py-1 rounded-md",
-          "transition-all duration-150",
-          isCurrent
-            ? "bg-surface text-fg-1"
-            : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
-        )}
+    return (
+      <HeroSidebar.MenuItem
+        id={getItemId(groupIndex, itemPath)}
+        href={href}
+        isCurrent={isCurrent}
+        onAction={onPress}
+        tooltipProps={tooltip ? toTooltipProps(tooltip) : undefined}
       >
-        {icon && (
-          <HeroSidebar.MenuIcon
+        <HeroSidebar.MenuItemContent
+          className={cn(
+            "flex items-center gap-2 min-h-8 my-px",
+            "px-2.5 py-1 rounded-md",
+            "transition-all duration-150",
+            isCurrent
+              ? "bg-surface text-fg-1"
+              : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
+          )}
+        >
+          {icon && (
+            <HeroSidebar.MenuIcon
+              className={cn(
+                "[&>svg]:size-3.75",
+                isCurrent ? "text-fg-1" : "text-fg-3",
+              )}
+            >
+              {icon}
+            </HeroSidebar.MenuIcon>
+          )}
+
+          <HeroSidebar.MenuLabel
             className={cn(
-              "[&>svg]:size-3.75",
+              "text-[0.8125rem]",
               isCurrent ? "text-fg-1" : "text-fg-3",
             )}
           >
-            {icon}
-          </HeroSidebar.MenuIcon>
-        )}
-
-        <HeroSidebar.MenuLabel
-          className={cn(
-            "text-[0.8125rem]",
-            isCurrent ? "text-fg-1" : "text-fg-3",
+            {label}
+          </HeroSidebar.MenuLabel>
+          {chip && <HeroSidebar.MenuChip>{chip}</HeroSidebar.MenuChip>}
+          {actions && (
+            <HeroSidebar.MenuActions>{actions}</HeroSidebar.MenuActions>
           )}
-        >
-          {label}
-        </HeroSidebar.MenuLabel>
-        {chip && <HeroSidebar.MenuChip>{chip}</HeroSidebar.MenuChip>}
-        {actions && (
-          <HeroSidebar.MenuActions>{actions}</HeroSidebar.MenuActions>
-        )}
-        {hasSubmenu && (
-          <HeroSidebar.MenuTrigger>
-            <HeroSidebar.MenuIndicator />
-          </HeroSidebar.MenuTrigger>
-        )}
-      </HeroSidebar.MenuItemContent>
+          {hasSubmenu && (
+            <HeroSidebar.MenuTrigger>
+              <HeroSidebar.MenuIndicator />
+            </HeroSidebar.MenuTrigger>
+          )}
+        </HeroSidebar.MenuItemContent>
 
-      {hasSubmenu && children != null && (
-        <HeroSidebar.Submenu>
-          {children.map((child, i) => (
-            <MenuItem
-              key={i}
-              item={child}
-              groupIndex={groupIndex}
-              itemPath={[...itemPath, i]}
-              activeLeafNorm={activeLeafNorm}
-            />
-          ))}
-        </HeroSidebar.Submenu>
-      )}
-    </HeroSidebar.MenuItem>
-  );
-}
+        {hasSubmenu && children != null && (
+          <HeroSidebar.Submenu>
+            {children.map((child, i) => (
+              <MenuItem
+                key={i}
+                item={child}
+                groupIndex={groupIndex}
+                itemPath={[...itemPath, i]}
+                activeLeafNorm={activeLeafNorm}
+              />
+            ))}
+          </HeroSidebar.Submenu>
+        )}
+      </HeroSidebar.MenuItem>
+    );
+  },
+  (prev, next) =>
+    prev.item === next.item &&
+    prev.groupIndex === next.groupIndex &&
+    prev.activeLeafNorm === next.activeLeafNorm &&
+    prev.itemPath.length === next.itemPath.length &&
+    prev.itemPath.every((v, i) => v === next.itemPath[i]),
+);
 
 // ---------------------------------------------------------------------------
 // 以下为侧栏菜单匹配 / 展开状态 / Hero 组件适配辅助
@@ -511,9 +533,11 @@ function resolveActiveRoute(
 function useMenuExpansion({
   pathname,
   requiredBranchIds,
+  groupCount,
 }: {
   pathname: string;
   requiredBranchIds: readonly string[];
+  groupCount: number;
 }) {
   const [userExpanded, setUserExpanded] =
     useState<ReadonlySet<string>>(EMPTY_SET);
@@ -530,13 +554,12 @@ function useMenuExpansion({
     return out;
   }, [userExpanded, requiredBranchIds, activeDismissed]);
 
-  const getExpandedForGroup = useCallback(
-    (groupIndex: number): Set<string> => {
-      const prefix = getGroupIdPrefix(groupIndex);
-      return filterByPrefix(mergedExpanded, prefix);
-    },
-    [mergedExpanded],
-  );
+  /** 每组一个 Set，仅在 mergedExpanded / 分组数变化时重建，避免子树因引用抖动无谓更新。 */
+  const expandedByGroup = useMemo(() => {
+    return Array.from({ length: groupCount }, (_, groupIndex) =>
+      filterByPrefix(mergedExpanded, getGroupIdPrefix(groupIndex)),
+    );
+  }, [mergedExpanded, groupCount]);
 
   const handleExpandedChange = useCallback(
     (groupIndex: number, nextKeys: Set<Key> | "all") => {
@@ -558,5 +581,5 @@ function useMenuExpansion({
     [pathname, requiredBranchIds],
   );
 
-  return { getExpandedForGroup, handleExpandedChange };
+  return { expandedByGroup, handleExpandedChange };
 }
