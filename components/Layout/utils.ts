@@ -32,7 +32,10 @@ export function isExternalHref(href: string): boolean {
   return href.startsWith("http://") || href.startsWith("https://");
 }
 
-function normalizedHrefMatchesPath(normPath: string, normHref: string): boolean {
+function normalizedHrefMatchesPath(
+  normPath: string,
+  normHref: string,
+): boolean {
   if (normHref === "/") return normPath === "/";
   return normPath === normHref || normPath.startsWith(`${normHref}/`);
 }

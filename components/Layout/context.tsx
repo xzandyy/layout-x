@@ -146,10 +146,15 @@ function useLayoutRootState({
 }): RootState {
   const pathname = usePathname() ?? "/";
 
+  const [prevPathname, setPrevPathname] = useState(pathname);
   const [railMenuOverride, setRailMenuOverride] = useState<{
     index: number;
-    forPathname: string;
   } | null>(null);
+
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setRailMenuOverride(null);
+  }
 
   const [manualRailItems, setManualRailItems] = useState<RailMenuItem[]>([]);
 
@@ -191,7 +196,7 @@ function useLayoutRootState({
 
   const activeRailMenu = useMemo(() => {
     if (!effectiveMenuConfig) return undefined;
-    if (railMenuOverride != null && railMenuOverride.forPathname === pathname) {
+    if (railMenuOverride != null) {
       return effectiveRailItems[railMenuOverride.index];
     }
     return urlRailMenu;
@@ -222,9 +227,9 @@ function useLayoutRootState({
       if (!effectiveMenuConfig) return;
       const idx = effectiveRailItems.indexOf(item);
       if (idx < 0) return;
-      setRailMenuOverride({ index: idx, forPathname: pathname });
+      setRailMenuOverride({ index: idx });
     },
-    [effectiveMenuConfig, pathname, effectiveRailItems],
+    [effectiveMenuConfig, effectiveRailItems],
   );
 
   return useMemo<RootState>(
