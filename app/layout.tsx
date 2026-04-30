@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { AriaNextRouterProvider } from "@/components/providers/aria-next-router-provider";
 import { ThemeProvider } from "@/components/Theme";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +34,9 @@ export default function RootLayout({
         <meta name="description" content="Layout" />
       </head>
       <body className="flex min-h-full min-w-0 flex-col bg-canvas text-fg-1">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <AriaNextRouterProvider>{children}</AriaNextRouterProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
