@@ -1,6 +1,6 @@
 "use client";
 
-import { Popover } from "@heroui/react";
+import { Button, Popover } from "@heroui/react";
 import { Sidebar as HeroSidebar } from "@heroui-pro/react";
 import type { SVGProps } from "react";
 
@@ -60,8 +60,7 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
   const hasNoSlot = !portalOpen;
 
   const showMobileHeaderOverflow =
-    !isDesktop &&
-    (portalOpen || (hasNoSlot && defaultTrailing != null));
+    !isDesktop && (portalOpen || (hasNoSlot && defaultTrailing != null));
 
   const trailingClassName =
     "flex max-w-full shrink-0 touch-pan-x items-center justify-end overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
@@ -69,7 +68,7 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
   return (
     <header
       className={cn(
-        "sticky top-0 z-10 flex min-w-0 max-w-full shrink-0 items-center gap-2 overflow-x-hidden border-b border-border-hair bg-surface pl-3 pr-5",
+        "sticky top-0 z-10 flex min-w-0 max-w-full shrink-0 items-center gap-2 overflow-x-hidden border-b border-border-hair bg-surface px-3",
         className,
       )}
       style={{ minHeight: `${headerHeight}rem` }}
@@ -95,23 +94,29 @@ export function ContentHeader({ className, children }: ContentHeaderProps) {
           />
         ) : showMobileHeaderOverflow ? (
           <Popover.Root>
-            <Popover.Trigger
-              className={cn(
-                "flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-fg-3 outline-none select-none",
-                "hover:bg-canvas-2 data-focus-visible:ring-2 data-focus-visible:ring-focus data-focus-visible:ring-offset-2 data-focus-visible:ring-offset-surface",
-              )}
-              aria-label="页面操作"
-            >
-              <HeaderOverflowDotsIcon className="size-5" />
+            <Popover.Trigger>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="ghost"
+                aria-label="页面操作"
+                className="size-8 min-w-8 shrink-0 rounded-full text-fg-3"
+              >
+                <HeaderOverflowDotsIcon className="size-5" />
+              </Button>
             </Popover.Trigger>
             <Popover.Content
-              placement="bottom end"
-              className="max-w-[min(calc(100vw-1.5rem),20rem)] p-2"
+              placement="bottom"
+              className="box-border  max-w-none min-w-0 rounded-sm py-0 px-3"
+              style={{ minHeight: `${headerHeight}rem` }}
             >
-              <Popover.Dialog>
+              <Popover.Dialog
+                className="w-full p-0 flex items-center justify-center"
+                style={{ minHeight: `${headerHeight}rem` }}
+              >
                 <div
                   ref={setContentHeaderAnchor}
-                  className="flex min-w-48 flex-col items-stretch gap-2"
+                  className="flex w-full min-w-0 items-center justify-end gap-2"
                 >
                   {hasNoSlot ? defaultTrailing : null}
                 </div>
