@@ -24,6 +24,17 @@ export function createMenuHome(): RailMenuItem {
       items: [
         {
           type: "group",
+          label: "HOME",
+          menu: [
+            {
+              icon: <House />,
+              label: "Home",
+              href: "/workspace",
+            },
+          ],
+        },
+        {
+          type: "group",
           label: "MY VIEWS",
           menu: [
             {
