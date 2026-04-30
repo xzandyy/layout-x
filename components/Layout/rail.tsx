@@ -1,10 +1,12 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useId,
   useLayoutEffect,
   useMemo,
+  memo,
   type CSSProperties,
   type ReactElement,
   type ReactNode,
@@ -137,12 +139,7 @@ export function RailMain({ className, children }: RailMainProps) {
   );
 }
 
-/** 声明式 `menuConfig` 外的项应在挂载时注册进布局；`item` 须保持稳定引用（配置对象或 useMemo），避免重复注册。 */
-export function RailMenuItem({
-  item,
-}: {
-  item: RailMenuItemModel;
-}) {
+export function RailMenuItem({ item }: { item: RailMenuItemModel }) {
   const fallbackAriaId = useId();
   const ctx = useLayout();
   const {
@@ -159,12 +156,7 @@ export function RailMenuItem({
     return () => {
       unregisterManualRailItem(item);
     };
-  }, [
-    item,
-    menuConfig,
-    registerManualRailItem,
-    unregisterManualRailItem,
-  ]);
+  }, [item, menuConfig, registerManualRailItem, unregisterManualRailItem]);
   const { isDesktop, setDesktopOpen } = ctx.sidebarState;
   const isActive = activeRailMenu === item;
   const name =
@@ -172,30 +164,59 @@ export function RailMenuItem({
       ? item.label
       : `Rail menu item ${fallbackAriaId.replace(/:/g, "")}`;
 
-  const button = (
-    <Button
-      aria-pressed={isActive}
-      aria-label={name}
-      onPress={() => {
-        setActiveRailMenu(item);
-        if (isDesktop) {
-          setDesktopOpen(true);
-        }
-      }}
-      className={cn(
-        "size-10 shrink-0 rounded-[10px]",
-        "transition-all duration-150",
-        "[&>svg]:size-5",
-        isActive
-          ? "bg-surface text-fg-1"
-          : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
-      )}
-    >
-      {item.icon}
-    </Button>
+  const handlePress = useCallback(() => {
+    setActiveRailMenu(item);
+    if (isDesktop) {
+      setDesktopOpen(true);
+    }
+  }, [item, isDesktop, setActiveRailMenu, setDesktopOpen]);
+
+  return (
+    <RailMenuItemTrigger
+      label={item.label}
+      name={name}
+      isActive={isActive}
+      icon={item.icon}
+      onPress={handlePress}
+    />
   );
-  return <RailMenuTooltip label={item.label}>{button}</RailMenuTooltip>;
 }
+
+type RailMenuItemTriggerProps = {
+  label: ReactNode;
+  name: string;
+  isActive: boolean;
+  icon: ReactNode;
+  onPress: () => void;
+};
+
+const RailMenuItemTrigger = memo(function RailMenuItemTrigger({
+  label,
+  name,
+  isActive,
+  icon,
+  onPress,
+}: RailMenuItemTriggerProps) {
+  return (
+    <RailMenuTooltip label={label}>
+      <Button
+        aria-pressed={isActive}
+        aria-label={name}
+        onPress={onPress}
+        className={cn(
+          "size-10 shrink-0 rounded-[10px]",
+          "transition-all duration-150",
+          "[&>svg]:size-5",
+          isActive
+            ? "bg-surface text-fg-1"
+            : "bg-transparent text-fg-3 hover:bg-canvas-2 hover:text-fg-1",
+        )}
+      >
+        {icon}
+      </Button>
+    </RailMenuTooltip>
+  );
+});
 
 // -- Rail Menu Tooltip -- //
 
