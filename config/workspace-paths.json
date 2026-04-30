@@ -79,8 +79,61 @@
       "title": "Library",
       "children": [
         {
+          "path": "guides",
+          "title": "Guides",
+          "hasPage": false,
+          "children": [
+            {
+              "path": "overview",
+              "title": "Overview"
+            },
+            {
+              "path": "workflows",
+              "title": "Workflows"
+            }
+          ]
+        },
+        {
+          "path": "media",
+          "title": "Media",
+          "hasPage": false,
+          "children": [
+            {
+              "path": "brand",
+              "title": "Brand kit"
+            },
+            {
+              "path": "uploads",
+              "title": "Uploads"
+            }
+          ]
+        },
+        {
           "path": "playbooks",
           "title": "Playbooks"
+        },
+        {
+          "path": "reference",
+          "title": "Reference",
+          "hasPage": false,
+          "children": [
+            {
+              "path": "changelog",
+              "title": "Changelog"
+            },
+            {
+              "path": "glossary",
+              "title": "Glossary"
+            }
+          ]
+        },
+        {
+          "path": "snippets",
+          "title": "Snippets"
+        },
+        {
+          "path": "templates",
+          "title": "Templates"
         }
       ]
     },

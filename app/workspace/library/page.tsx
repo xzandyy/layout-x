@@ -41,8 +41,8 @@ export default function LibraryPage() {
           Library
         </h1>
         <p className="text-[15px] leading-relaxed text-fg-2">
-          Main index next to Playbooks under the Library → Catalog group in the
-          sidebar.
+          Catalog overview · browse Templates, Snippets, Guides, Reference, and
+          Media from the Library rail.
         </p>
       </div>
     </>
