@@ -22,46 +22,55 @@ export function Breadcrumbs({ paths, className }: BreadcrumbsProps) {
   if (items.length === 0) return null;
 
   return (
-    <HeroBreadcrumbs
+    <div
       className={cn(
-        "breadcrumbs min-w-0 flex-wrap items-center",
+        "min-w-0 touch-pan-x overflow-x-auto overflow-y-hidden",
+        "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className,
       )}
-      separator={<span className="text-fg-4!">/</span>}
     >
-      {items.map((item, i) =>
-        item.href ? (
-          <HeroBreadcrumbs.Item
-            key={`${i}-${item.title}-${item.href}`}
-            className="no-underline"
-            href={item.href}
-          >
-            <span className="mr-1 text-[0.8rem] text-fg-4!">{item.title}</span>
-          </HeroBreadcrumbs.Item>
-        ) : (
-          <HeroBreadcrumbs.Item
-            key={`${i}-${item.title}-${String(item.isCurrent)}`}
-            className={cn(
-              "no-underline",
-              "pointer-events-none cursor-default",
-              "no-underline!",
-              "data-hovered:no-underline",
-            )}
-          >
-            <span
+      <HeroBreadcrumbs
+        className={cn(
+          "breadcrumbs flex min-w-max flex-nowrap items-center whitespace-nowrap",
+        )}
+        separator={<span className="text-fg-4! shrink-0">/</span>}
+      >
+        {items.map((item, i) =>
+          item.href ? (
+            <HeroBreadcrumbs.Item
+              key={`${i}-${item.title}-${item.href}`}
+              className="no-underline"
+              href={item.href}
+            >
+              <span className="mr-1 whitespace-nowrap text-[0.8rem] text-fg-4!">
+                {item.title}
+              </span>
+            </HeroBreadcrumbs.Item>
+          ) : (
+            <HeroBreadcrumbs.Item
+              key={`${i}-${item.title}-${String(item.isCurrent)}`}
               className={cn(
-                "mr-1 text-[0.8rem]",
-                item.isCurrent
-                  ? "hover:text-fg-1! data-hovered:text-fg-1!"
-                  : "hover:text-fg-4! data-hovered:text-fg-4!",
+                "no-underline",
+                "pointer-events-none cursor-default",
+                "no-underline!",
+                "data-hovered:no-underline",
               )}
             >
-              {item.title}
-            </span>
-          </HeroBreadcrumbs.Item>
-        ),
-      )}
-    </HeroBreadcrumbs>
+              <span
+                className={cn(
+                  "mr-1 whitespace-nowrap text-[0.8rem]",
+                  item.isCurrent
+                    ? "hover:text-fg-1! data-hovered:text-fg-1!"
+                    : "hover:text-fg-4! data-hovered:text-fg-4!",
+                )}
+              >
+                {item.title}
+              </span>
+            </HeroBreadcrumbs.Item>
+          ),
+        )}
+      </HeroBreadcrumbs>
+    </div>
   );
 }
 
