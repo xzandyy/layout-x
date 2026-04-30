@@ -177,7 +177,7 @@ export function SidebarMain({ className, children }: SidebarMainProps) {
 
 // -- MenuTree -- //
 
-const MenuTree = memo(function MenuTree({
+function MenuTree({
   config,
   pathname,
 }: {
@@ -219,7 +219,7 @@ const MenuTree = memo(function MenuTree({
       ))}
     </>
   );
-});
+}
 
 /** 稳定的空 Set，用于分组尚无展开状态时的占位（避免每次渲染新引用）。 */
 const EMPTY_STRING_SET: ReadonlySet<string> = new Set<string>();
