@@ -1,10 +1,18 @@
 "use client";
 
-import { useCallback, useMemo, memo, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useMemo,
+  memo,
+  useState,
+  createContext,
+  useContext,
+  type CSSProperties,
+} from "react";
 import type { Key } from "react-aria-components";
 import { Heading } from "react-aria-components";
 import { usePathname } from "next/navigation";
-import { Sidebar as HeroSidebar } from "@heroui-pro/react";
+import { Sidebar as HeroSidebar, useSidebar } from "@heroui-pro/react";
 import { cn } from "@/lib/utils";
 import { type LayoutChild, renderLayoutChild, useLayout } from "./context";
 import type {
@@ -29,6 +37,12 @@ export {
 } from "./utils";
 
 // -- Sidebar -- //
+
+/**
+ * 区分侧栏子节点渲染位置：`HeroSidebar` 桌面壳 vs `HeroSidebar.Mobile` Sheet，
+ * 用于移动端避免两份 MenuTree 同时挂载。
+ */
+const SidebarIsMobileContext = createContext(false);
 
 export type SidebarProps = {
   className?: string;
@@ -57,7 +71,9 @@ export function Sidebar({ className, children }: SidebarProps) {
         )}
         style={sidebarVars}
       >
-        {resolvedChildren}
+        <SidebarIsMobileContext.Provider value={false}>
+          {resolvedChildren}
+        </SidebarIsMobileContext.Provider>
       </HeroSidebar>
       <HeroSidebar.Mobile>
         <Heading slot="title" className="sr-only">
@@ -67,11 +83,15 @@ export function Sidebar({ className, children }: SidebarProps) {
           <div className="flex h-svh max-h-svh min-h-0 w-full flex-row overflow-hidden bg-canvas">
             {mobileRailSlot}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-canvas pr-2">
-              {resolvedChildren}
+              <SidebarIsMobileContext.Provider value={true}>
+                {resolvedChildren}
+              </SidebarIsMobileContext.Provider>
             </div>
           </div>
         ) : (
-          resolvedChildren
+          <SidebarIsMobileContext.Provider value={true}>
+            {resolvedChildren}
+          </SidebarIsMobileContext.Provider>
         )}
       </HeroSidebar.Mobile>
     </>
@@ -137,9 +157,19 @@ export function SidebarMain({ className, children }: SidebarMainProps) {
   const pathname = usePathname();
   const ctx = useLayout();
   const sidebar = ctx.rootState.activeRailMenu?.sidebar;
+  const insideMobileSheet = useContext(SidebarIsMobileContext);
+  const { isMobile, isMobileOpen } = useSidebar();
+
+  const showMenuTree = Boolean(
+    sidebar &&
+      (!isMobile || (insideMobileSheet && isMobileOpen)),
+  );
+
   return (
     <HeroSidebar.Content className={cn("p-0", className)}>
-      {sidebar && <MenuTree config={sidebar} pathname={pathname} />}
+      {showMenuTree && sidebar ? (
+        <MenuTree config={sidebar} pathname={pathname} />
+      ) : null}
       {renderLayoutChild(children, ctx)}
     </HeroSidebar.Content>
   );
