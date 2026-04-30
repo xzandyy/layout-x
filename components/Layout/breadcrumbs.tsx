@@ -2,7 +2,7 @@
 
 import { Breadcrumbs as HeroBreadcrumbs } from "@heroui/react";
 import { usePathname } from "next/navigation";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import type { Paths } from "./types";
 import { cn } from "@/lib/utils";
@@ -12,11 +12,19 @@ export type BreadcrumbsProps = {
   className?: string;
 };
 
-export function Breadcrumbs({ paths, className }: BreadcrumbsProps) {
+export const Breadcrumbs = memo(function Breadcrumbs({
+  paths,
+  className,
+}: BreadcrumbsProps) {
   const pathname = usePathname() || "/";
   const items = useMemo(
     () => buildBreadcrumbItems(pathname, paths),
     [pathname, paths],
+  );
+
+  const BREADCRUMB_SEPARATOR = useMemo(
+    () => <span className="text-fg-4! shrink-0">/</span>,
+    [],
   );
 
   if (items.length === 0) return null;
@@ -33,7 +41,7 @@ export function Breadcrumbs({ paths, className }: BreadcrumbsProps) {
         className={cn(
           "breadcrumbs flex min-w-max flex-nowrap items-center whitespace-nowrap",
         )}
-        separator={<span className="text-fg-4! shrink-0">/</span>}
+        separator={BREADCRUMB_SEPARATOR}
       >
         {items.map((item, i) =>
           item.href ? (
@@ -72,7 +80,7 @@ export function Breadcrumbs({ paths, className }: BreadcrumbsProps) {
       </HeroBreadcrumbs>
     </div>
   );
-}
+});
 
 // ---------------------------------------------------------------------------
 // 以下为面包屑数据构建辅助函数
@@ -175,10 +183,7 @@ function buildSteps(pathname: string, root: Paths): Step[] | null {
 /**
  * 将匹配步骤展开为带标题、链接、是否当前项的面包屑列表；`workspace-paths.json` 中标题为空的段会略去，并保证最后一项为「当前」。
  */
-function buildBreadcrumbItems(
-  pathname: string,
-  root: Paths,
-): BreadcrumbItem[] {
+function buildBreadcrumbItems(pathname: string, root: Paths): BreadcrumbItem[] {
   const steps = buildSteps(pathname, root);
   if (steps == null || steps.length === 0) return [];
   const parts = segs(pathname);
